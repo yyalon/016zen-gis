@@ -1,0 +1,262 @@
+<template>
+  <box1>
+    <span slot="title">2022主要污染物浓度趋势图 </span>
+    <div class="filters" style="text-align:right;padding:0;">
+      <el-select
+        @change="handleChange"
+        v-model="type"
+        placeholder="请选择监测指标"
+        size="mini"
+      >
+        <el-option
+          v-for="(type, key) in types"
+          :key="key"
+          :label="type"
+          :value="key"
+        />
+      </el-select>
+      <Echart
+        :options="options"
+        style="text-align:center;"
+        height="120px"
+        width="340px"
+      />
+    </div>
+  </box1>
+</template>
+
+<script>
+import Box1 from '@/views/components/box1'
+import Echart from '@/common/echart'
+
+const types = {
+  TP: 'T-P(mg/L)',
+  TN: 'T-N(mg/L)',
+  Cu: 'Cu(mg/L)',
+  Zn: 'Zn(mg/L)',
+  Pb: 'Pb(mg/L)',
+  Cd: 'Cd(mg/L)',
+  BOD5: 'BOD5(mg/L)',
+  TAs: 'T-As(mg/L)',
+  THg: 'T-Hg(mg/L)',
+  Cr6p: 'Cr6+(mg/L)',
+  Fm: 'F-(mg/L)',
+  CNm: 'CN-(mg/L)',
+  phenol: '挥发酚(mg/L)',
+  oils: '石油类(mg/L)',
+  LAS: 'LAS(mg/L)',
+  S2m: 'S2-(mg/L)',
+  Chla: 'Chla(mg/L)',
+  NO3m: 'NO3-(mg/L)',
+  NO2m: 'NO2-(mg/L)',
+  do: '溶解氧(mg/L)',
+  ph: 'pH值',
+  CODMn: 'COD Mn(mg/L)',
+  CODCr: 'COD Cr(mg/L)',
+  NH3mN: 'NH₃-N(mg/L)'
+}
+export default {
+  name: 'ChartWaterQualityRealtime',
+  components: { Box1, Echart },
+  props: {},
+  data() {
+    return {
+      type: 'TN',
+      types,
+      options: {
+        grid: {
+          left: '10px',
+          right: '10px',
+          bottom: '10px',
+          top: '10px',
+          containLabel: true
+        },
+        xAxis: [
+          {
+            type: 'category',
+            boundaryGap: false,
+            data: [],
+            axisLabel: {
+              //坐标轴刻度标签的相关设置。
+              interval: 0, //设置为 1，表示『隔一个标签显示一个标签』
+              margin: 15,
+              color: '#078ceb',
+              fontStyle: 'normal',
+              fontFamily: '微软雅黑',
+              fontSize: 12
+            },
+            axisTick: {
+              //坐标轴刻度相关设置。
+              show: false
+            },
+            axisLine: {
+              //坐标轴轴线相关设置
+              lineStyle: {
+                color: '#fff',
+                opacity: 0.2
+              }
+            },
+            splitLine: {
+              show: false
+            }
+          },
+          {
+            type: 'category',
+            boundaryGap: true,
+            show: false,
+            data: []
+          }
+        ],
+        yAxis: [
+          {
+            type: 'value',
+            splitNumber: 4,
+            axisLabel: {
+              fontStyle: 'normal',
+              fontFamily: '微软雅黑',
+              fontSize: 12
+            },
+            axisLine: {
+              show: false
+            },
+            axisTick: {
+              show: false
+            },
+            splitLine: {
+              show: false
+            }
+          }
+        ],
+        series: [
+          {
+            type: 'line',
+            symbolSize: 6, //空心标记的大小
+            areaStyle: {
+              opacity: 0.8,
+              pieces: [
+                {
+                  gt: 5.5,
+                  lte: 6.5,
+                  color: '#4a0daf'
+                },
+                {
+                  gt: 6.5,
+                  lte: 7.5,
+                  color: '#0566aa'
+                },
+                {
+                  gt: 7.5,
+                  lte: 10,
+                  color: '#dba70a'
+                },
+                {
+                  gt: 10,
+                  lte: 12,
+                  color: '#FF4200'
+                },
+                {
+                  gt: 12,
+                  color: '#CC0033'
+                }
+              ],
+              outOfRange: {
+                color: '#06965e'
+              }
+            },
+            data: [],
+            markLine: {
+              //预警线
+              silent: true,
+              symbol: ['circle', 'none'], //标线两端的标记类型
+              symbolSize: 5,
+              label: {
+                show: false
+              },
+              lineStyle: {
+                color: '#ba252b',
+                opacity: 0.8
+              },
+              data: [
+                {
+                  yAxis: 5.5
+                },
+                {
+                  yAxis: 6.5
+                },
+                {
+                  yAxis: 7.5
+                },
+                {
+                  yAxis: 10
+                },
+                {
+                  yAxis: 12
+                }
+              ]
+            },
+            lineStyle: {
+              width: 2,
+              color: '#19be6b'
+            },
+            itemStyle: {
+              color: '#404a59',
+              borderWidth: 2
+            },
+            label: {
+              show: true,
+              position: 'top',
+              color: '#a8aab0',
+              fontStyle: 'normal',
+              fontFamily: '微软雅黑',
+              fontSize: 12
+            }
+          }
+        ]
+      }
+    }
+  },
+  computed: {},
+  mounted() {
+    this.options.xAxis[0].data = [
+      '1月',
+      '2月',
+      '3月',
+      '4月',
+      '5月',
+      '6月',
+      '7月',
+      '8月',
+      '9月',
+      '10月',
+      '11月',
+      '12月'
+    ]
+    const data = []
+    for (let i = 0; i < 12; i++) {
+      data.push(_.round(_.random(1.1, 6.9), 1))
+    }
+    this.options.series[0].data = data
+  },
+  methods: {
+    handleChange() {
+      const data = []
+      for (let i = 0; i < 12; i++) {
+        data.push(_.round(_.random(1.1, 6.9), 1))
+      }
+      this.options.series[0].data = data
+    }
+  }
+}
+</script>
+
+<style lang="scss" scoped>
+::v-deep .box-content {
+  display: flex;
+  align-content: center;
+  justify-content: center;
+  align-items: center;
+  .filters .el-input__inner {
+    width: 130px;
+  }
+}
+</style>
