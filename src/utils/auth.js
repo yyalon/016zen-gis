@@ -45,6 +45,7 @@ export function removeToken() {
 
 export function getUser() {
   let user = localStorage.getItem(USER_INFO)
+  if (user === 'undefined') user = null
   if (user) {
     user = JSON.parse(user)
   }

@@ -1,30 +1,11 @@
 <template>
   <div class="dashboard-container">
-    <!-- <panel-left :width="400"
-      ><div slot="content"><box1>22222</box1></div>
-    </panel-left> -->
-    <filter-bar></filter-bar>
     <toolbar @toggle-visible="toggleVisible"></toolbar>
-    <graph-meteorology v-if="activeGraph === 'meteorology'"></graph-meteorology>
-    <graph-river v-if="activeGraph === 'river'"></graph-river>
-    <graph-outfall v-if="activeGraph === 'outfall'"></graph-outfall>
-    <graph-water-quality v-if="activeGraph === 'quality'"></graph-water-quality>
-    <graph-biology v-if="activeGraph === 'biology'"></graph-biology>
-    <graph-satellite v-if="activeGraph === 'satellite'"></graph-satellite>
-    <graph-switcher :active-graph.sync="activeGraph"></graph-switcher>
   </div>
 </template>
 
 <script>
 import Toolbar from './components/Toolbar'
-import FilterBar from './components/FilterBar'
-import GraphSwitcher from './components/GraphSwitcher'
-import GraphRiver from './components/GraphRiver'
-import GraphOutfall from './components/GraphOutfall'
-import GraphWaterQuality from './components/GraphWaterQuality'
-import GraphBiology from './components/GraphBiology'
-import GraphSatellite from './components/GraphSatellite'
-import GraphMeteorology from './components/GraphMeteorology'
 let coastlineLayer = null
 let seaFuntionLayer = null
 let seaBorderLayer = null
@@ -37,15 +18,7 @@ export default {
   name: 'GisDashboard',
   mixins: [],
   components: {
-    GraphSatellite,
-    GraphRiver,
-    Toolbar,
-    FilterBar,
-    GraphWaterQuality,
-    GraphOutfall,
-    GraphBiology,
-    GraphMeteorology,
-    GraphSwitcher
+    Toolbar
   },
   watch: {
     activeGraph: {
@@ -234,7 +207,7 @@ export default {
         name: '分类型岸线',
         url: window.config.geoJsonPath + 'seaFunction.json',
         symbol: {
-          callback: function(attr, styleOpt) {
+          callback: function (attr, styleOpt) {
             areas.push(attr)
             areaType[attr['功能区']] = 1
           },

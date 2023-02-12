@@ -1,12 +1,7 @@
 <template>
   <div class="navbar" :class="$store.state.app.mode === 'web' ? 'web' : ''">
     <div class="left-menu">
-      <div class="menu-item title-wrapper">
-        <div class="sys-title" @click="handleToDashboard" />
-      </div>
-      <div class="menu-item">
-        <task-menu v-if="$store.state.app.mode === 'web'" />
-      </div>
+      <div class="menu-item"></div>
     </div>
     <div class="middle-menu" />
     <div class="right-menu">
