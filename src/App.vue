@@ -1,11 +1,3 @@
 <template>
-  <div id="app">
-    <router-view />
-  </div>
+  <vab-app />
 </template>
-
-<script>
-export default {
-  name: 'App'
-}
-</script>

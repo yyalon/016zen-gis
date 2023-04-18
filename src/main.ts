@@ -1,49 +1,33 @@
-import Vue from 'vue'
-
-import 'normalize.css/normalize.css' // A modern alternative to CSS resets
-
-import ElementUI from 'element-ui'
-import 'element-ui/lib/theme-chalk/index.css'
-
-import '@/styles/index.scss' // global css
-import '@/assets/styles/common.scss'
-import '@/assets/styles/chart.scss'
-import '@/assets/styles/app.scss'
-import '@/assets/iconfont/iconfont.css'
-
-import 'mars3d/dist/mars3d.css'
-
+import { createApp } from 'vue'
 import App from './App.vue'
-import store from './store'
-import router from './router'
-import '@/icons' // icon
-import '@/permission' // permission control
-import _ from 'lodash'
+import { setupVab } from '~/library'
+import { setupI18n } from '@/i18n'
+import { setupStore } from '@/store'
+import { setupRouter } from '@/router'
 
-Vue.prototype._ = _
+/**
+ * @description 正式环境默认使用mock，正式项目记得注释后再打包
+ */
+import { baseURL, pwa } from './config'
+import { isExternal } from '@/utils/validate'
 
-import 'animate.css'
+const app = createApp(App)
 
-const moment = require('moment')
-require('moment/locale/zh-cn')
+if (process.env.NODE_ENV === 'production' && !isExternal(baseURL)) {
+  const { mockXHR } = require('@/utils/static')
+  mockXHR()
+}
 
-Vue.use(require('vue-moment'), {
-  moment
-})
+/**
+ * @description 生产环境启用组件初始化，编译，渲染和补丁性能跟踪。仅在开发模式和支持 Performance.mark API的浏览器中工作。
+ */
+//if (process.env.NODE_ENV === 'development') app.config.performance = true
 
-import ZhiUI from '@/components/Zhi/index.js'
-Vue.use(ZhiUI)
+if (pwa) require('./registerServiceWorker')
 
-Vue.use(ElementUI)
-
-import * as echarts from 'echarts'
-import 'default-passive-events'
-Vue.prototype.$echarts = echarts
-
-Vue.config.productionTip = false
-new Vue({
-  el: '#app',
-  router,
-  store,
-  render: h => h(App)
-})
+setupVab(app)
+setupI18n(app)
+setupStore(app)
+setupRouter(app)
+  .isReady()
+  .then(() => app.mount('#app'))
