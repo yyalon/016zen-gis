@@ -3,7 +3,9 @@
  */
 module.exports = {
   // 标题，此项修改后需要重启项目！！！ (包括初次加载雪花屏的标题 页面的标题 浏览器的标题)
-  title: 'Zen Gis',
+  title: '陆海气协同防治可视化智慧决策支持平台',
+  // 英文标题
+  titleEn: 'Marine Governance Platform',
   // 标题分隔符
   titleSeparator: ' - ',
   // 标题是否反转
@@ -11,7 +13,9 @@ module.exports = {
   // 如果为true : "title - page"
   titleReverse: false,
   // 简写
-  abbreviation: 'zen',
+  abbreviation: '陆海气协同防治决策平台',
+  // 英文简写
+  abbreviationEn: 'MGP',
   // pro版本copyright可随意修改
   copyright: 'zyzd',
   // 缓存路由的最大数量

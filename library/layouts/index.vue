@@ -1,5 +1,5 @@
 <template>
-  <div class="vue-admin-better-wrapper" :class="{ mobile }">
+  <div class="vue-admin-better-wrapper">
     <component
       :is="'vab-layout-' + theme.layout"
       :collapse="collapse"
@@ -36,21 +36,11 @@
         settingsStore
 
       const mobile = ref(false)
-      let oldLayout = theme.value.layout
+      const oldLayout = theme.value.layout
 
       const resizeBody = () => {
         mobile.value = document.body.getBoundingClientRect().width - 1 < 992
       }
-
-      watch(mobile, (val) => {
-        if (val) {
-          oldLayout = theme.value.layout
-          foldSideBar()
-        } else openSideBar()
-
-        theme.value.layout = val ? 'vertical' : oldLayout
-        toggleDevice(val ? 'mobile' : 'desktop')
-      })
 
       resizeBody()
       updateTheme()
