@@ -80,6 +80,7 @@
     <div class="date">{{ moment(null, 'YYYY-MM-DD') }}</div>
     <div class="weekday">{{ moment(null, 'dddd') }}</div>
     <div class="layout-mask"></div>
+    <ZMap />
   </div>
 </template>
 

@@ -23,6 +23,11 @@
     "template": "plop"
   },
   "dependencies": {
+    "@turf/turf": "^6.5.0",
+    "mars3d": "~3.5.0",
+    "mars3d-cesium": "~1.103.1",
+    "mars3d-echarts": "~3.5.0",
+    "mars3d-heatmap": "~3.5.0",
     "@element-plus/icons-vue": "^2.1.0",
     "@logicflow/core": "^1.2.3",
     "@logicflow/extension": "^1.2.3",
