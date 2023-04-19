@@ -109,20 +109,21 @@ export const useUserStore = defineStore('user', {
      */
     async getUserInfo() {
       const {
-        data: { username, avatar, roles, permissions },
+        data: { username, headImg, roles, permissions },
       } = await getUserInfo()
       /**
        * 检验返回数据是否正常，无对应参数，将使用默认用户名,头像,Roles和Permissions
        * username {String}
-       * avatar {String}
+       * headImg {String}
        * roles {List}
        * ability {List}
        */
+      console.error(username, headImg)
       if (
         (username && !isString(username)) ||
-        (avatar && !isString(avatar)) ||
-        (roles && !isArray(roles)) ||
-        (permissions && !isArray(permissions))
+        (headImg && !isString(headImg))
+        // (roles && !isArray(roles)) ||
+        // (permissions && !isArray(permissions))
       ) {
         const err = 'getUserInfo核心接口异常，请检查返回JSON格式是否正确'
         gp.$baseMessage(err, 'error', 'vab-hey-message-error')
@@ -132,11 +133,11 @@ export const useUserStore = defineStore('user', {
         // 如不使用username用户名,可删除以下代码
         if (username) this.setUsername(username)
         // 如不使用avatar头像,可删除以下代码
-        if (avatar) this.setAvatar(avatar)
-        // 如不使用roles权限控制,可删除以下代码
-        if (roles) aclStore.setRole(roles)
-        // 如不使用permissions权限控制,可删除以下代码
-        if (permissions) aclStore.setPermission(permissions)
+        if (headImg) this.setAvatar(headImg)
+        // // 如不使用roles权限控制,可删除以下代码
+        // if (roles) aclStore.setRole(roles)
+        // // 如不使用permissions权限控制,可删除以下代码
+        // if (permissions) aclStore.setPermission(permissions)
       }
     },
     /**

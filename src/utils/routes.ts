@@ -3,7 +3,7 @@ import { resolve } from 'path'
 import { VabRoute, VabRouteRecord } from '/#/router'
 import { hasPermission } from '@/utils/permission'
 import { isExternal } from '@/utils/validate'
-import { recordRoute } from '@/config'
+import { adminURL } from '@/config'
 
 /**
  * @description all模式渲染后端返回路由,支持包含views路径的所有页面
@@ -142,13 +142,15 @@ export function handleActivePath(route: VabRoute, isTab = false) {
  * @param currentPath 当前页面地址
  */
 export function toLoginRoute(currentPath: string) {
-  if (recordRoute && currentPath !== '/')
-    return {
-      path: '/login',
-      query: { redirect: currentPath },
-      replace: true,
-    }
-  else return { path: '/login', replace: true }
+  // if (recordRoute && currentPath !== '/')
+  //   return {
+  //     path: '/login',
+  //     query: { redirect: currentPath },
+  //     replace: true,
+  //   }
+  // else return { path: '/login', replace: true }
+  console.log(adminURL)
+  window.location.href = `${adminURL}/#${currentPath || '/'}`
 }
 
 /**

@@ -198,12 +198,12 @@
         state.imgNum = 0
         state.imgSuccessNum = 0
         state.imgErrorNum = 0
-        state.headers['Authorization'] = `Bearer ${token}`
+        state.headers['Authorization'] = `${token}`
         state.dialogFormVisible = false
       }
 
       onMounted(() => {
-        state.headers['Authorization'] = `Bearer ${token}`
+        state.headers['Authorization'] = `${token}`
         state.action = props.url
       })
 

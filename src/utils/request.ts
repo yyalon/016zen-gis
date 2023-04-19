@@ -56,7 +56,7 @@ const requestConf: any = (config: any) => {
   // if (token) config.headers[tokenName] = token
 
   // 规范写法 不可随意自定义
-  if (token) config.headers['Authorization'] = `Bearer ${token}`
+  if (token) config.headers['Authorization'] = `${token}`
 
   if (
     config.data &&
@@ -127,6 +127,7 @@ const handleData = async ({ config, data, status, statusText }: any) => {
       // 错误内容：{ code: 1, msg: '非法参数' }
       // 正确内容：{ code: 200, data: {  }, msg: '操作正常' }
       // return data
+      console.log(data)
       return data
     case 401:
       router.push({ path: '/login', replace: true }).then(() => {

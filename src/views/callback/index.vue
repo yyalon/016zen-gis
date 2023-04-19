@@ -10,8 +10,8 @@
     setup() {
       const loading = inject('$baseLoading')
       callback()
-      window.open(' ', '_self')
-      window.close()
+      // window.open(' ', '_self')
+      // window.close()
 
       onUnmounted(() => {
         loading.close()

@@ -84,7 +84,7 @@ module.exports = [
     response(config) {
       const authorization =
         config.headers.authorization || config.headers.Authorization
-      if (!authorization.startsWith('Bearer '))
+      if (!authorization.startsWith(''))
         return {
           code: 401,
           msg: '令牌无效',

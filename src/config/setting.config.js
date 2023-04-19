@@ -23,13 +23,22 @@ module.exports = {
   // 路由模式，是否为hash模式
   isHashRouterMode: true,
   // 不经过token校验的路由，白名单路由建议配置到与login页面同级，如果需要放行带传参的页面，请使用query传参，配置时只配置path即可
-  routesWhiteList: ['/login', '/register', '/callback', '/404', '/403'],
+  routesWhiteList: [
+    '/login',
+    '/register',
+    '/callback',
+    '/404',
+    '/403',
+    '/index',
+  ],
   // 加载时显示文字
   loadingText: '正在加载中...',
   // token名称
   tokenName: 'token',
   // token在localStorage、sessionStorage、cookie存储的key的名称
-  tokenTableName: 'admin-plus-token',
+  tokenTableName: 'mgp-token',
+  // token在localStorage、sessionStorage、cookie存储的key的名称
+  refreshTokenTableName: 'mgp-refresh-token',
   // token存储位置localStorage sessionStorage cookie
   storage: 'localStorage',
   // token失效回退到登录页时是否记录本次的路由（是否记录当前tab页）

@@ -26,8 +26,7 @@ export async function socialLogin(data: any) {
 
 export function getUserInfo() {
   return request({
-    url: '/userInfo',
-    method: 'get',
+    url: '/admin/base/comm/person',
   })
 }
 

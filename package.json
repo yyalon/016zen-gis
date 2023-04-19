@@ -113,6 +113,7 @@
     "vue-global-api": "^0.4.1",
     "vue-unplugins": "^1.0.6",
     "webpack": "^5.79.0",
+    "copy-webpack-plugin": "^6.3.2",
     "webpackbar": "^5.0.2"
   },
   "gitHooks": {
