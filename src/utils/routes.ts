@@ -141,7 +141,7 @@ export function handleActivePath(route: VabRoute, isTab = false) {
  * 获取当前跳转登录页的Route
  * @param currentPath 当前页面地址
  */
-export function toLoginRoute(currentPath: string) {
+export function toAdmin(currentPath: string) {
   // if (recordRoute && currentPath !== '/')
   //   return {
   //     path: '/login',

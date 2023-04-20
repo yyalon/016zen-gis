@@ -1,6 +1,6 @@
 <script lang="ts" setup>
   import { useUserStore } from '@/store/modules/user'
-  import { toLoginRoute } from '@/utils/routes'
+  import { toAdmin } from '@/utils/routes'
   import { translate } from '@/i18n'
   import { VabRoute } from '/#/router'
 
@@ -20,7 +20,7 @@
     switch (command) {
       case 'logout':
         await logout()
-        await router.push(toLoginRoute(route.fullPath))
+        await router.push(toAdmin(route.fullPath))
         break
       case 'personalCenter':
         await router.push('/setting/personalCenter')

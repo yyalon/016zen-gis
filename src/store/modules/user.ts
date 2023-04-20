@@ -9,7 +9,7 @@ import { UserModuleType } from '/#/store'
 import { getUserInfo, login, logout, socialLogin } from '@/api/user'
 import { getToken, removeToken, setToken } from '@/utils/token'
 import { resetRouter } from '@/router'
-import { isArray, isString } from '@/utils/validate'
+import { isString } from '@/utils/validate'
 import { tokenName } from '@/config'
 import { gp } from '@gp'
 
@@ -109,7 +109,7 @@ export const useUserStore = defineStore('user', {
      */
     async getUserInfo() {
       const {
-        data: { username, headImg, roles, permissions },
+        data: { username, headImg },
       } = await getUserInfo()
       /**
        * 检验返回数据是否正常，无对应参数，将使用默认用户名,头像,Roles和Permissions
@@ -118,7 +118,6 @@ export const useUserStore = defineStore('user', {
        * roles {List}
        * ability {List}
        */
-      console.error(username, headImg)
       if (
         (username && !isString(username)) ||
         (headImg && !isString(headImg))
@@ -129,7 +128,7 @@ export const useUserStore = defineStore('user', {
         gp.$baseMessage(err, 'error', 'vab-hey-message-error')
         throw err
       } else {
-        const aclStore = useAclStore()
+        // const aclStore = useAclStore()
         // 如不使用username用户名,可删除以下代码
         if (username) this.setUsername(username)
         // 如不使用avatar头像,可删除以下代码

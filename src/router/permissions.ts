@@ -7,7 +7,7 @@ import { useSettingsStore } from '@/store/modules/settings'
 import VabProgress from 'nprogress'
 import 'nprogress/nprogress.css'
 import getPageTitle from '@/utils/pageTitle'
-import { toLoginRoute } from '@/utils/routes'
+import { toAdmin } from '@/utils/routes'
 import {
   authentication,
   loginInterception,
@@ -26,7 +26,6 @@ export function setupPermissions(router: Router) {
   })
   router.beforeEach(
     async (to: { path: string; query: object }, from: any, next: any) => {
-      console.log(to)
       const query: any = to.query
       if (query.t && query.rt && query.te && query.rte) {
         setToken(query.t)
@@ -38,7 +37,7 @@ export function setupPermissions(router: Router) {
       const {
         getTheme: { showProgressBar },
       } = useSettingsStore()
-      const { routes, setRoutes } = useRoutesStore()
+      const { setRoutes } = useRoutesStore()
       const { token, getUserInfo, setVirtualRoles, resetAll } = useUserStore()
 
       if (showProgressBar) VabProgress.start()
@@ -60,11 +59,10 @@ export function setupPermissions(router: Router) {
         } catch (err) {
           console.error('错误拦截:', err)
           await resetAll()
-          // next(toLoginRoute(to.path))
+          next(toAdmin('/logout'))
         }
       } else {
-        console.error('跳转')
-        // next(toLoginRoute(to.path))
+        next(toAdmin('/logout'))
       }
     }
   )
