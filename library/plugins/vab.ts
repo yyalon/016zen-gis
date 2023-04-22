@@ -3,6 +3,12 @@ import { loadingText, messageDuration } from '@/config'
 import mitt from 'mitt'
 import _ from 'lodash'
 import { globalPropertiesType } from '/#/library'
+import {
+  ElMessageBox,
+  ElLoading,
+  ElMessage,
+  ElNotification,
+} from 'element-plus'
 
 export let gp: globalPropertiesType
 

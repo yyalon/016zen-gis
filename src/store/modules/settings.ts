@@ -57,7 +57,10 @@ const getLocalStorage = (key: string) => {
   return value && isJson(value) ? JSON.parse(value) : false
 }
 
+console.log(getLocalStorage('theme'))
+console.log(defaultTheme)
 const theme = getLocalStorage('theme') || { ...defaultTheme }
+console.log(theme)
 const { collapse = foldSidebar } = getLocalStorage('collapse')
 const { language = i18n } = getLocalStorage('language')
 const { lock = false } = getLocalStorage('lock')
@@ -108,6 +111,7 @@ export const useSettingsStore = defineStore('settings', {
       this.updateTheme()
     },
     updateTheme() {
+      console.log(this.theme)
       const index = this.theme.themeName.indexOf('-')
       const themeName = this.theme.themeName.substring(0, index) || 'blue'
 
