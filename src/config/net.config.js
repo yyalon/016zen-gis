@@ -13,7 +13,7 @@ module.exports = {
 
   // 支持多环境接口地址配置的方法
   // 开发环境去.env.development改，生产环境去.env.production改，测试环境去.env.test改
-  baseURL: `${process.env.VUE_APP_BASE_URL}`,
+  baseURL: `zen-gis`,
   adminURL: `${process.env.VUE_APP_ADMIN_URL}`,
   // 配后端数据的接收方式application/json;charset=UTF-8 或 application/x-www-form-urlencoded;charset=UTF-8
   contentType: 'application/json;charset=UTF-8',

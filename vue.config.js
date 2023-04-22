@@ -70,7 +70,7 @@ module.exports = defineConfig({
     // 4、webpack5版本前端配置代理无法与mock同时使用，如果一定要用前端代理，需注释setupMiddlewares: require('./mock')
     proxy: {
       [baseURL]: {
-        target: `http://localhost:8888`,
+        target: `http://localhost:8848`,
         ws: true,
         changeOrigin: true,
         pathRewrite: {
