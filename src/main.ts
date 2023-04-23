@@ -1,35 +1,33 @@
-import { createApp } from 'vue'
+import './utils/system.copyright'
+import ElementPlus from 'element-plus'
 import App from './App.vue'
-import { setupVab } from '~/library'
-import { setupZhi } from '@/components/Zhi'
-import { setupI18n } from '@/i18n'
-import { setupStore } from '@/store'
-import { setupRouter } from '@/router'
+import pinia from './store'
+import router from './router'
+import useSettingsStore from './store/modules/settings'
+import { setupZhi } from '@/lib/Zhi'
 
-/**
- * @description 正式环境默认使用mock，正式项目记得注释后再打包
- */
-import { baseURL, pwa } from './config'
-import { isExternal } from '@/utils/validate'
+// 自定义指令
+import directive from '@/utils/directive'
+
+// 加载 svg 图标
+import 'virtual:svg-icons-register'
+
+// 全局样式
+import '@/assets/styles/globals.scss'
+
+// 加载 iconify 图标（element plus）
+import { downloadAndInstall } from '@/iconify-ep'
 
 const app = createApp(App)
 
-if (process.env.NODE_ENV === 'production' && !isExternal(baseURL)) {
-  const { mockXHR } = require('@/utils/static')
-  mockXHR()
-}
-
-/**
- * @description 生产环境启用组件初始化，编译，渲染和补丁性能跟踪。仅在开发模式和支持 Performance.mark API的浏览器中工作。
- */
-//if (process.env.NODE_ENV === 'development') app.config.performance = true
-
-if (pwa) require('./registerServiceWorker')
-
-setupVab(app)
 setupZhi(app)
-setupI18n(app)
-setupStore(app)
-setupRouter(app)
-  .isReady()
-  .then(() => app.mount('#app'))
+app.use(ElementPlus)
+app.use(pinia)
+app.use(router)
+directive(app)
+if (useSettingsStore().settings.app.iconifyOfflineUse) {
+  downloadAndInstall()
+}
+setTimeout(() => {
+  app.mount('#app')
+}, 1000)

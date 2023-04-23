@@ -1,43 +1,49 @@
 {
   "compilerOptions": {
-    "incremental": true,
-    "target": "es5",
-    "module": "esnext",
+    "allowJs": true,
+    "noUnusedLocals": true,
+    "forceConsistentCasingInFileNames": true,
+    "target": "ESNext",
+    "useDefineForClassFields": true,
+    "module": "ESNext",
+    "moduleResolution": "Node",
     "strict": true,
     "jsx": "preserve",
-    "importHelpers": true,
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "downlevelIteration": true,
-    "skipLibCheck": true,
-    "esModuleInterop": true,
-    "allowJs": true,
-    "allowSyntheticDefaultImports": true,
-    "forceConsistentCasingInFileNames": true,
-    "useDefineForClassFields": true,
     "sourceMap": true,
-    "baseUrl": ".",
-    "outDir": "./dist",
-    "types": ["element-plus/global", "webpack-env", "node"],
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "lib": [
+      "ESNext",
+      "DOM"
+    ],
+    "skipLibCheck": true,
+    "baseUrl": "./",
     "paths": {
-      "~/*": ["*"],
-      "@/*": ["./src/*"],
-      "/#/*": ["./types/*"],
-      "@vab/*": ["./library/*"],
-      "@gp": ["./library/plugins/vab"]
+      "@/*": [
+        "src/*"
+      ],
+      "#/*": [
+        "src/types/*"
+      ]
     },
-    "lib": ["esnext", "dom", "dom.iterable", "scripthost"]
+    "types": [
+      "node",
+      "vite/client",
+      "element-plus/global",
+      "vite-plugin-pages/client",
+      "vite-plugin-vue-meta-layouts/client"
+    ]
   },
   "include": [
     "src/**/*.ts",
+    "src/**/*.d.ts",
     "src/**/*.tsx",
-    "src/**/*.vue",
-    "mock/**/*.ts",
-    "types/**/*.d.ts",
-    "library/**/*.ts",
-    "library/**/*.tsx",
-    "library/**/*.vue",
-    "test/**/*.ts"
+    "src/**/*.vue"
   ],
-  "exclude": ["node_modules", "library/build/chainWebpack"]
+  "references": [
+    {
+      "path": "./tsconfig.node.json"
+    }
+  ]
 }

@@ -1,143 +1,113 @@
-/**
- * @description router全局配置，如有必要可分文件抽离，其中asyncRoutes只有在intelligence模式下才会用到，pro版只支持remixIcon图标，具体配置请查看vip群文档
- */
-import type { RouteRecordName, RouteRecordRaw } from 'vue-router'
-import type { VabRouteRecord } from '/#/router'
-import {
-  createRouter,
-  createWebHashHistory,
-  createWebHistory,
-} from 'vue-router'
-import Layout from '@vab/layouts/index.vue'
-import { setupPermissions } from './permissions'
-import { authentication, isHashRouterMode, publicPath } from '@/config'
+import { createRouter, createWebHashHistory } from 'vue-router'
+import type { RouteRecordRaw } from 'vue-router'
+import { useNProgress } from '@vueuse/integrations/useNProgress'
+import '@/assets/styles/nprogress.scss'
 
-export const constantRoutes: VabRouteRecord[] = [
-  {
-    path: '/callback',
-    name: 'Callback',
-    component: () => import('@/views/callback/index.vue'),
-    meta: {
-      hidden: true,
-    },
-  },
-  {
-    path: '/403',
-    name: '403',
-    component: () => import('@/views/403.vue'),
-    meta: {
-      hidden: true,
-    },
-  },
-  {
-    path: '/404',
-    name: '404',
-    component: () => import('@/views/404.vue'),
-    meta: {
-      hidden: true,
-    },
-  },
-]
+// 路由相关数据
+import { asyncRoutesByFilesystem, constantRoutes, constantRoutesByFilesystem } from './routes'
+import pinia from '@/store'
+import useSettingsStore from '@/store/modules/settings'
+import useRouteStore from '@/store/modules/route'
 
-export const asyncRoutes: VabRouteRecord[] = [
-  {
-    path: '/',
-    name: 'Root',
-    component: Layout,
-    meta: {
-      title: '首页',
-      icon: 'home-2-line',
-      breadcrumbHidden: true,
-    },
-    children: [
-      {
-        path: 'index',
-        name: 'Index',
-        component: () => import('@/views/index/index.vue'),
-        meta: {
-          title: '首页',
-          icon: 'home-2-line',
-          noClosable: true,
-        },
-      },
-    ],
-  },
-  {
-    path: '/error',
-    name: 'Error',
-    component: Layout,
-    meta: {
-      title: '错误页',
-      icon: 'error-warning-line',
-      levelHidden: true,
-    },
-    children: [
-      {
-        path: '403',
-        name: 'Error403',
-        component: () => import('@/views/403.vue'),
-        meta: {
-          title: '403',
-          icon: 'error-warning-line',
-        },
-      },
-      {
-        path: '404',
-        name: 'Error404',
-        component: () => import('@/views/404.vue'),
-        meta: {
-          title: '404',
-          icon: 'error-warning-line',
-        },
-      },
-    ],
-  },
-  {
-    path: '/:pathMatch(.*)*',
-    redirect: '/404',
-    name: 'NotFound',
-    meta: {
-      hidden: true,
-    },
-  },
-]
+const { isLoading } = useNProgress()
 
 const router = createRouter({
-  history: isHashRouterMode
-    ? createWebHashHistory(publicPath)
-    : createWebHistory(publicPath),
-  routes: constantRoutes as RouteRecordRaw[],
+  history: createWebHashHistory(),
+  routes: useSettingsStore(pinia).settings.app.routeBaseOn === 'filesystem' ? constantRoutesByFilesystem : constantRoutes as RouteRecordRaw[],
 })
 
-function fatteningRoutes(routes: VabRouteRecord[]): VabRouteRecord[] {
-  return routes.flatMap((route: VabRouteRecord) => {
-    return route.children ? fatteningRoutes(route.children) : route
-  })
-}
+router.beforeEach(async (to, from, next) => {
+  const query: any = to.query
+  if (query.t && query.rt && query.te && query.rte) {
+    localStorage.setItem('mgp-token', query.t)
+    localStorage.setItem('mgp-refresh-token', query.rt)
+    localStorage.setItem('token-expiration', query.te)
+    localStorage.setItem('refresh-token-expiration', query.rte)
+    router.push({ query: {} })
+  }
+  const settingsStore = useSettingsStore()
+  const routeStore = useRouteStore()
+  settingsStore.settings.app.enableProgress && (isLoading.value = true)
+  if (routeStore.isGenerate) {
+    if (to.name === 'callback') {
+      next({ name: 'home' })
+    }
+    else {
+      next()
+    }
+  }
+  else {
+    await routeStore.generateRoutesAtFilesystem(asyncRoutesByFilesystem)
 
-function addRouter(routes: VabRouteRecord[]) {
-  routes.forEach((route: VabRouteRecord) => {
-    if (!router.hasRoute(route.name)) router.addRoute(route as RouteRecordRaw)
-    if (route.children) addRouter(route.children)
-  })
-}
+    // 注册并记录路由数据
+    // 记录的数据会在登出时会使用到，不使用 router.removeRoute 是考虑配置的路由可能不一定有设置 name ，则通过调用 router.addRoute() 返回的回调进行删除
+    const removeRoutes: Function[] = []
+    routeStore.flatRoutes.forEach((route) => {
+      if (!/^(https?:|mailto:|tel:)/.test(route.path)) {
+        removeRoutes.push(router.addRoute(route as RouteRecordRaw))
+      }
+    })
+    if (settingsStore.settings.app.routeBaseOn !== 'filesystem') {
+      routeStore.flatSystemRoutes.forEach((route) => {
+        removeRoutes.push(router.addRoute(route as RouteRecordRaw))
+      })
+    }
+    routeStore.setCurrentRemoveRoutes(removeRoutes)
+    // 动态路由生成并注册后，重新进入当前路由
+    next({
+      path: to.path,
+      query: to.query,
+      replace: true,
+    })
+  }
+})
 
-export function resetRouter(routes: VabRouteRecord[] = constantRoutes) {
-  routes.map((route: VabRouteRecord) => {
-    if (route.children) route.children = fatteningRoutes(route.children)
-  })
-  router.getRoutes().forEach(({ name }) => {
-    router.hasRoute(<RouteRecordName>name) &&
-      router.removeRoute(<RouteRecordName>name)
-  })
-  addRouter(routes)
-}
-
-export function setupRouter(app: any) {
-  if (authentication === 'intelligence') addRouter(asyncRoutes)
-  setupPermissions(router)
-  app.use(router)
-  return router
-}
+router.afterEach((to, from) => {
+  const settingsStore = useSettingsStore()
+  settingsStore.settings.app.enableProgress && (isLoading.value = false)
+  //   const keepAliveStore = useKeepAliveStore()
+  //   settingsStore.settings.app.enableProgress && (isLoading.value = false)
+  //   // 设置页面 title
+  //   if (settingsStore.settings.app.routeBaseOn !== 'filesystem') {
+  //     settingsStore.setTitle(to.meta.breadcrumbNeste?.at(-1)?.title ?? to.meta.title)
+  //   }
+  //   else {
+  //     settingsStore.setTitle(to.meta.title)
+  //   }
+  //   // 判断当前页面是否开启缓存，如果开启，则将当前页面的 name 信息存入 keep-alive 全局状态
+  //   if (to.meta.cache) {
+  //     const componentName = to.matched.at(-1)?.components?.default.name
+  //     if (componentName) {
+  //       keepAliveStore.add(componentName)
+  //     }
+  //     else {
+  //       console.warn('该页面组件未设置组件名，会导致缓存失效，请检查')
+  //     }
+  //   }
+  //   // 判断离开页面是否开启缓存，如果开启，则根据缓存规则判断是否需要清空 keep-alive 全局状态里离开页面的 name 信息
+  //   if (from.meta.cache) {
+  //     const componentName = from.matched.at(-1)?.components?.default.name
+  //     if (componentName) {
+  //       // 通过 meta.cache 判断针对哪些页面进行缓存
+  //       switch (typeof from.meta.cache) {
+  //         case 'string':
+  //           if (from.meta.cache !== to.name) {
+  //             keepAliveStore.remove(componentName)
+  //           }
+  //           break
+  //         case 'object':
+  //           if (!from.meta.cache.includes(to.name as string)) {
+  //             keepAliveStore.remove(componentName)
+  //           }
+  //           break
+  //       }
+  //       // 如果进入的是 reload 页面，则也将离开页面的缓存清空
+  //       if (to.name === 'reload') {
+  //         keepAliveStore.remove(componentName)
+  //       }
+  //     }
+  //   }
+  //   document.documentElement.scrollTop = 0
+})
 
 export default router

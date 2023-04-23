@@ -1,185 +1,123 @@
-/**
- * @description 所有全局配置的状态管理，如无必要请勿修改
- */
-import { SettingsModuleType } from '/#/store'
-import { isJson } from '@/utils/validate'
-import {
-  logo as _logo,
-  title as _title,
-  i18n,
-  layout,
-  themeName,
-  background,
-  columnStyle,
-  fixedHeader,
-  foldSidebar,
-  menuWidth,
-  showProgressBar,
-  showTabs,
-  showTabsIcon,
-  showLanguage,
-  showRefresh,
-  showSearch,
-  showTheme,
-  showNotice,
-  showFullScreen,
-  showThemeSetting,
-  showPageTransition,
-  showLock,
-  tabsBarStyle,
-} from '@/config'
+import { defaultsDeep } from 'lodash-es'
+import type { RouteMeta } from 'vue-router'
+import type { RecursiveRequired, Settings } from '#/global'
+import settingsCustom from '@/settings'
+import settingsDefault from '@/settings.default'
 
-const defaultTheme: ThemeType = {
-  layout,
-  themeName,
-  background,
-  columnStyle,
-  fixedHeader,
-  foldSidebar,
-  menuWidth,
-  showProgressBar,
-  showTabs,
-  showTabsIcon,
-  showLanguage,
-  showRefresh,
-  showSearch,
-  showTheme,
-  showNotice,
-  showFullScreen,
-  showThemeSetting,
-  showPageTransition,
-  showLock,
-  tabsBarStyle,
-}
+const useSettingsStore = defineStore(
+  // 唯一ID
+  'settings',
+  () => {
+    const mergeSettings: RecursiveRequired<Settings.all> = defaultsDeep(settingsCustom, settingsDefault)
+    const settings = ref(mergeSettings)
+    watch(() => settings.value.app.colorScheme, (val) => {
+      if (val === '') {
+        val = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+      }
+      switch (val) {
+        case 'dark':
+          document.documentElement.classList.add('dark')
+          break
+        case 'light':
+          document.documentElement.classList.remove('dark')
+          break
+      }
+    }, {
+      immediate: true,
+    })
+    watch(() => settings.value.menu.menuMode, (val) => {
+      document.body.setAttribute('data-menu-mode', val)
+    }, {
+      immediate: true,
+    })
 
-const getLocalStorage = (key: string) => {
-  const value: string | null = localStorage.getItem(key)
-  return value && isJson(value) ? JSON.parse(value) : false
-}
+    // 操作系统
+    const os = ref<'mac' | 'windows' | 'linux' | 'other'>('other')
+    const agent = navigator.userAgent.toLowerCase()
+    switch (true) {
+      case agent.includes('mac os'):
+        os.value = 'mac'
+        break
+      case agent.includes('windows'):
+        os.value = 'windows'
+        break
+      case agent.includes('linux'):
+        os.value = 'linux'
+        break
+    }
 
-console.log(getLocalStorage('theme'))
-console.log(defaultTheme)
-const theme = getLocalStorage('theme') || { ...defaultTheme }
-console.log(theme)
-const { collapse = foldSidebar } = getLocalStorage('collapse')
-const { language = i18n } = getLocalStorage('language')
-const { lock = false } = getLocalStorage('lock')
-const { logo = _logo } = getLocalStorage('logo')
-const { title = _title } = getLocalStorage('title')
+    // 页面标题
+    const title = ref<RouteMeta['title']>()
+    // 设置网页标题
+    function setTitle(_title: RouteMeta['title']) {
+      title.value = _title
+    }
 
-export const useSettingsStore = defineStore('settings', {
-  state: (): SettingsModuleType => ({
-    theme,
-    device: 'desktop',
-    collapse,
-    language,
-    lock,
-    logo,
-    title,
-    echartsGraphic1: ['#3ED572', '#399efd'],
-    echartsGraphic2: ['#399efd', '#8cc8ff'],
-  }),
-  getters: {
-    getTheme: (state) => state.theme,
-    getDevice: (state) => state.device,
-    getCollapse: (state) => state.collapse,
-    getLanguage: (state) => state.language,
-    getLock: (state) => state.lock,
-    getLogo: (state) => state.logo,
-    getTitle: (state) => state.title,
-  },
-  actions: {
-    updateState(obj: any) {
-      Object.getOwnPropertyNames(obj).forEach((key) => {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        this[key] = obj[key]
-        localStorage.setItem(
-          key,
-          typeof obj[key] == 'string'
-            ? `{"${key}":"${obj[key]}"}`
-            : `{"${key}":${obj[key]}}`
-        )
-      })
-    },
-    saveTheme() {
-      localStorage.setItem('theme', JSON.stringify(this.theme))
-    },
-    resetTheme() {
-      this.theme = { ...defaultTheme }
-      localStorage.removeItem('theme')
-      this.updateTheme()
-    },
-    updateTheme() {
-      console.log(this.theme)
-      const index = this.theme.themeName.indexOf('-')
-      const themeName = this.theme.themeName.substring(0, index) || 'blue'
-
-      let variables = require(`@vab/styles/variables/vab-${themeName}-variables.module.scss`)
-      if (variables.default) variables = variables.default
-
-      Object.keys(variables).forEach((key) => {
-        if (key.startsWith('vab-')) {
-          useCssVar(key.replace('vab-', '--el-'), ref(null)).value =
-            variables[key]
+    // 显示模式
+    const mode = ref<'pc' | 'mobile'>('pc')
+    // 设置访问模式
+    function setMode(width: number) {
+      if (settings.value.layout.enableMobileAdaptation) {
+        // 先判断 UA 是否为移动端设备（手机&平板）
+        if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+          mode.value = 'mobile'
         }
-      })
+        else {
+          // 如果为桌面设备，再根据页面宽度判断是否需要切换为移动端展示
+          mode.value = width < 992 ? 'mobile' : 'pc'
+        }
+      }
+      else {
+        mode.value = 'pc'
+      }
+    }
 
-      this.echartsGraphic1 = [
-        variables['vab-color-transition'],
-        variables['vab-color-primary'],
-      ]
+    // 侧边栏是否收起（用于记录 pc 模式下最后的状态）
+    const subMenuCollapseLastStatus = ref(mergeSettings.menu.subMenuCollapse)
+    // 切换侧边栏导航展开/收起
+    function toggleSidebarCollapse() {
+      settings.value.menu.subMenuCollapse = !settings.value.menu.subMenuCollapse
+      if (mode.value === 'pc') {
+        subMenuCollapseLastStatus.value = !subMenuCollapseLastStatus.value
+      }
+    }
 
-      this.echartsGraphic2 = [
-        variables['vab-color-primary-light-5'],
-        variables['vab-color-primary'],
-      ]
+    watch(mode, (val) => {
+      switch (val) {
+        case 'pc':
+          settings.value.menu.subMenuCollapse = subMenuCollapseLastStatus.value
+          break
+        case 'mobile':
+          settings.value.menu.subMenuCollapse = true
+          break
+      }
+      document.body.setAttribute('data-mode', val)
+    }, {
+      immediate: true,
+    })
 
-      const menuBackground =
-        this.theme.themeName.split('-')[1] || this.theme.themeName
-      document.getElementsByTagName(
-        'body'
-      )[0].className = `vab-theme-${menuBackground}`
+    // 设置主题颜色模式
+    function setColorScheme(color: Required<Settings.app>['colorScheme']) {
+      settings.value.app.colorScheme = color
+    }
+    // 更新应用配置
+    function updateSettings(data: Settings.all) {
+      settings.value = defaultsDeep(data, settings.value)
+    }
 
-      if (this.theme.background !== 'none')
-        document
-          .getElementsByTagName('body')[0]
-          .classList.add(this.theme.background)
-
-      nextTick(() => {
-        const el = ref(null)
-        if (this.theme.menuWidth && this.theme.menuWidth.endsWith('px'))
-          useCssVar('--el-left-menu-width', el).value = this.theme.menuWidth
-        else useCssVar('--el-left-menu-width', el).value = '266px'
-      })
-    },
-    toggleCollapse() {
-      this.collapse = !this.collapse
-      localStorage.setItem('collapse', `{"collapse":${this.collapse}}`)
-    },
-    toggleDevice(device: string) {
-      this.updateState({ device })
-    },
-    openSideBar() {
-      this.updateState({ collapse: false })
-    },
-    foldSideBar() {
-      this.updateState({ collapse: true })
-    },
-    changeLanguage(language: string) {
-      this.updateState({ language })
-    },
-    handleLock() {
-      this.updateState({ lock: true })
-    },
-    handleUnLock() {
-      this.updateState({ lock: false })
-    },
-    changeLogo(logo: string) {
-      this.updateState({ logo })
-    },
-    changeTitle(title: string) {
-      this.updateState({ title })
-    },
+    return {
+      settings,
+      os,
+      title,
+      setTitle,
+      mode,
+      setMode,
+      subMenuCollapseLastStatus,
+      toggleSidebarCollapse,
+      setColorScheme,
+      updateSettings,
+    }
   },
-})
+)
+
+export default useSettingsStore

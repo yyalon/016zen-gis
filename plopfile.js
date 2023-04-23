@@ -1,11 +1,6 @@
-const viewGenerator = require('plop-templates/view/prompt')
-const curdGenerator = require('plop-templates/curd/prompt')
-const componentGenerator = require('plop-templates/component/prompt')
-const mockGenerator = require('plop-templates/mock/prompt')
-
-module.exports = (plop) => {
-  plop.setGenerator('view', viewGenerator)
-  plop.setGenerator('curd', curdGenerator)
-  plop.setGenerator('component', componentGenerator)
-  plop.setGenerator('mock&api', mockGenerator)
+module.exports = function (plop) {
+  plop.setWelcomeMessage('请选择需要创建的模式：')
+  plop.setGenerator('page', require('./plop-templates/page/prompt'))
+  plop.setGenerator('component', require('./plop-templates/component/prompt'))
+  plop.setGenerator('store', require('./plop-templates/store/prompt'))
 }
