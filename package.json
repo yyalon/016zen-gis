@@ -7,7 +7,7 @@
     "dev": "vite",
     "build:test": "vue-tsc --noEmit && vite build --mode test",
     "build": "vue-tsc --noEmit && vite build",
-    "serve:test": "http-server ./dist-test -o",
+    "serve:test": "http-server ./dist-test -o ",
     "serve": "http-server ./dist -o",
     "svgo": "svgo -f src/assets/icons",
     "new": "plop",

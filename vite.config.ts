@@ -24,7 +24,7 @@ export default ({ mode, command }) => {
     }
   })
   return defineConfig({
-    base: '/zen-gis/',
+    base: env.VITE_APP_PUBLIC_PATH,
     // 开发服务器选项 https://cn.vitejs.dev/config/#server-options
     server: {
       open: true,

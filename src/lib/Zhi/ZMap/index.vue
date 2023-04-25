@@ -52,7 +52,6 @@ export default {
         }
       })
     }
-
     this.config = (defaultConfig && defaultConfig.map3d) || {}
     this.config = { ...this.config, ...this.mapOptions }
   },
