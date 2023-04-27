@@ -68,7 +68,7 @@ export default {
       const map = new $ZMap.Map(`zmap-container-${this.mapKey}`, mapOptions)
 
       const instance = getCurrentInstance()
-      $zMap = map
+      window.$zMap = map
     },
   },
 }
