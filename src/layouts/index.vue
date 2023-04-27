@@ -16,9 +16,6 @@ export default {
     }
   },
   mounted() {
-    console.error(window.$ZMap)
-    console.error(window.$Cesium)
-    console.error(window.$zMap)
     this.setScale()
     window.addEventListener('resize', () => {
       this.setScale()
