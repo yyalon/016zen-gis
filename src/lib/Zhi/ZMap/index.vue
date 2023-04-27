@@ -1,17 +1,16 @@
 <script>
-import ZMapViewer from './z-map.vue'
+import { getCurrentInstance } from 'vue'
 import defaultConfig from './config/default.json'
 
 export default {
   name: 'ZMap',
   components: {
-    ZMapViewer,
   },
   props: {
     // 地图唯一性标识
     mapKey: {
       type: String,
-      default: '',
+      default: 'zMap',
     },
     mapOptions: {
       type: Object,
@@ -33,6 +32,9 @@ export default {
   watch: {},
   beforeCreate() {},
   created() {
+
+  },
+  mounted() {
     if (
       defaultConfig.tdtKeys
         && defaultConfig.map3d
@@ -53,11 +55,24 @@ export default {
       })
     }
     this.config = (defaultConfig && defaultConfig.map3d) || {}
-    this.config = { ...this.config, ...this.mapOptions }
+    this.config = this.$ZMap.Util.merge(this.config, this.mapOptions)
+    this.initMars3d(this.config)
   },
-  mounted() {},
   unmounted() {},
   methods: {
+    initMars3d(mapOptions) {
+      if (this[`map${this.mapKey}`]) {
+        this[`map${this.mapKey}`].destroy()
+      }
+      // 创建三维地球场景
+      const map = new this.$ZMap.Map(`zmap-container-${this.mapKey}`, mapOptions)
+
+      const instance = getCurrentInstance()
+      instance.appContext.config.globalProperties.$zMap = map
+
+    // 抛出事件
+    // this.$emit('onload', map)
+    },
     onMapload(map) {
       this[`$${this.mapKey || 'zMap'}`].Event.$on('CLICK_ICON', (event) => {
         if (
@@ -117,11 +132,7 @@ export default {
 
 <template>
   <div class="map">
-    <ZMapViewer
-      :map-key="mapKey || 'zMap'"
-      :options="config"
-      @onload="onMapload"
-    />
+    <div :id="`zmap-container-${mapKey}`" class="zmap-container" />
   </div>
 </template>
 
@@ -130,5 +141,10 @@ export default {
     width: 100%;
     height: 100%;
     overflow: hidden;
+
+    .zmap-container {
+      height: 100%;
+      overflow: hidden;
+    }
   }
 </style>

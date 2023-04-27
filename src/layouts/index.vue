@@ -1,42 +1,49 @@
-<script lang="ts" setup name="Layout">
+<script lang="ts"   name="Layout">
 import dayjs from 'dayjs'
-import settingsDefault from '@/settings.default'
+import settings from '@/settings.default'
 
 import { toAdmin } from '@/utils/index'
 import 'dayjs/locale/zh-cn'
 
 const width = 1920
 const height = 1080
-const settings = ref(settingsDefault)
 
-const state = reactive({
-  transform: 'scale(1,1) translate(-50%, -50%)',
-})
-function getScale() {
-  const w = window.innerWidth / width
-  const h = window.innerHeight / height
-  return { x: w, y: h }
-}
-function setScale() {
-  const scale = getScale()
-  state.transform = `scale(${scale.x},${scale.y}) translate(-50%, -50%)`
-}
-function moment(date: any, format: any) {
-  return date
-    ? dayjs(date).locale('zh-cn').format(format)
-    : dayjs().locale('zh-cn').format(format)
-}
-onMounted(() => {
-  setScale()
-  window.addEventListener('resize', () => {
-    setScale()
-  })
-})
-function toLogin() {
-  toAdmin('/logout')
-}
-function toAdminIndex() {
-  toAdmin('')
+export default {
+  data() {
+    return {
+      settings,
+      transform: 'scale(1,1) translate(-50%, -50%)',
+    }
+  },
+  mounted() {
+    this.setScale()
+    window.addEventListener('resize', () => {
+      this.setScale()
+    })
+  },
+  unmounted() {},
+  methods: {
+    getScale() {
+      const w = window.innerWidth / width
+      const h = window.innerHeight / height
+      return { x: w, y: h }
+    },
+    setScale() {
+      const scale = this.getScale()
+      this.transform = `scale(${scale.x},${scale.y}) translate(-50%, -50%)`
+    },
+    toLogin() {
+      toAdmin('/logout')
+    },
+    toAdminIndex() {
+      toAdmin('')
+    },
+    moment(date: any, format: any) {
+      return date
+        ? dayjs(date).locale('zh-cn').format(format)
+        : dayjs().locale('zh-cn').format(format)
+    },
+  },
 }
 </script>
 
@@ -44,7 +51,7 @@ function toAdminIndex() {
   <div
     class="layout"
     :style="{
-      transform: state.transform,
+      transform,
     }"
   >
     <div class="title" @click="toAdminIndex()">
