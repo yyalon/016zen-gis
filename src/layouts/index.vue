@@ -1,4 +1,4 @@
-<script lang="ts"   name="Layout">
+<script lang="ts" name="Layout">
 import dayjs from 'dayjs'
 import settings from '@/settings.default'
 
@@ -16,6 +16,9 @@ export default {
     }
   },
   mounted() {
+    console.error(window.$ZMap)
+    console.error(window.$Cesium)
+    console.error(window.$zMap)
     this.setScale()
     window.addEventListener('resize', () => {
       this.setScale()
