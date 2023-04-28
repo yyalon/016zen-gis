@@ -1,7 +1,7 @@
-<script lang="ts" name="Layout">
+<script lang="ts"  name="Layout">
 import dayjs from 'dayjs'
+import GraphSwitcher from './components/GraphSwitcher.vue'
 import settings from '@/settings.default'
-
 import { toAdmin } from '@/utils/index'
 import 'dayjs/locale/zh-cn'
 
@@ -9,13 +9,26 @@ const width = 1920
 const height = 1080
 
 export default {
+  components: { GraphSwitcher },
   data() {
     return {
+      activeGraph: '',
       settings,
       transform: 'scale(1,1) translate(-50%, -50%)',
     }
   },
+  watch: {
+    activeGraph: {
+      deep: true,
+      handler(n) {
+        // if (n) {
+        //   router.push({ query: { graph: n } })
+        // }
+      },
+    },
+  },
   mounted() {
+    this.activeGraph = 'river'
     this.setScale()
     window.addEventListener('resize', () => {
       this.setScale()
@@ -69,6 +82,7 @@ export default {
     <div class="weekday">
       {{ moment(null, 'dddd') }}
     </div>
+    <GraphSwitcher v-model:active-graph="activeGraph" />
     <div class="layout-mask" />
     <ZMap />
   </div>
