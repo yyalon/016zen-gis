@@ -1,7 +1,8 @@
 import type { App } from 'vue'
 import ZMap from './ZMap/index.vue'
+import ZDrawer from './ZDrawer/index.vue'
 
-const components: any = [ZMap]
+const components: any = [ZMap, ZDrawer]
 
 export function setupZhi(app: App<Element>) {
   const files: any = import.meta.glob('./*/*.ts', { eager: true })
