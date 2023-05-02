@@ -1,3 +1,11 @@
+<script>
+import RightDrawer from './RightDrawer.vue'
+
+export default {
+  components: { RightDrawer },
+}
+</script>
+
 <template>
-  <ZDrawer :drawer-visible="true" direction="rtl" :width="400" />
+  <RightDrawer>GraphPolicy</RightDrawer>
 </template>

@@ -45,9 +45,7 @@ export default {
     v-model="visible" class="z-drawer" :with-header="false" :size="width" :title="title" :modal="false"
     :append-to-body="false" :direction="direction" :show-close="false" :wrapper-closable="false"
   >
-    <template #default>
-      <span>{{ direction }}</span>
-    </template>
+    <slot />
   </el-drawer>
 </template>
 
