@@ -7,6 +7,7 @@ export default {
       default: 'quality',
     },
   },
+  emits: ['update:activeGraph'],
   data() {
     return {
       graphs: [
@@ -23,9 +24,9 @@ export default {
   mounted() { },
   methods: {
     handleClick(key) {
-      // if (key !== this.activeGraph) {
-      //   this.$emit('update:activeGraph', key)
-      // }
+      if (key !== this.activeGraph) {
+        this.$emit('update:activeGraph', key)
+      }
     },
   },
 }

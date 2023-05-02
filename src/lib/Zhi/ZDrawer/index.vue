@@ -26,6 +26,7 @@ export default {
   data() {
     return {
       visible: true,
+      mydirection: 'ltr',
     }
   },
   watch: {
@@ -42,8 +43,22 @@ export default {
 <template>
   <el-drawer
     v-model="visible" class="z-drawer" :with-header="false" :size="width" :title="title" :modal="false"
-    :direction="direction" :show-close="false" :wrapper-closable="false"
+    :append-to-body="false" :direction="direction" :show-close="false" :wrapper-closable="false"
   >
-    <slot name="content" />
+    <template #default>
+      <span>{{ direction }}</span>
+    </template>
   </el-drawer>
 </template>
+
+<style>
+div:has(> .z-drawer) {
+  pointer-events: none;
+}
+
+.z-drawer {
+  pointer-events: all;
+  background-color: unset !important;
+  box-shadow: unset !important;
+}
+</style>

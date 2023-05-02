@@ -1,3 +1,3 @@
 <template>
-  <ZDrawer :drawer-visible="true" :width="400" />
+  <ZDrawer :drawer-visible="true" direction="rtl" :width="400" />
 </template>
