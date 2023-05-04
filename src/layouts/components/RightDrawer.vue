@@ -8,6 +8,6 @@
 .z-drawer {
   bottom: 0 !important;
   top: unset !important;
-  height: calc(100% - 129px) !important;
+  height: calc(100% - 65px) !important;
 }
 </style>
