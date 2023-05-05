@@ -16,6 +16,9 @@ export default {
       activeGraph: '',
       settings,
       transform: 'scale(1,1) translate(-50%, -50%)',
+      transformContent: 'scale(1,1)',
+      transformX: 'scale(1,1)',
+      transformY: 'scale(1,1)',
     }
   },
   watch: {
@@ -45,6 +48,10 @@ export default {
     setScale() {
       const scale = this.getScale()
       this.transform = `scale(${scale.x},${scale.y}) translate(-50%, -50%)`
+      const scaleContent = scale.x < scale.y ? scale.x : scale.y
+      this.transformContent = `scale(${scaleContent},${scaleContent})`
+      this.transformX = `scale(${scale.x},${scale.x})`
+      this.transformY = `scale(${scale.y},${scale.y})`
     },
     toLogin() {
       toAdmin('/logout')
@@ -62,53 +69,67 @@ export default {
 </script>
 
 <template>
-  <div
-    class="layout" :style="{
-      transform,
-    }"
-  >
-    <div class="title" @click="toAdminIndex()">
-      {{ settings.app.abbreviation }}
+  <div class="layout">
+    <div class="layout-background" :style="{ transform }">
+      <div class="layout-mask" />
+      <ZMap />
     </div>
-    <div class="title-en">
-      {{ settings.app.titleEn }}
+    <div class="layout-content">
+      <div class="title" :style="{ transform: transformContent }" @click="toAdminIndex()">
+        {{ settings.app.abbreviation }}
+      </div>
+      <div class="title-en" :style="{ transform: transformContent }">
+        {{ settings.app.titleEn }}
+      </div>
+      <div class="time" :style="{ transform: transformContent }" @click="toLogin()">
+        {{ moment(null, 'HH:mm') }}
+      </div>
+      <div class="date" :style="{ transform: transformContent }">
+        {{ moment(null, 'YYYY-MM-DD') }}
+      </div>
+      <div class="weekday" :style="{ transform: transformContent }">
+        {{ moment(null, 'dddd') }}
+      </div>
+      <GraphSwitcher v-model:active-graph="activeGraph" :style="{ transform: transformContent }" />
+      <GraphPolicy
+        :style="{
+          transform: transformY,
+          transformOrigin: '100% 0px',
+        }"
+      />
     </div>
-    <div class="time" @click="toLogin()">
-      {{ moment(null, 'HH:mm') }}
-    </div>
-    <div class="date">
-      {{ moment(null, 'YYYY-MM-DD') }}
-    </div>
-    <div class="weekday">
-      {{ moment(null, 'dddd') }}
-    </div>
-    <GraphSwitcher v-model:active-graph="activeGraph" />
-    <GraphPolicy />
-    <div class="layout-mask" />
-    <ZMap />
   </div>
 </template>
 
 <style lang="scss" scoped>
 .layout {
   position: fixed;
-  top: 50%;
-  left: 50%;
-  width: 1920px;
-  height: 1080px;
-  overflow: hidden;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   color: white;
-  background-color: black;
-  background-image: url("@/assets/images/bg.png");
-  transform-origin: 0 0;
+  overflow: hidden;
+
+  .layout-background {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 1920px;
+    height: 1080px;
+    overflow: hidden;
+    background-color: black;
+    background-image: url("@/assets/images/bg.png");
+    transform-origin: 0 0;
+  }
 
   .layout-mask {
     position: absolute;
     top: 0;
     left: 0;
-    z-index: 1000;
     width: 100%;
     height: 100%;
+    z-index: 1000;
     pointer-events: none;
     background-image: url("@/assets/images/mask.png");
     background-repeat: no-repeat;
@@ -117,8 +138,10 @@ export default {
 
   .title {
     position: absolute;
-    top: 27px;
-    left: 749px;
+    top: 10px;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
     z-index: 2000;
     width: 424px;
     height: 32px;
@@ -128,15 +151,18 @@ export default {
     text-align: center;
     text-shadow: rgb(11 113 230 / 0%) 1px 1px 1px;
     user-select: none;
+    transform-origin: 50% 50%;
   }
 
   .title-en {
     position: absolute;
-    top: 65px;
-    left: 797px;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    top: 45px;
     z-index: 2000;
     width: 327px;
-    height: 14px;
+    height: 16px;
     clip-path: inset(1px 0);
     font-family: SourceHanSansCN-Regular;
     font-size: 13px;

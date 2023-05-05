@@ -1,5 +1,5 @@
 <template>
-  <ZDrawer :drawer-visible="true" direction="rtl" :width="400">
+  <ZDrawer :drawer-visible="true" direction="rtl" :width="375">
     <slot />
   </ZDrawer>
 </template>
@@ -7,7 +7,11 @@
 <style lang='scss'>
 .z-drawer {
   bottom: 0 !important;
-  top: unset !important;
-  height: calc(100% - 65px) !important;
+  top: 80px !important;
+  height: fit-content !important;
+
+  .el-drawer__body {
+    padding: 0;
+  }
 }
 </style>
