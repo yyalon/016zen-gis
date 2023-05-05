@@ -70,10 +70,9 @@ export default {
 
 <template>
   <div class="layout">
-    <div class="layout-background" :style="{ transform }">
-      <div class="layout-mask" />
-      <ZMap />
-    </div>
+    <div class="layout-background" />
+    <ZMap />
+    <div class="layout-mask" />
     <div class="layout-content">
       <div class="title" :style="{ transform: transformContent }" @click="toAdminIndex()">
         {{ settings.app.abbreviation }}
@@ -113,18 +112,16 @@ export default {
 
   .layout-background {
     position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 1920px;
-    height: 1080px;
-    overflow: hidden;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
     background-color: black;
     background-image: url("@/assets/images/bg.png");
-    transform-origin: 0 0;
   }
 
   .layout-mask {
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 0;
     width: 100%;
