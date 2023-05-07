@@ -13,7 +13,7 @@ export default {
     },
     height: {
       type: Number,
-      default: 270,
+      default: 220,
     },
   },
   data() {

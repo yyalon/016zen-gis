@@ -1,5 +1,16 @@
+<script>
+export default {
+  props: {
+    drawerVisible: {
+      type: Boolean,
+      default: false,
+    },
+  },
+}
+</script>
+
 <template>
-  <ZDrawer :drawer-visible="true" direction="rtl" :width="375">
+  <ZDrawer :drawer-visible="drawerVisible" direction="rtl" :width="375">
     <slot />
   </ZDrawer>
 </template>

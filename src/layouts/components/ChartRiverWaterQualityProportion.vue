@@ -2,13 +2,11 @@
 import ZFrame from './ZFrame.vue'
 
 export default {
-  name: 'ChartBarEutrophiaYears',
+  name: 'ChartRiverWaterQualityProportion',
   components: { ZFrame },
 }
 </script>
 
 <template>
-  <ZFrame title="入海河流断面水质类别面积占比">
-    333
-  </ZFrame>
+  <ZFrame :height="220" title="入海河流断面水质类别面积占比" />
 </template>

@@ -2,13 +2,11 @@
 import ZFrame from './ZFrame.vue'
 
 export default {
-  name: 'ChartBarEutrophia',
+  name: 'ChartSeaWaterQualityProportion',
   components: { ZFrame },
 }
 </script>
 
 <template>
-  <ZFrame title="主要污染物浓度趋势图">
-    222
-  </ZFrame>
+  <ZFrame :height="220" title="东海海域水质类别面积占比" />
 </template>

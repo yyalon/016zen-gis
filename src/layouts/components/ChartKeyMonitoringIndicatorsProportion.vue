@@ -2,13 +2,11 @@
 import ZFrame from './ZFrame.vue'
 
 export default {
-  name: 'ChartBar',
+  name: 'ChartKeyMonitoringIndicatorsProportion',
   components: { ZFrame },
 }
 </script>
 
 <template>
-  <ZFrame title="主要污染物浓度趋势图">
-    111
-  </ZFrame>
+  <ZFrame title="主要监控指标排放比例" />
 </template>

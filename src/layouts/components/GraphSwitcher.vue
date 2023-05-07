@@ -13,7 +13,7 @@ export default {
       graphs: [
         { text: '入海河流', key: 'river' },
         { text: '入海排污口', key: 'outfall' },
-        { text: '海洋环境质量', key: 'quality' },
+        { text: '海洋环境质量', key: 'ocean' },
         { text: '海洋生态状况', key: 'biology' },
         { text: '气象信息', key: 'meteorology' },
         // { text: '遥感专题', key: 'satellite' }

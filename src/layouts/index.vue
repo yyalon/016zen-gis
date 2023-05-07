@@ -1,7 +1,11 @@
 <script lang="ts"  name="Layout">
 import dayjs from 'dayjs'
 import GraphSwitcher from './components/GraphSwitcher.vue'
-import GraphPolicy from './components/GraphPolicy.vue'
+import GraphOutfall from './components/GraphOutfall.vue'
+import GraphRiver from './components/GraphRiver.vue'
+import GraphOcean from './components/GraphOcean.vue'
+import GraphBiology from './components/GraphBiology.vue'
+import GraphMeteorology from './components/GraphMeteorology.vue'
 import settings from '@/settings.default'
 import { toAdmin } from '@/utils/index'
 import 'dayjs/locale/zh-cn'
@@ -10,10 +14,10 @@ const width = 1920
 const height = 1080
 
 export default {
-  components: { GraphSwitcher, GraphPolicy },
+  components: { GraphSwitcher, GraphOutfall, GraphRiver, GraphOcean, GraphBiology, GraphMeteorology },
   data() {
     return {
-      activeGraph: '',
+      activeGraph: 'river',
       settings,
       transform: 'scale(1,1) translate(-50%, -50%)',
       transformContent: 'scale(1,1)',
@@ -90,8 +94,32 @@ export default {
         {{ moment(null, 'dddd') }}
       </div>
       <GraphSwitcher v-model:active-graph="activeGraph" :style="{ transform: transformContent }" />
-      <GraphPolicy
-        :style="{
+      <GraphRiver
+        :visible="activeGraph === 'river'" :style="{
+          transform: transformY,
+          transformOrigin: '100% 0px',
+        }"
+      />
+      <GraphOutfall
+        :visible="activeGraph === 'outfall'" :style="{
+          transform: transformY,
+          transformOrigin: '100% 0px',
+        }"
+      />
+      <GraphOcean
+        :visible="activeGraph === 'ocean'" :style="{
+          transform: transformY,
+          transformOrigin: '100% 0px',
+        }"
+      />
+      <GraphBiology
+        :visible="activeGraph === 'biology'" :style="{
+          transform: transformY,
+          transformOrigin: '100% 0px',
+        }"
+      />
+      <GraphMeteorology
+        :visible="activeGraph === 'meteorology'" :style="{
           transform: transformY,
           transformOrigin: '100% 0px',
         }"
