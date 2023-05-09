@@ -157,7 +157,7 @@ const useMenuStore = defineStore(
           accessedMenus = cloneDeep(res.data)
         }
         menus.value = accessedMenus.filter(item => item.children.length !== 0)
-      }).catch(() => {})
+      }).catch(() => { })
     }
     // 切换主导航
     function setActived(data: number | string) {

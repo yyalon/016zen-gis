@@ -10,6 +10,8 @@ import settings from '@/settings.default'
 import { toAdmin } from '@/utils/index'
 import 'dayjs/locale/zh-cn'
 
+import geoApi from '@/api/modules/layers'
+
 const width = 1920
 const height = 1080
 
@@ -17,6 +19,7 @@ export default {
   components: { GraphSwitcher, GraphOutfall, GraphRiver, GraphOcean, GraphBiology, GraphMeteorology },
   data() {
     return {
+      loading: false,
       activeGraph: 'river',
       settings,
       transform: 'scale(1,1) translate(-50%, -50%)',
@@ -35,7 +38,44 @@ export default {
       },
     },
   },
-  mounted() {
+  async mounted() {
+    // getGeoSerevrLayers().then((res) => {
+    //   console.error(res)
+    // })
+
+    const { data } = await geoApi.getGeoSerevrLayers()
+
+    this.loading = this.$loading({
+      lock: true,
+      text: '正在加载地图数据...',
+      spinner: 'el-icon-loading',
+      background: '#100d17e3',
+    })
+    const layers = data.layers.layer
+    layers.forEach((layer: any) => {
+      const tileLayer = new window.$ZMap.layer.WmsLayer({
+        name: layer.name,
+        type: 'wms',
+        url: 'http://139.9.41.23:8078/geoserver/sea/wms',
+        layers: `sea:${layer.name}`,
+        parameters: {
+          service: 'WMS',
+          format: 'image/png',
+          transparent: true,
+        },
+        maxLength: -1,
+        popup: 'all',
+        opacity: 0.3,
+        show: true,
+      })
+      tileLayer.on('load', () => {
+        setTimeout(() => {
+          tileLayer.show = true
+          this.loading.close()
+        }, 1000)
+      })
+      window.$zMap.addLayer(tileLayer)
+    })
     this.activeGraph = 'river'
     this.setScale()
     window.addEventListener('resize', () => {
@@ -195,11 +235,9 @@ export default {
     text-align: center;
     user-select: none;
     background:
-      linear-gradient(
-        360deg,
+      linear-gradient(360deg,
         rgb(155 155 155) 0%,
-        rgb(255 255 255) 100%
-      );
+        rgb(255 255 255) 100%);
     background-clip: text !important;
   }
 
