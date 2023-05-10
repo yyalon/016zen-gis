@@ -65,7 +65,7 @@ export default {
         },
         maxLength: -1,
         popup: 'all',
-        opacity: 0.3,
+        opacity: 0.2,
         show: true,
       })
       tileLayer.on('load', () => {
