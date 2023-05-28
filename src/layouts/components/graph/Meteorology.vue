@@ -1,5 +1,5 @@
 <script>
-import RightDrawer from './RightDrawer.vue'
+import RightDrawer from '../RightDrawer.vue'
 
 export default {
   components: {

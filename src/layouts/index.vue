@@ -1,11 +1,11 @@
 <script lang="ts"  name="Layout">
 import dayjs from 'dayjs'
 import GraphSwitcher from './components/GraphSwitcher.vue'
-import GraphOutfall from './components/GraphOutfall.vue'
-import GraphRiver from './components/GraphRiver.vue'
-import GraphOcean from './components/GraphOcean.vue'
-import GraphBiology from './components/GraphBiology.vue'
-import GraphMeteorology from './components/GraphMeteorology.vue'
+import GraphOutfall from './components/graph/Outfall.vue'
+import GraphRiver from './components/graph/River.vue'
+import GraphOcean from './components/graph/Ocean.vue'
+import GraphBiology from './components/graph/Biology.vue'
+import GraphMeteorology from './components/graph/Meteorology.vue'
 import settings from '@/settings.default'
 import { toAdmin } from '@/utils/index'
 import 'dayjs/locale/zh-cn'
@@ -19,7 +19,7 @@ export default {
   components: { GraphSwitcher, GraphOutfall, GraphRiver, GraphOcean, GraphBiology, GraphMeteorology },
   data() {
     return {
-      loading: false,
+      loading: null,
       activeGraph: 'river',
       settings,
       transform: 'scale(1,1) translate(-50%, -50%)',
@@ -65,7 +65,6 @@ export default {
         },
         maxLength: -1,
         popup: 'all',
-        opacity: 0.2,
         show: true,
       })
       tileLayer.on('load', () => {
@@ -235,9 +234,11 @@ export default {
     text-align: center;
     user-select: none;
     background:
-      linear-gradient(360deg,
+      linear-gradient(
+        360deg,
         rgb(155 155 155) 0%,
-        rgb(255 255 255) 100%);
+        rgb(255 255 255) 100%
+      );
     background-clip: text !important;
   }
 

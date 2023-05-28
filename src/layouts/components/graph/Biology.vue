@@ -1,9 +1,9 @@
 <script>
-import RightDrawer from './RightDrawer.vue'
-import ChartRiverWaterQualityProportion from './ChartRiverWaterQualityProportion.vue'
-import ChartWaterQualityComplianceStatus from './ChartWaterQualityComplianceStatus.vue'
-import ChartNitrogenComplianceStatus from './ChartNitrogenComplianceStatus.vue'
-import ChartMajorPollutantsConcentrationsTrend from './ChartMajorPollutantsConcentrationsTrend.vue'
+import RightDrawer from '../RightDrawer.vue'
+import ChartRiverWaterQualityProportion from '../chart/RiverWaterQualityProportion.vue'
+import ChartWaterQualityComplianceStatus from '../chart/WaterQualityComplianceStatus.vue'
+import ChartNitrogenComplianceStatus from '../chart/NitrogenComplianceStatus.vue'
+import ChartMajorPollutantsConcentrationsTrend from '../chart/MajorPollutantsConcentrationsTrend.vue'
 
 export default {
   components: {

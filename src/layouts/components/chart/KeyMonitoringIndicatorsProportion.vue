@@ -1,5 +1,5 @@
 <script>
-import ZFrame from './ZFrame.vue'
+import ZFrame from '../ZFrame.vue'
 
 export default {
   name: 'ChartKeyMonitoringIndicatorsProportion',

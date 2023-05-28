@@ -1,7 +1,7 @@
 <script>
-import RightDrawer from './RightDrawer.vue'
-import ChartSeaWaterQualityProportion from './ChartSeaWaterQualityProportion.vue'
-import ChartEutrophicWaterAreaTrend from './ChartEutrophicWaterAreaTrend.vue'
+import ChartSeaWaterQualityProportion from '../chart/SeaWaterQualityProportion.vue'
+import ChartEutrophicWaterAreaTrend from '../chart/EutrophicWaterAreaTrend.vue'
+import RightDrawer from '../RightDrawer.vue'
 
 export default {
   components: {
