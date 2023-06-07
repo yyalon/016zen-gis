@@ -115,7 +115,7 @@ export default {
     <ZMap />
     <div class="layout-mask" />
     <div class="layout-container">
-      <div class="layout-header" :style="{ transform: transformX }">
+      <div class="layout-header">
         <div class="title" @click="toAdminIndex()">
           {{ settings.app.abbreviation }}
         </div>
@@ -133,38 +133,13 @@ export default {
         </div>
       </div>
       <div class="layout-body">
-        <GraphRiver
-          :visible="activeGraph === 'river'" :style="{
-            transform: transformY,
-            transformOrigin: '100% 0px',
-          }"
-        />
-        <GraphOutfall
-          :visible="activeGraph === 'outfall'" :style="{
-            transform: transformY,
-            transformOrigin: '100% 0px',
-          }"
-        />
-        <GraphOcean
-          :visible="activeGraph === 'ocean'" :style="{
-            transform: transformY,
-            transformOrigin: '100% 0px',
-          }"
-        />
-        <GraphBiology
-          :visible="activeGraph === 'biology'" :style="{
-            transform: transformY,
-            transformOrigin: '100% 0px',
-          }"
-        />
-        <GraphMeteorology
-          :visible="activeGraph === 'meteorology'" :style="{
-            transform: transformY,
-            transformOrigin: '100% 0px',
-          }"
-        />
+        <GraphRiver :visible="activeGraph === 'river'" />
+        <GraphOutfall :visible="activeGraph === 'outfall'" />
+        <GraphOcean :visible="activeGraph === 'ocean'" />
+        <GraphBiology :visible="activeGraph === 'biology'" />
+        <GraphMeteorology :visible="activeGraph === 'meteorology'" />
       </div>
-      <GraphSwitcher v-model:active-graph="activeGraph" :style="{ transform: transformContent }" />
+      <GraphSwitcher v-model:active-graph="activeGraph" />
     </div>
   </div>
 </template>
