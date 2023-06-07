@@ -18,7 +18,6 @@ export default {
 
 <template>
   <RightDrawer :drawer-visible="visible">
-    22
     <ChartOutfallsStatus />
     <ChartKeyMonitoringIndicatorsTrend />
     <ChartKeyMonitoringIndicatorsProportion />

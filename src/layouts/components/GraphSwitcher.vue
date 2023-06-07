@@ -45,6 +45,7 @@ export default {
 
 <style lang="scss" scoped>
 .graph-switcher {
+  pointer-events: auto;
   z-index: 1100;
   position: fixed;
   bottom: 30px;

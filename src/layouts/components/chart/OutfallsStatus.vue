@@ -8,7 +8,5 @@ export default {
 </script>
 
 <template>
-  <ZFrame :height="220" title="东海海域入海排口情况">
-    222
-  </ZFrame>
+  <ZFrame :height="220" title="东海海域入海排口情况" />
 </template>
