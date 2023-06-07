@@ -148,7 +148,7 @@ export default {
 .filters {
   padding: 10px;
 
-  ::v-deep .el-select {
+  :deep .el-select {
     margin-right: 10px;
     width: 140px;
 

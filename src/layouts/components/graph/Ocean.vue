@@ -2,7 +2,7 @@
 import ChartSeaWaterQualityProportion from '../chart/SeaWaterQualityProportion.vue'
 import ChartEutrophicWaterAreaTrend from '../chart/EutrophicWaterAreaTrend.vue'
 import LayerSeaWaterQuality from '../layer/SeaWaterQuality.vue'
-import LayerSeaShanghai from '../layer/seaShanghai.vue'
+import LayerSeaShanghai from '../layer/SeaShanghai.vue'
 import RightDrawer from '../RightDrawer.vue'
 
 export default {

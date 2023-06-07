@@ -2,6 +2,7 @@
 let layerSeaShanghai = null
 
 export default {
+  name: 'LayerSeaShanghai',
   props: {
 
   },
@@ -31,9 +32,9 @@ export default {
           background: '#100d17e3',
         })
 
-        const layer = new this.$ZMap.layer.GeoJsonLayer({
+        const layer = new window.$ZMap.layer.GeoJsonLayer({
           name: '上海市海域',
-          url: `${import.meta.env.VITE_APP_STATIC_PATH}/sea_shanghai.json`,
+          url: 'file/json/sea_shanghai.json',
           symbol: {
             styleOptions: {
               fill: true,
