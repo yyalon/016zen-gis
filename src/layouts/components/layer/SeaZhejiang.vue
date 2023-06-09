@@ -2,14 +2,14 @@
 let _layer = null
 
 export default {
-  name: 'LayerSeaShanghai',
+  name: 'LayerSeaZhejiang',
   mounted() {
     this.showLayer()
   },
   unmounted() {
-    // if (_layer) {
-    //   _layer.show = false
-    // }
+    if (_layer) {
+      _layer.show = false
+    }
   },
   methods: {
     showLayer() {
@@ -25,10 +25,9 @@ export default {
         })
 
         _layer = new window.$ZMap.layer.GeoJsonLayer({
-          id: 2000,
-          name: '上海市海域',
-          url: 'file/json/sea_shanghai.json',
-          zIndex: 1000,
+          id: 2002,
+          name: '浙江省海域',
+          url: 'file/json/sea_zhejiang.json',
           symbol: {
             styleOptions: {
               fill: true,

@@ -2,14 +2,14 @@
 let _layer = null
 
 export default {
-  name: 'LayerSeaShanghai',
+  name: 'LayerSeaJiangsu',
   mounted() {
     this.showLayer()
   },
   unmounted() {
-    // if (_layer) {
-    //   _layer.show = false
-    // }
+    if (_layer) {
+      _layer.show = false
+    }
   },
   methods: {
     showLayer() {
@@ -25,10 +25,9 @@ export default {
         })
 
         _layer = new window.$ZMap.layer.GeoJsonLayer({
-          id: 2000,
-          name: '上海市海域',
-          url: 'file/json/sea_shanghai.json',
-          zIndex: 1000,
+          id: 2001,
+          name: '江苏省海域',
+          url: 'file/json/sea_jiangsu.json',
           symbol: {
             styleOptions: {
               fill: true,
@@ -46,7 +45,7 @@ export default {
                 font_size: 20,
                 color: '#ffffff',
 
-                font_family: '楷体',
+                font_family: '微软雅黑',
                 outline: true,
                 outlineColor: '#000000',
                 outlineWidth: 4,
@@ -72,6 +71,7 @@ export default {
             },
           },
         })
+
         _layer.on(window.$ZMap.EventType.load, () => {
           setTimeout(() => {
             _layer.show = true

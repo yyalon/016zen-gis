@@ -1,5 +1,4 @@
 <script>
-import { getCurrentInstance } from 'vue'
 import defaultConfig from './config/default.json'
 
 export default {
@@ -30,15 +29,15 @@ export default {
   },
   computed: {},
   watch: {},
-  beforeCreate() {},
+  beforeCreate() { },
   created() {
 
   },
   mounted() {
     if (
       defaultConfig.tdtKeys
-        && defaultConfig.map3d
-        && defaultConfig.map3d.basemaps
+      && defaultConfig.map3d
+      && defaultConfig.map3d.basemaps
     ) {
       defaultConfig.map3d.basemaps.forEach((map) => {
         if (map.type === 'tdt') {
@@ -46,11 +45,11 @@ export default {
         }
         if (map.type === 'group') {
           map.layers
-              && map.layers.forEach((layer) => {
-                if (layer.type === 'tdt') {
-                  layer.key = defaultConfig.tdtKeys
-                }
-              })
+            && map.layers.forEach((layer) => {
+              if (layer.type === 'tdt') {
+                layer.key = defaultConfig.tdtKeys
+              }
+            })
         }
       })
     }
@@ -58,7 +57,7 @@ export default {
     this.config = $ZMap.Util.merge(this.config, this.mapOptions)
     this.initMars3d(this.config)
   },
-  unmounted() {},
+  unmounted() { },
   methods: {
     initMars3d(mapOptions) {
       if (this[`map${this.mapKey}`]) {
@@ -67,8 +66,8 @@ export default {
       // 创建三维地球场景
       const map = new $ZMap.Map(`zmap-container-${this.mapKey}`, mapOptions)
 
-      const instance = getCurrentInstance()
       window.$zMap = map
+      this.$emit('mapLoaded')
     },
   },
 }
@@ -81,14 +80,14 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-  .map {
-    width: 100%;
+.map {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+
+  .zmap-container {
     height: 100%;
     overflow: hidden;
-
-    .zmap-container {
-      height: 100%;
-      overflow: hidden;
-    }
   }
+}
 </style>

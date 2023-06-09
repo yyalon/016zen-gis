@@ -6,12 +6,13 @@
         "lat": 30.900271,
         "alt": 2500000,
         "heading": 0,
-        "pitch": -70
+        "pitch": -90
       },
-      "scene3DOnly": true,
+      "scene3DOnly": false,
       "shadows": false,
       "removeDblClick": true,
       "sceneMode": 2,
+      "resolutionScale": 1.2,
       "showSun": false,
       "showMoon": false,
       "showSkyBox": false,
@@ -27,8 +28,9 @@
       },
       "cameraController": {
         "zoomFactor": 3.0,
-        "minimumZoomDistance": 1,
-        "maximumZoomDistance": 50000000,
+        "enableReverseZoom": false,
+        "minimumZoomDistance": 1000,
+        "maximumZoomDistance": 4000000,
         "enableRotate": true,
         "enableTranslate": true,
         "enableTilt": true,
@@ -67,16 +69,16 @@
     },
     "terrain": {
       "url": "//data.mars3d.cn/terrain",
-      "show": true
+      "show": false
     },
     "basemaps": [
       {
+        "id": 1000,
         "name": "Bing影像",
         "icon": "https://muyao1987.gitee.io/cdn/mars3d.cn/img/basemaps/tdt_img.png",
         "type": "bing",
         "layer": "Aerial",
-        "key": "Am5SdKm6pNdkP1P5zuUOMZwleCHeA7GD5vuQgZ3xBUbEMBeQ5cQ1WN4B8xqqV1Vt",
-        "show": true
+        "key": "Am5SdKm6pNdkP1P5zuUOMZwleCHeA7GD5vuQgZ3xBUbEMBeQ5cQ1WN4B8xqqV1Vt"
       },
       {
         "name": "Bing影像(含注记)",

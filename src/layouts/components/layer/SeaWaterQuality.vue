@@ -1,6 +1,10 @@
 <script>
 const layers = {}
 
+let shanghai = null
+let jiangsu = null
+let zhejiang = null
+
 const seas = [
   { value: 'all', label: '所有' },
   { value: 'shanghai', label: '上海' },
@@ -47,7 +51,7 @@ export default {
 
   },
   data() {
-    return { seas, legendWQ, legendE, years, seasons, types, year: 2022, season: 'spring', type: 'wq', sea: 'all' }
+    return { seas, legendWQ, legendE, years, seasons, types, year: 2022, season: 'spring', type: 'wq', sea: '' }
   },
   watch: {
     year() {
@@ -59,19 +63,62 @@ export default {
     type() {
       this.showLayer()
     },
+    sea() {
+      if (this.sea === 'all') {
+        window.$zMap.flyHome()
+        this.setOpacity(shanghai, 0.01)
+        this.setOpacity(jiangsu, 0.01)
+        this.setOpacity(zhejiang, 0.01)
+      }
+      else if (this.sea === 'shanghai') {
+        shanghai.flyTo({ height: 200000 })
+        this.setOpacity(shanghai, 0.1)
+        this.setOpacity(jiangsu, 0.8)
+        this.setOpacity(zhejiang, 0.8)
+      }
+      else if (this.sea === 'zhejiang') {
+        zhejiang.flyTo({ height: 1000000 })
+        this.setOpacity(shanghai, 0.8)
+        this.setOpacity(jiangsu, 0.8)
+        this.setOpacity(zhejiang, 0.1)
+      }
+      else if (this.sea === 'jiangsu') {
+        jiangsu.flyTo({ height: 1000000 })
+        this.setOpacity(shanghai, 0.8)
+        this.setOpacity(jiangsu, 0.1)
+        this.setOpacity(zhejiang, 0.8)
+      }
+    },
   },
   mounted() {
+    shanghai = window.$zMap.getLayerById(2000)
+    jiangsu = window.$zMap.getLayerById(2001)
+    zhejiang = window.$zMap.getLayerById(2002)
+    this.sea = 'all'
     this.showLayer()
   },
   unmounted() {
     for (const key in layers) {
       layers[key].show = false
     }
+    this.setOpacity(shanghai, 0.3)
+    this.setOpacity(jiangsu, 0.3)
+    this.setOpacity(zhejiang, 0.3)
   },
   methods: {
+    setOpacity(obj, opacity) {
+      if (obj) {
+        obj.setOptions({
+          symbol: {
+            styleOptions: {
+              opacity,
+            },
+          },
+        })
+      }
+    },
     showLayer() {
       const name = this.type + this.year + this.season
-
       for (const key in layers) {
         layers[key].show = false
       }
@@ -88,6 +135,7 @@ export default {
         const tileLayer = new window.$ZMap.layer.WmsLayer({
           name,
           type: 'wms',
+          zIndex: 2000,
           url: 'http://139.9.41.23:8078/geoserver/sea/wms',
           layers: `sea:${name}`,
           parameters: {
@@ -102,8 +150,9 @@ export default {
         tileLayer.on(window.$ZMap.EventType.load, () => {
           setTimeout(() => {
             tileLayer.show = true
+            tileLayer.toTop()
             loading.close()
-          }, 1000)
+          }, 500)
         })
         window.$zMap.addLayer(tileLayer)
         layers[name] = tileLayer
@@ -154,7 +203,7 @@ export default {
 
     &:hover .el-input__wrapper {
       box-shadow: none;
-      border: 2px solid #64b4ff;
+      border: 1px solid #72b3f0;
     }
 
     .el-input__wrapper {

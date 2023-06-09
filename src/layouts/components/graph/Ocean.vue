@@ -2,7 +2,6 @@
 import ChartSeaWaterQualityProportion from '../chart/SeaWaterQualityProportion.vue'
 import ChartEutrophicWaterAreaTrend from '../chart/EutrophicWaterAreaTrend.vue'
 import LayerSeaWaterQuality from '../layer/SeaWaterQuality.vue'
-import LayerSeaShanghai from '../layer/SeaShanghai.vue'
 import RightDrawer from '../RightDrawer.vue'
 
 export default {
@@ -11,7 +10,6 @@ export default {
     LayerSeaWaterQuality,
     ChartSeaWaterQualityProportion,
     ChartEutrophicWaterAreaTrend,
-    LayerSeaShanghai,
   },
   props: {
     visible: {
@@ -29,6 +27,5 @@ export default {
       <ChartSeaWaterQualityProportion />
       <ChartEutrophicWaterAreaTrend />
     </RightDrawer>
-    <LayerSeaShanghai />
   </div>
 </template>

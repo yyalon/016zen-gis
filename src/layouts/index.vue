@@ -1,5 +1,8 @@
 <script lang="ts"  name="Layout">
 import dayjs from 'dayjs'
+import LayerSeaShanghai from './components/layer/SeaShanghai.vue'
+import LayerSeaJiangsu from './components/layer/SeaJiangsu.vue'
+import LayerSeaZhejiang from './components/layer/SeaZhejiang.vue'
 import GraphSwitcher from './components/GraphSwitcher.vue'
 import GraphOutfall from './components/graph/Outfall.vue'
 import GraphRiver from './components/graph/River.vue'
@@ -14,7 +17,17 @@ const width = 1920
 const height = 1080
 
 export default {
-  components: { GraphSwitcher, GraphOutfall, GraphRiver, GraphOcean, GraphBiology, GraphMeteorology },
+  components: {
+    GraphSwitcher,
+    GraphOutfall,
+    GraphRiver,
+    GraphOcean,
+    GraphBiology,
+    LayerSeaShanghai,
+    LayerSeaJiangsu,
+    LayerSeaZhejiang,
+    GraphMeteorology,
+  },
   data() {
     return {
       loading: null,
@@ -81,6 +94,14 @@ export default {
   },
   unmounted() { },
   methods: {
+    mapLoaded() {
+      const mapLayer = window.$zMap.getLayerById(1000)
+      mapLayer.brightness = 1.2
+      mapLayer.saturation = 1
+      mapLayer.alpha = 1
+      mapLayer.contrast = 1.3
+      mapLayer.gamma = 1.4
+    },
     getScale() {
       const w = window.innerWidth / width
       const h = window.innerHeight / height
@@ -112,7 +133,7 @@ export default {
 <template>
   <div class="layout">
     <div class="layout-background" />
-    <ZMap />
+    <ZMap @map-loaded="mapLoaded" />
     <div class="layout-mask" />
     <div class="layout-container">
       <div class="layout-header">
@@ -140,6 +161,9 @@ export default {
         <GraphMeteorology :visible="activeGraph === 'meteorology'" />
       </div>
       <GraphSwitcher v-model:active-graph="activeGraph" />
+      <LayerSeaShanghai />
+      <LayerSeaZhejiang />
+      <LayerSeaJiangsu />
     </div>
   </div>
 </template>
