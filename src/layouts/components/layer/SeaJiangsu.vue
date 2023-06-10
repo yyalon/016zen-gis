@@ -26,8 +26,10 @@ export default {
 
         _layer = new window.$ZMap.layer.GeoJsonLayer({
           id: 2001,
+          zIndex: 2001,
           name: '江苏省海域',
           url: 'file/json/sea_jiangsu.json',
+          allowDrillPick: true,
           symbol: {
             styleOptions: {
               fill: true,
@@ -40,7 +42,7 @@ export default {
                 opacity: 0.9,
               },
               label: {
-                text: '{名称}',
+                text: '{name}',
                 opacity: 1,
                 font_size: 20,
                 color: '#ffffff',

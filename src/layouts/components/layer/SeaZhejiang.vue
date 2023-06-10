@@ -26,8 +26,10 @@ export default {
 
         _layer = new window.$ZMap.layer.GeoJsonLayer({
           id: 2002,
+          zIndex: 2002,
           name: '浙江省海域',
           url: 'file/json/sea_zhejiang.json',
+          allowDrillPick: true,
           symbol: {
             styleOptions: {
               fill: true,
@@ -40,7 +42,7 @@ export default {
                 opacity: 0.9,
               },
               label: {
-                text: '{名称}',
+                text: '{name}',
                 opacity: 1,
                 font_size: 20,
                 color: '#ffffff',

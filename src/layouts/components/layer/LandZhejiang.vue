@@ -2,14 +2,14 @@
 let _layer = null
 
 export default {
-  name: 'LayerSeaShanghai',
+  name: 'LayerLandZhejiang',
   mounted() {
     this.showLayer()
   },
   unmounted() {
-    // if (_layer) {
-    //   _layer.show = false
-    // }
+    if (_layer) {
+      _layer.show = false
+    }
   },
   methods: {
     showLayer() {
@@ -25,29 +25,35 @@ export default {
         })
 
         _layer = new window.$ZMap.layer.GeoJsonLayer({
-          id: 2000,
-          zIndex: 2000,
-          name: '上海市海域',
-          url: 'file/json/sea_shanghai.json',
+          id: 1102,
+          zIndex: 1101,
+          name: '浙江省陆域',
+          url: 'file/json/land_zhejiang.json',
           allowDrillPick: true,
           symbol: {
             styleOptions: {
               fill: true,
-              color: '#2971fd',
-              opacity: 0.3,
+              color: '#08e129',
+              opacity: 0.05,
               outline: true,
               outlineStyle: {
-                color: '#2971fd',
-                width: 1,
+                color: '#08e129',
+                width: 2,
                 opacity: 0.9,
               },
+              scaleByDistance: true,
+              scaleByDistance_far: 1000000,
+              scaleByDistance_farValue: 0.1,
+              scaleByDistance_near: 1000,
+              scaleByDistance_nearValue: 1,
+
               label: {
                 text: '{name}',
                 opacity: 1,
                 font_size: 20,
                 color: '#ffffff',
 
-                font_family: '楷体',
+                font_family: '微软雅黑',
                 outline: true,
                 outlineColor: '#000000',
                 outlineWidth: 4,
@@ -65,23 +71,25 @@ export default {
                 scaleByDistance_near: 1000,
                 scaleByDistance_nearValue: 1,
 
-                distanceDisplayCondition: false,
-                distanceDisplayCondition_far: 10000,
+                distanceDisplayCondition: true,
+                distanceDisplayCondition_far: 1000000,
                 distanceDisplayCondition_near: 0,
                 visibleDepth: false,
               },
             },
           },
         })
+
         _layer.on(window.$ZMap.EventType.load, () => {
           setTimeout(() => {
             _layer.show = true
+            _layer.toBottom()
             loading.close()
           }, 1000)
         })
         setTimeout(() => {
           window.$zMap.addLayer(_layer)
-        }, 1000)
+        }, 500)
       }
     },
   },

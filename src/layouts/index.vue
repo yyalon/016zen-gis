@@ -3,6 +3,10 @@ import dayjs from 'dayjs'
 import LayerSeaShanghai from './components/layer/SeaShanghai.vue'
 import LayerSeaJiangsu from './components/layer/SeaJiangsu.vue'
 import LayerSeaZhejiang from './components/layer/SeaZhejiang.vue'
+import LayerLandJiangsu from './components/layer/LandJiangsu.vue'
+import LayerLandShanghai from './components/layer/LandShanghai.vue'
+import LayerLandZhejiang from './components/layer/LandZhejiang.vue'
+import LayerAllBorderMask from './components/layer/AllBorderMask.vue'
 import GraphSwitcher from './components/GraphSwitcher.vue'
 import GraphOutfall from './components/graph/Outfall.vue'
 import GraphRiver from './components/graph/River.vue'
@@ -26,6 +30,10 @@ export default {
     LayerSeaShanghai,
     LayerSeaJiangsu,
     LayerSeaZhejiang,
+    LayerLandJiangsu,
+    LayerLandShanghai,
+    LayerLandZhejiang,
+    LayerAllBorderMask,
     GraphMeteorology,
   },
   data() {
@@ -135,6 +143,13 @@ export default {
     <div class="layout-background" />
     <ZMap @map-loaded="mapLoaded" />
     <div class="layout-mask" />
+    <LayerSeaShanghai />
+    <LayerSeaZhejiang />
+    <LayerSeaJiangsu />
+    <LayerLandJiangsu />
+    <LayerLandShanghai />
+    <LayerLandZhejiang />
+    <LayerAllBorderMask />
     <div class="layout-container">
       <div class="layout-header">
         <div class="title" @click="toAdminIndex()">
@@ -161,9 +176,6 @@ export default {
         <GraphMeteorology :visible="activeGraph === 'meteorology'" />
       </div>
       <GraphSwitcher v-model:active-graph="activeGraph" />
-      <LayerSeaShanghai />
-      <LayerSeaZhejiang />
-      <LayerSeaJiangsu />
     </div>
   </div>
 </template>

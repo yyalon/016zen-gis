@@ -135,7 +135,7 @@ export default {
         const tileLayer = new window.$ZMap.layer.WmsLayer({
           name,
           type: 'wms',
-          zIndex: 2000,
+          zIndex: 3000,
           url: 'http://139.9.41.23:8078/geoserver/sea/wms',
           layers: `sea:${name}`,
           parameters: {
