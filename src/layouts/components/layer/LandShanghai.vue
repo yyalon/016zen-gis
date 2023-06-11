@@ -17,13 +17,6 @@ export default {
         _layer.show = true
       }
       else {
-        const loading = this.$loading({
-          lock: true,
-          text: '正在加载地图数据...',
-          spinner: 'el-icon-loading',
-          background: '#100d17e3',
-        })
-
         _layer = new window.$ZMap.layer.GeoJsonLayer({
           id: 1100,
           zIndex: 1100,
@@ -32,52 +25,54 @@ export default {
           allowDrillPick: true,
           symbol: {
             styleOptions: {
-              fill: true,
-              color: '#08e129',
-              opacity: 0.1,
+              fillColor: '#08e129',
+              fillOpacity: 0.2,
               outline: true,
-              outlineStyle: {
-                color: '#08e129',
-                width: 2,
-                opacity: 0.9,
-              },
-              label: {
-                text: '{name}',
-                opacity: 1,
-                font_size: 20,
-                color: '#ffffff',
-
-                font_family: '微软雅黑',
-                outline: true,
-                outlineColor: '#000000',
-                outlineWidth: 4,
-
-                background: false,
-                backgroundColor: '#000000',
-                backgroundOpacity: 0.1,
-
-                font_weight: 'normal',
-                font_style: 'normal',
-
-                scaleByDistance: true,
-                scaleByDistance_far: 2000000,
-                scaleByDistance_farValue: 0.4,
-                scaleByDistance_near: 1000,
-                scaleByDistance_nearValue: 1,
-
-                distanceDisplayCondition: true,
-                distanceDisplayCondition_far: 1000000,
-                distanceDisplayCondition_near: 0,
-                visibleDepth: false,
-              },
+              outlineColor: '#08e129',
+              outlineOpacity: 0.5,
+              outlineWidth: 2,
             },
           },
         })
+        _layer.on(window.$ZMap.EventType.mouseover, (event) => {
+          const graphic = event.layer
+          graphic.setStyle({
+            fillOpacity: 0.3,
+          })
+        })
 
-        _layer.on(window.$ZMap.EventType.load, () => {
+        _layer.on(window.$ZMap.EventType.mouseout, (event) => {
+          const graphic = event.layer
+          graphic.setStyle({
+            fillOpacity: 0.2,
+          })
+        })
+        _layer.on(window.$ZMap.EventType.load, (e) => {
+          const names = []
+          e.graphics.forEach((graphic) => {
+            if (graphic.center && graphic.attr && graphic.attr.name) {
+              if (!names.includes(graphic.attr.name)) {
+                names.push(graphic.attr.name)
+                const label = new window.$ZMap.graphic.Label({
+                  latlng: graphic.center,
+                  style: {
+                    text: graphic.attr.name,
+                    color: '#ffffff',
+                    font_size: 12,
+                    font_family: '楷体',
+                    border: true,
+                    border_width: 1,
+                    border_style: '',
+                    border_color: '#000000',
+                    className: 'label-name',
+                  },
+                })
+                _layer.addGraphic(label)
+              }
+            }
+          })
           setTimeout(() => {
             _layer.show = true
-            loading.close()
           }, 1000)
         })
         setTimeout(() => {

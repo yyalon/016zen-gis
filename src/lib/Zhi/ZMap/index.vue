@@ -55,15 +55,16 @@ export default {
     }
     this.config = (defaultConfig && defaultConfig.map3d) || {}
     this.config = $ZMap.Util.merge(this.config, this.mapOptions)
-    this.initMars3d(this.config)
+    this.initMap(this.config)
   },
   unmounted() { },
   methods: {
-    initMars3d(mapOptions) {
+    initMap(mapOptions) {
       if (this[`map${this.mapKey}`]) {
         this[`map${this.mapKey}`].destroy()
       }
       // 创建三维地球场景
+
       const map = new $ZMap.Map(`zmap-container-${this.mapKey}`, mapOptions)
 
       window.$zMap = map

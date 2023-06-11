@@ -1,15 +1,16 @@
 <script>
 const layers = {}
+let currentlayer = null
 
 let shanghai = null
 let jiangsu = null
 let zhejiang = null
 
 const seas = [
-  { value: 'all', label: '所有' },
-  { value: 'shanghai', label: '上海' },
-  { value: 'jiangsu', label: '江苏' },
-  { value: 'zhejiang', label: '浙江' },
+  { value: 'all', label: '所有海域' },
+  { value: 'shanghai', label: '上海海域' },
+  { value: 'jiangsu', label: '江苏海域' },
+  { value: 'zhejiang', label: '浙江海域' },
 ]
 
 const legendWQ = [
@@ -66,26 +67,23 @@ export default {
     sea() {
       if (this.sea === 'all') {
         window.$zMap.flyHome()
-        this.setOpacity(shanghai, 0.01)
-        this.setOpacity(jiangsu, 0.01)
-        this.setOpacity(zhejiang, 0.01)
+        this.setOpacity(shanghai, 0)
+        this.setOpacity(jiangsu, 0)
+        this.setOpacity(zhejiang, 0)
       }
       else if (this.sea === 'shanghai') {
-        shanghai.flyTo({ height: 200000 })
-        this.setOpacity(shanghai, 0.1)
+        this.setOpacity(shanghai, 0.01)
         this.setOpacity(jiangsu, 0.8)
         this.setOpacity(zhejiang, 0.8)
       }
       else if (this.sea === 'zhejiang') {
-        zhejiang.flyTo({ height: 1000000 })
+        this.setOpacity(zhejiang, 0.01)
         this.setOpacity(shanghai, 0.8)
         this.setOpacity(jiangsu, 0.8)
-        this.setOpacity(zhejiang, 0.1)
       }
       else if (this.sea === 'jiangsu') {
-        jiangsu.flyTo({ height: 1000000 })
+        this.setOpacity(jiangsu, 0.01)
         this.setOpacity(shanghai, 0.8)
-        this.setOpacity(jiangsu, 0.1)
         this.setOpacity(zhejiang, 0.8)
       }
     },
@@ -101,17 +99,18 @@ export default {
     for (const key in layers) {
       layers[key].show = false
     }
-    this.setOpacity(shanghai, 0.3)
-    this.setOpacity(jiangsu, 0.3)
-    this.setOpacity(zhejiang, 0.3)
+    this.setOpacity(shanghai, 0.2)
+    this.setOpacity(jiangsu, 0.2)
+    this.setOpacity(zhejiang, 0.2)
   },
   methods: {
     setOpacity(obj, opacity) {
       if (obj) {
-        obj.setOptions({
+        obj.load({
+          url: obj.options.url,
           symbol: {
             styleOptions: {
-              opacity,
+              fillOpacity: opacity,
             },
           },
         })
@@ -135,27 +134,24 @@ export default {
         const tileLayer = new window.$ZMap.layer.WmsLayer({
           name,
           type: 'wms',
-          zIndex: 3000,
+          zIndex: 300,
           url: 'http://139.9.41.23:8078/geoserver/sea/wms',
           layers: `sea:${name}`,
-          parameters: {
-            tiled: true,
-            VERSION: '1.3.0',
-            format: 'image/png',
-            transparent: true,
-          },
-          popup: 'all',
-          show: true,
+          tiled: true,
+          VERSION: '1.3.0',
+          format: 'image/png',
+          transparent: true,
+          show: false,
         })
         tileLayer.on(window.$ZMap.EventType.load, () => {
           setTimeout(() => {
             tileLayer.show = true
-            tileLayer.toTop()
             loading.close()
           }, 500)
         })
         window.$zMap.addLayer(tileLayer)
         layers[name] = tileLayer
+        currentlayer = tileLayer
       }
     },
   },

@@ -20,7 +20,7 @@ export default {
         _layer.show = true
       }
       else {
-        const loading = this.$loading({
+        let loading = this.$loading({
           lock: true,
           text: '正在加载地图数据...',
           spinner: 'el-icon-loading',
@@ -32,30 +32,38 @@ export default {
           name: '全域边界',
           url: 'file/json/all_border.json',
           mask: true,
+          show: false,
+          interactive: false,
           symbol: {
             styleOptions: {
               fill: true,
-              color: '#444444',
-              opacity: 0.3,
+              fillColor: '#ffffff',
+              fillOpacity: 0.3,
               outline: true,
-              outlineStyle: {
-                color: '#444444',
-                width: 4,
-                opacity: 0.3,
-              },
+              outlineColor: '#ffffff',
+              outlineWidth: 6,
+              outlineOpacity: 0.5,
             },
           },
         })
 
         _layer.on(window.$ZMap.EventType.load, (e) => {
+          loading = this.$loading({
+            lock: true,
+            text: '正在加载地图数据...',
+            spinner: 'el-icon-loading',
+            background: '#100d17e3',
+          })
           setTimeout(() => {
-            _layer.show = true
             if (!buffered) {
               buffered = true
-              const bufferedGeoJSON = featureCollection([buffer(e.geojson, 10, { units: 'kilometers' })])
+              const bufferedGeoJSON = featureCollection([buffer(e.geojson, 20, { units: 'kilometers' })])
               _layer.load({ data: bufferedGeoJSON, mask: true })
             }
-            loading.close()
+            else {
+              _layer.show = true
+              loading.close()
+            }
           }, 1000)
         })
         setTimeout(() => {
