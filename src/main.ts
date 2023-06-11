@@ -1,3 +1,5 @@
+import 'mars3d-cesium/Build/Cesium/Widgets/widgets.css'
+import 'mars3d/dist/mars3d.css'
 import './utils/system.copyright'
 import ElementPlus from 'element-plus'
 import App from './App.vue'

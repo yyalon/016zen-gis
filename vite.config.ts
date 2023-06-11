@@ -2,6 +2,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { defineConfig, loadEnv } from 'vite'
 import dayjs from 'dayjs'
+import { vitePluginMars3d } from 'vite-plugin-mars3d'
 import pkg from './package.json'
 import createVitePlugins from './vite/plugins'
 
@@ -55,7 +56,7 @@ export default ({ mode, command }) => {
         lastBuildTime: dayjs().format('YYYY-MM-DD HH:mm:ss'),
       }),
     },
-    plugins: [...createVitePlugins(env, command === 'build')],
+    plugins: [...createVitePlugins(env, command === 'build'), vitePluginMars3d()],
     resolve: {
       alias: {
         '@': path.resolve(__dirname, 'src'),
