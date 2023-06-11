@@ -6,7 +6,8 @@ import LayerSeaZhejiang from './components/layer/SeaZhejiang.vue'
 import LayerLandJiangsu from './components/layer/LandJiangsu.vue'
 import LayerLandShanghai from './components/layer/LandShanghai.vue'
 import LayerLandZhejiang from './components/layer/LandZhejiang.vue'
-import LayerAllBorderMask from './components/layer/AllBorderMask.vue'
+
+// import LayerAllBorderMask from './components/layer/AllBorderMask.vue'
 import GraphSwitcher from './components/GraphSwitcher.vue'
 import GraphOutfall from './components/graph/Outfall.vue'
 import GraphRiver from './components/graph/River.vue'
@@ -33,7 +34,7 @@ export default {
     LayerLandJiangsu,
     LayerLandShanghai,
     LayerLandZhejiang,
-    LayerAllBorderMask,
+    // LayerAllBorderMask,
     GraphMeteorology,
   },
   data() {
@@ -103,12 +104,9 @@ export default {
   unmounted() { },
   methods: {
     mapLoaded() {
-      const mapLayer = window.$zMap.getLayerById(1000)
-      mapLayer.brightness = 1.2
-      mapLayer.saturation = 1
-      mapLayer.alpha = 1
-      mapLayer.contrast = 1.3
-      mapLayer.gamma = 1.4
+      window.$zMap.on(window.$ZMap.EventType.zoom, () => {
+        const zoom = window.$zMap.getZoom()
+      })
     },
     getScale() {
       const w = window.innerWidth / width
@@ -149,7 +147,7 @@ export default {
     <LayerLandJiangsu />
     <LayerLandShanghai />
     <LayerLandZhejiang />
-    <LayerAllBorderMask />
+    <!-- <LayerAllBorderMask /> -->
     <div class="layout-container">
       <div class="layout-header">
         <div class="title" @click="toAdminIndex()">
@@ -179,6 +177,12 @@ export default {
     </div>
   </div>
 </template>
+
+<style>
+.label-name {
+  text-shadow: -1px 0 1px rgb(0 0 0 / 60%), 1px 0 1px rgb(0 0 0 / 60%), 0 1px 1px rgb(0 0 0 / 60%), 0 -1px 1px rgb(0 0 0 / 60%);
+}
+</style>
 
 <style lang="scss" scoped>
 .layout {

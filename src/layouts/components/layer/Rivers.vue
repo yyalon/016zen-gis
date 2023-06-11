@@ -1,9 +1,13 @@
 <script>
+import api from '@/api/modules/data'
+
 const layers = {}
 
+const nameLayers = {}
+
 const riverLevels = [
-  { value: 1, label: '一级河流' },
-  { value: 23, label: '二级,三级河流' },
+  { value: '1p', label: '一级河流' },
+  { value: '23p', label: '二级,三级河流' },
   { value: 4, label: '四级河流' },
   { value: 5, label: '五级河流' },
 ]
@@ -17,12 +21,16 @@ export default {
       this.showLayer()
     },
   },
-  mounted() {
+  async mounted() {
+    const result = await api.get135RiverSections()
     this.showLayer()
   },
   unmounted() {
     for (const key in layers) {
       layers[key].show = false
+    }
+    for (const key in nameLayers) {
+      nameLayers[key].show = false
     }
   },
   methods: {
@@ -30,9 +38,11 @@ export default {
       const name = `river${this.riverLevel}`
       for (const key in layers) {
         layers[key].show = false
+        nameLayers[key].show = false
       }
       if (layers[name]) {
         layers[name].show = true
+        nameLayers[name].show = true
       }
       else {
         const loading = this.$loading({
@@ -41,73 +51,68 @@ export default {
           spinner: 'el-icon-loading',
           background: '#100d17e3',
         })
-        const tileLayer = new window.$ZMap.layer.GeoJsonLayer({
-          zIndex: 4001,
-          name: '河流',
-          url: `file/json/${name}.json`,
-          tooltip(event) {
-            const attr = event.graphic?.attr
-            if (attr.NAME) {
-              return attr.NAME
-            }
+
+        const nameLayer = new window.$ZMap.layer.GraphicLayer({
+          name: `riverName${this.riverLevel}`,
+          attr: {
+            minZoom: 9,
           },
+        })
+        const tileLayer = new window.$ZMap.layer.GeoJsonLayer({
+          zIndex: 1,
+          name: 'layerRiver',
+          url: `file/json/${name}.json`,
           symbol: {
             styleOptions: {
-              width: 2,
-              arcType: window.$Cesium.ArcType.GEODESIC,
-              fill: true,
-              color: '#0000ff',
-              opacity: 0.4,
-              distanceDisplayCondition: true,
-              distanceDisplayCondition_far: 1000000,
-              distanceDisplayCondition_near: 0,
-              highlight: {
-                type: window.$ZMap.EventType.mouseOver,
-                width: 6,
-                opacity: 0.8,
-              },
-              label: {
-                text: '{NAME}',
-                opacity: 1,
-                font_size: 12,
-                color: '#000',
-
-                font_family: '微软雅黑',
-                outline: false,
-                outlineColor: '#3388cc',
-                outlineWidth: 2,
-
-                background: true,
-                backgroundColor: '#fff',
-                backgroundOpacity: 0.8,
-
-                font_weight: 'normal',
-                font_style: 'normal',
-
-                // scaleByDistance: true,
-                // scaleByDistance_far: 2000000,
-                // scaleByDistance_farValue: 0,
-                // scaleByDistance_near: 300000,
-                // scaleByDistance_nearValue: 1,
-
-                distanceDisplayCondition: true,
-                distanceDisplayCondition_far: 500000,
-                distanceDisplayCondition_near: 0,
-                visibleDepth: false,
-              },
+              width: 3,
+              color: '#0669ff',
+              fillColor: '#0669ff',
+              fillOpacity: 0.7,
+              outlineColor: '#0669ff',
+              opacity: 1,
+              outlineWidth: 2,
             },
           },
         })
-        tileLayer.on(window.$ZMap.EventType.load, () => {
+        tileLayer.on(window.$ZMap.EventType.load, (e) => {
           setTimeout(() => {
+            const names = []
+            e.graphics.forEach((graphic) => {
+              if (graphic.center && graphic.attr && graphic.attr.NAME) {
+                if (!names.includes(graphic.attr.NAME)) {
+                  names.push(graphic.attr.NAME)
+                  const label = new window.$ZMap.graphic.Label({
+                    latlng: graphic.center,
+                    attr: {
+                      minZoom: 9,
+                    },
+                    style: {
+                      text: graphic.attr.NAME,
+                      color: '#414141',
+                      font_size: 10,
+                      font_family: '楷体',
+                      border: true,
+                      border_width: 1,
+                      border_style: '',
+                      border_color: '#000000',
+                      className: 'label-river-name',
+                    },
+                  })
+                  nameLayer.addGraphic(label)
+                }
+              }
+            })
             tileLayer.show = true
+            nameLayer.show = true
             loading.close()
           }, 500)
         })
         setTimeout(() => {
           window.$zMap.addLayer(tileLayer)
-        }, 1000)
+          window.$zMap.addLayer(nameLayer)
+        }, 500)
         layers[name] = tileLayer
+        nameLayers[name] = nameLayer
       }
     },
   },
@@ -123,6 +128,14 @@ export default {
     </div>
   </div>
 </template>
+
+<style>
+.label-river-name {
+  background: #ffc500cf;
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+</style>
 
 <style lang="scss" scoped>
 .filters {
