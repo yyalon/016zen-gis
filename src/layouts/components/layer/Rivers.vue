@@ -1,9 +1,7 @@
 <script>
-import api from '@/api/modules/data'
+const _layers = {}
 
-const layers = {}
-
-const nameLayers = {}
+const _nameLayers = {}
 
 const riverLevels = [
   { value: '1p', label: '一级河流' },
@@ -22,27 +20,26 @@ export default {
     },
   },
   async mounted() {
-    const result = await api.get135RiverSections()
     this.showLayer()
   },
   unmounted() {
-    for (const key in layers) {
-      layers[key].show = false
+    for (const key in _layers) {
+      _layers[key].show = false
     }
-    for (const key in nameLayers) {
-      nameLayers[key].show = false
+    for (const key in _nameLayers) {
+      _nameLayers[key].show = false
     }
   },
   methods: {
     showLayer() {
       const name = `river${this.riverLevel}`
-      for (const key in layers) {
-        layers[key].show = false
-        nameLayers[key].show = false
+      for (const key in _layers) {
+        _layers[key].show = false
+        _nameLayers[key].show = false
       }
-      if (layers[name]) {
-        layers[name].show = true
-        nameLayers[name].show = true
+      if (_layers[name]) {
+        _layers[name].show = true
+        _nameLayers[name].show = true
       }
       else {
         const loading = this.$loading({
@@ -109,8 +106,8 @@ export default {
             loading.close()
           }, 500)
         })
-        layers[name] = tileLayer
-        nameLayers[name] = nameLayer
+        _layers[name] = tileLayer
+        _nameLayers[name] = nameLayer
       }
     },
   },

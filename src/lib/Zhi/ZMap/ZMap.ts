@@ -1,3 +1,4 @@
+import { createApp, h } from 'vue'
 import type { App } from 'vue'
 
 import 'leaflet/dist/leaflet.css'
@@ -12,8 +13,31 @@ declare global {
   }
 }
 
+function loadComponentContent(target: any, myComponent: any, props: any) {
+  props = { ...props, ...{ ref: 'myComponentRef' } }
+  const app = createApp({
+    render() {
+      return h(myComponent, props)
+    },
+  })
+
+  const div = document.createElement('div')
+  const mount = app.mount(div)
+  target.myComponentRef = mount.$refs.myComponentRef
+  target.app = app
+  return mount.$el
+}
+
+function unloadComponentContent(target: any) {
+  target.app.unmount(target.myComponentRef)
+  delete target.app
+  delete target.myComponentRef
+}
+
 export default {
   install(app: App<Element>) {
     window.$ZMap = mars2d
+    window.$ZMap.loadComponentContent = loadComponentContent
+    window.$ZMap.unloadComponentContent = unloadComponentContent
   },
 }

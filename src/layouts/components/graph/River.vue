@@ -5,9 +5,11 @@ import ChartWaterQualityComplianceStatus from '../chart/WaterQualityComplianceSt
 import ChartNitrogenComplianceStatus from '../chart/NitrogenComplianceStatus.vue'
 import ChartMajorPollutantsConcentrationsTrend from '../chart/MajorPollutantsConcentrationsTrend.vue'
 import LayerRivers from '../layer/Rivers.vue'
+import LayerRiverSections from '../layer/RiverSections.vue'
 
 export default {
   components: {
+    LayerRiverSections,
     LayerRivers,
     RightDrawer,
     ChartRiverWaterQualityProportion,
@@ -27,6 +29,7 @@ export default {
 <template>
   <div>
     <LayerRivers v-if="visible" />
+    <LayerRiverSections v-if="visible" />
     <RightDrawer :drawer-visible="visible">
       <ChartRiverWaterQualityProportion />
       <ChartWaterQualityComplianceStatus />
