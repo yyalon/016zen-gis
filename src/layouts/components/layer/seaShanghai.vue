@@ -34,6 +34,7 @@ export default {
           },
         })
 
+        window.$zMap.addLayer(_layer)
         _layer.on(window.$ZMap.EventType.load, (e) => {
           e.graphics.forEach((graphic) => {
             if (graphic.center && graphic.attr && graphic.attr.name) {
@@ -58,8 +59,6 @@ export default {
             _layer.show = true
           }, 1000)
         })
-
-        window.$zMap.addLayer(_layer)
       }
     },
   },

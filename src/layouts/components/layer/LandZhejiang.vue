@@ -34,6 +34,7 @@ export default {
             },
           },
         })
+        window.$zMap.addLayer(_layer)
         _layer.on(window.$ZMap.EventType.mouseover, (event) => {
           const graphic = event.layer
           graphic.setStyle({
@@ -75,9 +76,6 @@ export default {
             _layer.show = true
           }, 1000)
         })
-        setTimeout(() => {
-          window.$zMap.addLayer(_layer)
-        }, 500)
       }
     },
   },

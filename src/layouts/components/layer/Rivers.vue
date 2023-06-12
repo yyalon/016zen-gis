@@ -74,6 +74,8 @@ export default {
             },
           },
         })
+        window.$zMap.addLayer(tileLayer)
+        window.$zMap.addLayer(nameLayer)
         tileLayer.on(window.$ZMap.EventType.load, (e) => {
           setTimeout(() => {
             const names = []
@@ -107,10 +109,6 @@ export default {
             loading.close()
           }, 500)
         })
-        setTimeout(() => {
-          window.$zMap.addLayer(tileLayer)
-          window.$zMap.addLayer(nameLayer)
-        }, 500)
         layers[name] = tileLayer
         nameLayers[name] = nameLayer
       }
