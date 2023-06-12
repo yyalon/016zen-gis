@@ -2,19 +2,18 @@ import axios from 'axios'
 
 // import qs from 'qs'
 import { ElMessage } from 'element-plus'
-import router from '@/router/index'
 import useUserStore from '@/store/modules/user'
 
-function toLogin() {
-  useUserStore().logout().then(() => {
-    router.push({
-      path: '/login',
-      query: {
-        redirect: router.currentRoute.value.path !== '/login' ? router.currentRoute.value.fullPath : undefined,
-      },
-    })
-  })
-}
+// function toLogin() {
+//   useUserStore().logout().then(() => {
+//     router.push({
+//       path: '/login',
+//       query: {
+//         redirect: router.currentRoute.value.path !== '/login' ? router.currentRoute.value.fullPath : undefined,
+//       },
+//     })
+//   })
+// }
 
 const api = axios.create({
   baseURL: (import.meta.env.DEV && import.meta.env.VITE_OPEN_PROXY === 'true') ? '/proxy/' : import.meta.env.VITE_APP_API_BASEURL,
@@ -50,16 +49,16 @@ api.interceptors.response.use(
      * 规则是当 status 为 1 时表示请求成功，为 0 时表示接口需要登录或者登录状态失效，需要重新登录
      * 请求出错时 error 会返回错误信息
      */
-    if (response.data.status === 1) {
-      if (response.data.error !== '') {
-        // 这里做错误提示，如果使用了 element plus 则可以使用 Message 进行提示
-        // ElMessage.error(options)
-        return Promise.reject(response.data)
-      }
-    }
-    else {
-      toLogin()
-    }
+    // if (response.data.status === 1) {
+    //   if (response.data.error !== '') {
+    //     // 这里做错误提示，如果使用了 element plus 则可以使用 Message 进行提示
+    //     // ElMessage.error(options)
+    //     return Promise.reject(response.data)
+    //   }
+    // }
+    // else {
+    //   toLogin()
+    // }
     return Promise.resolve(response.data)
   },
   (error) => {

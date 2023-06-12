@@ -37,17 +37,12 @@
       {
         "name": "高德卫星",
         "type": "group",
+        "show": true,
         "layers": [
           {
             "name": "底图",
             "type": "gaode",
-            "layer": "img_d",
-            "show": true
-          },
-          {
-            "name": "注记",
-            "type": "gaode",
-            "layer": "img_z"
+            "layer": "img_d"
           }
         ]
       }
