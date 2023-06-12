@@ -79,8 +79,6 @@ export default {
           })
 
           graphic.bindTooltip(null, {
-            minWidth: 300,
-            maxWidth: 400,
             className: 'custom_popup',
           })
 
@@ -116,6 +114,13 @@ export default {
     </div>
   </div>
 </template>
+
+<style>
+.custom_popup {
+  min-width: 300px;
+  max-width: 400px;
+}
+</style>
 
 <style lang="scss" scoped>
 .river-sections {
