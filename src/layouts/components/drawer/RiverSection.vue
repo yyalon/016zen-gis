@@ -4,6 +4,7 @@ import apiData from '@/api/modules/data'
 export default {
   components: {},
   props: {
+
     visible: {
       type: Boolean,
       default: false,
@@ -15,7 +16,7 @@ export default {
   },
   emits: ['close'],
   data() {
-    return { drawerVisible: false, riverSectionInfo: [], waterQuality: {} }
+    return { drawerVisible: false, riverSectionInfo: [], waterQuality: {}, loading: false }
   },
   watch: {
     async visible() {
@@ -32,8 +33,24 @@ export default {
   },
   methods: {
     async getData() {
-      await this.getRiverSectionInfo()
-      await this.getWaterQuality()
+      if (this.drawerData.sectionType === 135) {
+        await this.get135Data()
+      }
+      else {
+        await this.get145Data()
+      }
+      // await this.getRiverSectionInfo()
+      // await this.getWaterQuality()
+    },
+    async get135Data() {
+      this.loading = true
+      const [result1, result2] = await Promise.all([apiData.get135WaterQualityBySectionCode({ code: this.drawerData.code }), apiData.get135RiverSectionInfo({ id: this.drawerData.id })])
+      this.loading = false
+    },
+    async get145Data() {
+      this.loading = true
+      const [result1, result2] = await Promise.all([apiData.get145WaterQualityBySectionName({ name: this.drawerData.name, province: this.drawerData.atProvince }), apiData.get145RiverSectionInfo({ id: this.drawerData.id })])
+      this.loading = false
     },
     async getRiverSectionInfo() {
       if (this.drawerData.sectionType === 135) {
@@ -57,7 +74,7 @@ export default {
         }
       }
       else {
-        const { code, data } = await apiData.get145WaterQualityBySectionName({ name: this.drawerData.name })
+        const { code, data } = await apiData.get145WaterQualityBySectionName({ name: this.drawerData.name, province: this.drawerData.atProvince })
         if (code === 1000) {
           this.waterQuality = data
         }
@@ -71,14 +88,14 @@ export default {
 </script>
 
 <template>
-  <div clase="drawer-river-section">
+  <div v-loading="loading" clase="drawer-river-section">
     <el-drawer
       v-model="drawerVisible" class="drawer-river-section" :append-to-body="true" direction="btt"
       :close-on-press-escape="false" :close-on-click-modal="false" :show-close="false" @close="handleClose()"
     >
       <template #default>
         <div>
-          <el-button class="close-button" type="primary" circle size="large" @click="handleClose">
+          <el-button v-loading="loading" class="close-button" type="primary" circle size="large" @click="handleClose">
             <el-icon>
               <svg-icon name="ep:close" />
             </el-icon>

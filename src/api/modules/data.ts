@@ -17,7 +17,7 @@ export default {
   get135WaterQualityBySectionCode: (params: any) => api.post('/app/data/river-water-quality-monthly/list', {}, { params }),
 
   // 通过断面名称获取十四五单个断面水质信息
-  get145WaterQualityBySectionName: (params: any) => api.post('/app/data/river-water-quality/list', {}, { params }),
+  get145WaterQualityBySectionName: (data: any) => api.post('/app/data/river-water-quality/list', data),
 
   // 获取排污口列表
   getSewageOutfalls: () => api.post('/app/data/sewage-outfall/list'),
