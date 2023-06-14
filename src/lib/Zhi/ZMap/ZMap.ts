@@ -29,7 +29,7 @@ function loadComponentContent(target: any, myComponent: any, props: any) {
 }
 
 function unloadComponentContent(target: any) {
-  target.app.unmount(target.myComponentRef)
+  target.app?.unmount(target.myComponentRef)
   delete target.app
   delete target.myComponentRef
 }

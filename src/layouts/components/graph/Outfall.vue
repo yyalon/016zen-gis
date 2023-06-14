@@ -1,4 +1,5 @@
 <script>
+import SewageOutfalls from '../layer/SewageOutfalls.vue'
 import RightDrawer from '../RightDrawer.vue'
 import ChartOutfallsStatus from '../chart/OutfallsStatus.vue'
 import ChartKeyMonitoringIndicatorsTrend from '../chart/KeyMonitoringIndicatorsTrend.vue'
@@ -6,7 +7,7 @@ import ChartKeyMonitoringIndicatorsProportion from '../chart/KeyMonitoringIndica
 import ChartOnlineMonitoring from '../chart/OnlineMonitoring.vue'
 
 export default {
-  components: { RightDrawer, ChartOutfallsStatus, ChartKeyMonitoringIndicatorsTrend, ChartKeyMonitoringIndicatorsProportion, ChartOnlineMonitoring },
+  components: { SewageOutfalls, RightDrawer, ChartOutfallsStatus, ChartKeyMonitoringIndicatorsTrend, ChartKeyMonitoringIndicatorsProportion, ChartOnlineMonitoring },
   props: {
     visible: {
       type: Boolean,
@@ -17,10 +18,13 @@ export default {
 </script>
 
 <template>
-  <RightDrawer :drawer-visible="visible">
-    <ChartOutfallsStatus />
-    <ChartKeyMonitoringIndicatorsTrend />
-    <ChartKeyMonitoringIndicatorsProportion />
-    <ChartOnlineMonitoring />
-  </RightDrawer>
+  <div>
+    <SewageOutfalls v-if="visible" />
+    <RightDrawer :drawer-visible="visible">
+      <ChartOutfallsStatus />
+      <ChartKeyMonitoringIndicatorsTrend />
+      <ChartKeyMonitoringIndicatorsProportion />
+      <ChartOnlineMonitoring />
+    </RightDrawer>
+  </div>
 </template>

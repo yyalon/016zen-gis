@@ -1,4 +1,5 @@
 <script>
+import drawerRiverSection from '../drawer/RiverSection.vue'
 import PopupRiverSection from '../popup/RiverSection.vue'
 import apiData from '@/api/modules/data'
 
@@ -10,9 +11,9 @@ const sectionTypes = [
 ]
 
 export default {
-  components: {},
+  components: { DrawerRiverSection: drawerRiverSection },
   data() {
-    return { sectionTypes, sectionType: 145, riverSections: [] }
+    return { sectionTypes, sectionType: 145, riverSections: [], drawerVisible: false, drawerData: {} }
   },
   watch: {
     sectionType() {
@@ -79,14 +80,20 @@ export default {
           })
 
           graphic.bindTooltip(null, {
-            className: 'custom_popup',
+            className: 'custom_tooltp',
+          })
+
+          graphic.on(window.$ZMap.EventType.click, (e) => {
+            this.drawerData = e.target.attr
+            this.drawerData.sectionType = this.sectionType
+            this.drawerVisible = true
           })
 
           graphic.on(window.$ZMap.EventType.tooltipopen, (e) => {
             e.target.setTooltipContent(window.$ZMap.loadComponentContent(e.target, PopupRiverSection, { popupData: e.target.attr }))
           })
 
-          graphic.on(window.$ZMap.EventType.popupclose, (e) => {
+          graphic.on(window.$ZMap.EventType.tooltipclose, (e) => {
             window.$ZMap.unloadComponentContent(e.target)
           })
 
@@ -104,21 +111,19 @@ export default {
 </script>
 
 <template>
-  <div>
-    <div class="river-sections">
-      <el-radio-group v-model="sectionType" size="large">
-        <el-radio-button v-for="(item, index) in sectionTypes" :key="index" :label="item.value">
-          {{ item.label }}
-        </el-radio-button>
-      </el-radio-group>
-    </div>
+  <div class="river-sections">
+    <el-radio-group v-model="sectionType" size="large">
+      <el-radio-button v-for="(item, index) in sectionTypes" :key="index" :label="item.value">
+        {{ item.label }}
+      </el-radio-button>
+    </el-radio-group>
+    <DrawerRiverSection :drawer-data="drawerData" :visible="drawerVisible" @close="drawerVisible = false" />
   </div>
 </template>
 
 <style>
-.custom_popup {
-  min-width: 300px;
-  max-width: 400px;
+.custom_tooltp {
+  width: auto;
 }
 </style>
 
