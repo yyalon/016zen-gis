@@ -18,12 +18,14 @@ export default {
     return { drawerVisible: false, sewageOutfallDetails: [] }
   },
   watch: {
-    visible() {
+    async visible() {
       this.drawerVisible = this.visible
+      if (this.drawerVisible) {
+        await this.getData()
+      }
     },
   },
   async mounted() {
-    await this.getData()
   },
   unmounted() {
     this.handleClose()

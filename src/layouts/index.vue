@@ -6,6 +6,9 @@ import LayerSeaZhejiang from './components/layer/SeaZhejiang.vue'
 import LayerLandJiangsu from './components/layer/LandJiangsu.vue'
 import LayerLandShanghai from './components/layer/LandShanghai.vue'
 import LayerLandZhejiang from './components/layer/LandZhejiang.vue'
+import LayergetMeteorologyStations from './components/layer/MeteorologyStations.vue'
+import LayerReservoirs from './components/layer/Reservoirs.vue'
+import LayerRiverChannels from './components/layer/RiverChannels.vue'
 
 // import LayerAllBorderMask from './components/layer/AllBorderMask.vue'
 import GraphSwitcher from './components/GraphSwitcher.vue'
@@ -35,6 +38,9 @@ export default {
     LayerLandShanghai,
     LayerLandZhejiang,
     // LayerAllBorderMask,
+    LayergetMeteorologyStations,
+    LayerReservoirs,
+    LayerRiverChannels,
     GraphMeteorology,
   },
   data() {
@@ -105,7 +111,6 @@ export default {
   methods: {
     mapLoaded() {
       window.$zMap.on(window.$ZMap.EventType.zoom, () => {
-        const zoom = window.$zMap.getZoom()
       })
     },
     getScale() {
@@ -147,6 +152,9 @@ export default {
     <LayerLandJiangsu />
     <LayerLandShanghai />
     <LayerLandZhejiang />
+    <LayergetMeteorologyStations />
+    <LayerReservoirs />
+    <LayerRiverChannels />
     <!-- <LayerAllBorderMask /> -->
     <div class="layout-container">
       <div class="layout-header">

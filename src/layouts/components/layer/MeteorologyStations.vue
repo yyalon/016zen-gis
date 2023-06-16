@@ -1,6 +1,6 @@
 <script>
 import drawerSewageOutfall from '../drawer/SewageOutfall.vue'
-import PopupSweageOutfall from '../popup/SweageOutfall.vue'
+import PopupMeteorologyStation from '../popup/MeteorologyStation.vue'
 import apiData from '@/api/modules/data'
 
 let _layer = null
@@ -8,7 +8,7 @@ let _layer = null
 export default {
   components: { DrawerSewageOutfall: drawerSewageOutfall },
   data() {
-    return { sewageOutfalls: [], drawerVisible: false, drawerData: {} }
+    return { meteorologyStations: [], drawerVisible: false, drawerData: {} }
   },
   async mounted() {
     await this.showLayer()
@@ -20,9 +20,9 @@ export default {
   },
   methods: {
     async getData() {
-      const { code, data } = await apiData.getSewageOutfalls()
+      const { code, data } = await apiData.getMeteorologyStations()
       if (code === 1000) {
-        this.sewageOutfalls = data
+        this.meteorologyStations = data
       }
     },
     async showLayer() {
@@ -40,22 +40,26 @@ export default {
           show: false,
           chunkedLoading: true, // 间隔添加数据，以便页面不冻结。
           showCoverageOnHover: false, // 是否显示聚合标记的边界。
-          disableClusteringAtZoom: 18, // 此级别下不聚合
+          disableClusteringAtZoom: 7, // 此级别下不聚合
         })
         window.$zMap.addLayer(_layer)
 
         await this.getData()
 
-        for (let i = 0, len = this.sewageOutfalls.length; i < len; i++) {
-          const item = this.sewageOutfalls[i]
+        for (let i = 0, len = this.meteorologyStations.length; i < len; i++) {
+          const item = this.meteorologyStations[i]
 
-          if (item.longitude && item.latitude) {
-            const graphic = new window.$ZMap.graphic.Marker({
-              latlng: [item.latitude, item.longitude],
+          if (item.LON && item.LAT) {
+            const graphic = new window.$ZMap.graphic.Point({
+              latlng: [item.LAT, item.LON],
               style: {
-                image: '/img/marker/sewage_outfall.png',
-                horizontalOrigin: window.$ZMap.HorizontalOrigin.CENTER,
-                verticalOrigin: window.$ZMap.VerticalOrigin.BOTTOM,
+                pixelSize: 3,
+                color: '#00ffff',
+                opacity: 0.6,
+                outline: true,
+                outlineWidth: 1,
+                outlineColor: '#00ff00',
+                outlineOpacity: 1.0,
               },
               attr: item,
             })
@@ -63,12 +67,14 @@ export default {
             graphic.bindTooltip(null, {
               className: 'custom_tooltip',
             })
+
             graphic.on(window.$ZMap.EventType.click, (e) => {
               this.drawerData = e.target.attr
               this.drawerVisible = true
             })
+
             graphic.on(window.$ZMap.EventType.tooltipopen, async (e) => {
-              e.target.setTooltipContent(window.$ZMap.loadComponentContent(e.target, PopupSweageOutfall, { popupData: e.target.attr }))
+              e.target.setTooltipContent(window.$ZMap.loadComponentContent(e.target, PopupMeteorologyStation, { popupData: e.target.attr }))
             })
 
             graphic.on(window.$ZMap.EventType.tooltipclose, (e) => {

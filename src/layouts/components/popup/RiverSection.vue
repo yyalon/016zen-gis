@@ -20,7 +20,7 @@ export default {
 </script>
 
 <template>
-  <div class="popup-river-section">
+  <div class="popup-container">
     <ElDescriptions :title="`断面名称 :${popupData.name}`" :column="1" border size="small">
       <ElDescriptionsItem v-if="popupData.code" label="断面编码">
         {{ popupData.code }}
@@ -99,7 +99,7 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-.popup-river-section {
+.popup-container {
   :deep .el-descriptions__title {
     text-wrap: wrap;
   }

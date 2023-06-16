@@ -24,4 +24,13 @@ export default {
 
   // 获取排污口详细信息
   getSewageOutfallInfo: (params: any) => api.get('/app/data/sewage-outfall/info', { params }),
+
+  // 获取地面气象站
+  getMeteorologyStations: (params: any) => api.post('/app/data/meteorology-station/list'),
+
+  // 获取重点水库测站列表
+  getReservoirs: (params: any) => api.post('/app/data/reservoir/list'),
+
+  // 获取重点水道测站列表
+  getRiverChannels: (params: any) => api.post('/app/data/river-channel/list'),
 }
