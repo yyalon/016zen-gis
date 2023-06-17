@@ -131,5 +131,9 @@ export default {
 .river-sections {
   text-align: center;
   pointer-events: auto;
+  position: fixed;
+  margin: auto;
+  left: 0;
+  right: 0;
 }
 </style>
