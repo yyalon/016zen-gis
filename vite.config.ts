@@ -34,6 +34,11 @@ export default ({ mode, command }) => {
           changeOrigin: command === 'serve' && env.VITE_OPEN_PROXY === 'true',
           rewrite: path => path.replace(/\/proxy/, ''),
         },
+        '/arcmap': {
+          target: 'https://services.arcgisonline.com',
+          changeOrigin: command === 'serve' && env.VITE_OPEN_PROXY === 'true',
+          rewrite: path => path.replace(/\/arcmap/, ''),
+        },
         '/file': {
           target: env.VITE_APP_STATIC_PATH,
           rewrite: path => path.replace(/\/file/, ''),

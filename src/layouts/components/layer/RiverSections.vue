@@ -13,7 +13,7 @@ const sectionTypes = [
 export default {
   components: { DrawerRiverSection: drawerRiverSection },
   data() {
-    return { sectionTypes, sectionType: 145, riverSections: [], drawerVisible: false, drawerData: {} }
+    return { sectionTypes, sectionType: 135, riverSections: [], drawerVisible: false, drawerData: {} }
   },
   watch: {
     sectionType() {
@@ -112,7 +112,7 @@ export default {
 
 <template>
   <div class="river-sections">
-    <el-radio-group v-model="sectionType" size="large">
+    <el-radio-group v-model="sectionType" size="large" style="visibility: hidden;">
       <el-radio-button v-for="(item, index) in sectionTypes" :key="index" :label="item.value">
         {{ item.label }}
       </el-radio-button>

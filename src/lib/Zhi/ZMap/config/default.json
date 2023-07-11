@@ -26,8 +26,9 @@
     "basemaps": [
       {
         "name": "ArcGIS卫星",
+        "show": true,
         "type": "arcgis",
-        "url": "https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer"
+        "url": "arcmap/ArcGIS/rest/services/World_Imagery/MapServer"
       },
       {
         "name": "高德地图",
@@ -37,7 +38,6 @@
       {
         "name": "高德卫星",
         "type": "group",
-        "show": true,
         "layers": [
           {
             "name": "底图",
