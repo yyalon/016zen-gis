@@ -1,5 +1,6 @@
 import './utils/system.copyright'
 import ElementPlus from 'element-plus'
+import autofit from 'autofit.js'
 import App from './App.vue'
 import pinia from './store'
 import router from './router'
@@ -17,6 +18,13 @@ import '@/assets/styles/globals.scss'
 
 // 加载 iconify 图标（element plus）
 import { downloadAndInstall } from '@/iconify-ep'
+
+autofit.init({
+  el: '#app',
+  dw: 1920,
+  dh: 1080,
+  resize: true,
+})
 
 const app = createApp(App)
 
