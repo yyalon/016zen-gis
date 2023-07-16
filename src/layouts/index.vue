@@ -21,9 +21,6 @@ import settings from '@/settings.default'
 import { toAdmin } from '@/utils/index'
 import 'dayjs/locale/zh-cn'
 
-const width = 1920
-const height = 1080
-
 export default {
   components: {
     GraphSwitcher,
@@ -48,10 +45,6 @@ export default {
       loading: null,
       activeGraph: 'river',
       settings,
-      transform: 'scale(1,1) translate(-50%, -50%)',
-      transformContent: 'scale(1,1)',
-      transformX: 'scale(1,1)',
-      transformY: 'scale(1,1)',
     }
   },
   watch: {
@@ -102,29 +95,12 @@ export default {
     // })
 
     this.activeGraph = 'river'
-    this.setScale()
-    window.addEventListener('resize', () => {
-      this.setScale()
-    })
   },
   unmounted() { },
   methods: {
     mapLoaded() {
       window.$zMap.on(window.$ZMap.EventType.zoom, () => {
       })
-    },
-    getScale() {
-      const w = window.innerWidth / width
-      const h = window.innerHeight / height
-      return { x: w, y: h }
-    },
-    setScale() {
-      const scale = this.getScale()
-      this.transform = `scale(${scale.x},${scale.y}) translate(-50%, -50%)`
-      const scaleContent = scale.x < scale.y ? scale.x : scale.y
-      this.transformContent = `scale(${scaleContent},${scaleContent}) `
-      this.transformX = `scale(${scale.x},${scale.x})`
-      this.transformY = `scale(${scale.y},${scale.y})`
     },
     toLogin() {
       toAdmin('/logout')
