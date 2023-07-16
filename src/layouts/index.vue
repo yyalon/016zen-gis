@@ -170,9 +170,7 @@ export default {
 
 <style lang="scss" scoped>
 .layout {
-  position: fixed;
-  top: 0;
-  left: 0;
+  position: relative;
   width: 100%;
   height: 100%;
   color: white;
@@ -185,12 +183,11 @@ export default {
     width: 100%;
     height: 100%;
     background-color: black;
-    background-image: url("@/assets/images/bg.png");
   }
 
   &-mask,
   &-container {
-    position: fixed;
+    position: absolute;
     top: 0;
     left: 0;
     width: 100%;

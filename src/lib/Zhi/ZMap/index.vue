@@ -89,6 +89,7 @@ export default {
   .zmap-container {
     height: 100%;
     overflow: hidden;
+    background-image: url("@/assets/images/bg_grid.png");
   }
 }
 </style>

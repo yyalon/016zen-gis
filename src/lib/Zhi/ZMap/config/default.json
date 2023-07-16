@@ -25,8 +25,47 @@
     },
     "basemaps": [
       {
+        "name": "天地图电子",
+        "type": "group",
+        "layers": [
+          {
+            "name": "底图",
+            "type": "tdt",
+            "layer": "vec_d"
+          },
+          {
+            "name": "注记",
+            "type": "tdt",
+            "layer": "vec_z"
+          }
+        ],
+        "show": true
+      },
+      {
+        "name": "天地图卫星",
+        "type": "group",
+        "layers": [
+          {
+            "name": "底图",
+            "type": "tdt",
+            "layer": "img_d"
+          }
+        ]
+      },
+      {
+        "name": "蓝色地图",
+        "type": "arcgis",
+        "url": "http://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineStreetPurplishBlue/MapServer",
+        "chinaCRS": "GCJ02"
+      },
+      {
+        "name": "灰色地图",
+        "type": "arcgis",
+        "url": "http://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineStreetGray/MapServer",
+        "chinaCRS": "GCJ02"
+      },
+      {
         "name": "ArcGIS卫星",
-        "show": true,
         "type": "arcgis",
         "url": "arcmap/ArcGIS/rest/services/World_Imagery/MapServer"
       },
