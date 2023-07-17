@@ -50,7 +50,7 @@ export default {
       </el-icon>
     </div>
     <div class="button-grounp">
-      <div v-for="(button, index) in buttons" :key="index" class="button"
+      <div v-for="(button, index) in buttons" :key="index" class="button" :class="button.visibility ? 'active' : ''"
         @click="excuteCommand(button.command, button.value)">
         <el-icon>
           <svg-icon :name="button.icon" />
@@ -104,6 +104,11 @@ export default {
     transition: all 0.3s linear;
     cursor: pointer;
 
+    &.active {
+      background: #fffb75;
+      color: #242424ba;
+    }
+
     &:active {
       transform: translateY(4px);
 
@@ -114,6 +119,7 @@ export default {
 
     &:hover {
       background-color: rgba(63, 158, 255, 1);
+      color: white;
     }
 
     .name {
@@ -129,6 +135,7 @@ export default {
       text-align: left;
       width: max-content;
       padding: 0 10px;
+      color: white;
 
       &:hover {
         background-color: #3f9eff;

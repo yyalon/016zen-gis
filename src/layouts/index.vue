@@ -48,8 +48,8 @@ export default {
       activeGraph: 'river',
       settings,
       buttons: [
-        { name: '水库', value: 'layerReservoirs', command: 'toggleLayer', visibility: true, icon: 'ep:map-location' },
-        { name: '河道', value: 'layerRiverChannels', command: 'toggleLayer', visibility: true, icon: 'ep:map-location' }, { name: '气象站', value: 'layergetMeteorologyStations', command: 'toggleLayer', visibility: true, icon: 'ep:map-location' },
+        { name: '水库', value: 'layerReservoirs', command: 'toggleLayer', visibility: false, icon: 'ep:map-location' },
+        { name: '河道', value: 'layerRiverChannels', command: 'toggleLayer', visibility: false, icon: 'ep:map-location' }, { name: '气象站', value: 'layergetMeteorologyStations', command: 'toggleLayer', visibility: false, icon: 'ep:map-location' },
         { name: '海域', value: 'sea', command: 'toggleLayer', visibility: true, icon: 'ep:reading' },
         { name: '陆域', value: 'land', command: 'toggleLayer', visibility: true, icon: 'ep:reading' }],
       visibilities: {
@@ -135,6 +135,11 @@ export default {
     },
     toggleLayer(name: any) {
       this.visibilities[name] = !this.visibilities[name]
+      this.buttons.forEach((button) => {
+        if (button.value === name) {
+          button.visibility = !button.visibility
+        }
+      })
     },
   },
 }

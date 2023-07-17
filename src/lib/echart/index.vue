@@ -41,7 +41,9 @@ export default {
   },
   mounted() {
     window.$echarts.registerTheme('tdTheme', tdTheme) // 覆盖默认主题
+    // setTimeout(() => {
     this.initChart()
+    // }, 500)
   },
   beforeUnmount() {
     this.chart.dispose()
