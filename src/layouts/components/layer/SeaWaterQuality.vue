@@ -159,7 +159,19 @@ export default {
 </script>
 
 <template>
-  <div>
+  <div class="work-zone">
+    <div class="legend">
+      <div v-if="type === 'wq'" class="legend-wq">
+        <div v-for="item in legendWQ" :key="item.color" class="legend-item" :style="{ background: item.color }">
+          {{ item.label }}
+        </div>
+      </div>
+      <div v-if="type === 'e'" class="legend-e">
+        <div v-for="item in legendE" :key="item.color" class="legend-item" :style="{ background: item.color }">
+          {{ item.label }}
+        </div>
+      </div>
+    </div>
     <div class="filters">
       <el-select v-model="year" placeholder="请选择年份">
         <el-option v-for="item in years" :key="item.value" :label="item.label" :value="item.value" />
@@ -174,22 +186,14 @@ export default {
         <el-option v-for="item in seas" :key="item.value" :label="item.label" :value="item.value" />
       </el-select>
     </div>
-    <div class="legend">
-      <div v-if="type === 'wq'" class="legend-wq">
-        <div v-for="item in legendWQ" :key="item.color" class="legend-item" :style="{ background: item.color }">
-          {{ item.label }}
-        </div>
-      </div>
-      <div v-if="type === 'e'" class="legend-e">
-        <div v-for="item in legendE" :key="item.color" class="legend-item" :style="{ background: item.color }">
-          {{ item.label }}
-        </div>
-      </div>
-    </div>
   </div>
 </template>
 
 <style lang="scss" scoped>
+.work-zone {
+  display: flex;
+}
+
 .filters {
   padding: 10px;
 
@@ -217,9 +221,6 @@ export default {
 }
 
 .legend {
-  position: fixed;
-  bottom: 100px;
-  left: 10px;
 
   .legend-wq,
   .legend-e {

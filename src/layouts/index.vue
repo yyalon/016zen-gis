@@ -17,6 +17,7 @@ import GraphRiver from './components/graph/River.vue'
 import GraphOcean from './components/graph/Ocean.vue'
 import GraphBiology from './components/graph/Biology.vue'
 import GraphMeteorology from './components/graph/Meteorology.vue'
+import Toolbar from './components/Toolbar.vue'
 import settings from '@/settings.default'
 import { toAdmin } from '@/utils/index'
 import 'dayjs/locale/zh-cn'
@@ -39,12 +40,25 @@ export default {
     LayerReservoirs,
     LayerRiverChannels,
     GraphMeteorology,
+    Toolbar,
   },
   data() {
     return {
       loading: null,
       activeGraph: 'river',
       settings,
+      buttons: [
+        { name: '水库', value: 'layerReservoirs', command: 'toggleLayer', visibility: true, icon: 'ep:map-location' },
+        { name: '河道', value: 'layerRiverChannels', command: 'toggleLayer', visibility: true, icon: 'ep:map-location' }, { name: '气象站', value: 'layergetMeteorologyStations', command: 'toggleLayer', visibility: true, icon: 'ep:map-location' },
+        { name: '海域', value: 'sea', command: 'toggleLayer', visibility: true, icon: 'ep:reading' },
+        { name: '陆域', value: 'land', command: 'toggleLayer', visibility: true, icon: 'ep:reading' }],
+      visibilities: {
+        sea: true,
+        land: true,
+        layerReservoirs: false,
+        layerRiverChannels: false,
+        layergetMeteorologyStations: false,
+      },
     }
   },
   watch: {
@@ -113,6 +127,15 @@ export default {
         ? dayjs(date).locale('zh-cn').format(format)
         : dayjs().locale('zh-cn').format(format)
     },
+    excuteCommand(data: any) {
+      switch (data.command) {
+        case 'toggleLayer':
+          this.toggleLayer(data.value)
+      }
+    },
+    toggleLayer(name: any) {
+      this.visibilities[name] = !this.visibilities[name]
+    },
   },
 }
 </script>
@@ -122,15 +145,16 @@ export default {
     <div class="layout-background" />
     <ZMap @map-loaded="mapLoaded" />
     <div class="layout-mask" />
-    <LayerSeaShanghai />
-    <LayerSeaZhejiang />
-    <LayerSeaJiangsu />
-    <LayerLandJiangsu />
-    <LayerLandShanghai />
-    <LayerLandZhejiang />
-    <LayergetMeteorologyStations />
-    <LayerReservoirs />
-    <LayerRiverChannels />
+    <LayerSeaShanghai v-if="visibilities.sea" />
+    <LayerSeaZhejiang v-if="visibilities.sea" />
+    <LayerSeaJiangsu v-if="visibilities.sea" />
+    <LayerLandJiangsu v-if="visibilities.land" />
+    <LayerLandShanghai v-if="visibilities.land" />
+    <LayerLandZhejiang v-if="visibilities.land" />
+    <LayergetMeteorologyStations v-if="visibilities.layergetMeteorologyStations" />
+    <LayerReservoirs v-if="visibilities.layerReservoirs" />
+    <LayerRiverChannels v-if="visibilities.layerRiverChannels" />
+    <Toolbar :buttons="buttons" @excute-command="excuteCommand" />
     <!-- <LayerAllBorderMask /> -->
     <div class="layout-container">
       <div class="layout-header">
@@ -232,11 +256,9 @@ export default {
         text-align: center;
         user-select: none;
         background:
-          linear-gradient(
-            360deg,
+          linear-gradient(360deg,
             rgb(155 155 155) 0%,
-            rgb(255 255 255) 100%
-          );
+            rgb(255 255 255) 100%);
         background-clip: text !important;
       }
 

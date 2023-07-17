@@ -7,9 +7,9 @@ export default {
     this.showLayer()
   },
   unmounted() {
-    // if (_layer) {
-    //   _layer.show = false
-    // }
+    if (_layer) {
+      _layer.show = false
+    }
   },
   methods: {
     showLayer() {

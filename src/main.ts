@@ -1,6 +1,7 @@
 import './utils/system.copyright'
 import ElementPlus from 'element-plus'
 import autofit from 'autofit.js'
+import * as echarts from 'echarts'
 import App from './App.vue'
 import pinia from './store'
 import router from './router'
@@ -18,6 +19,16 @@ import '@/assets/styles/globals.scss'
 
 // 加载 iconify 图标（element plus）
 import { downloadAndInstall } from '@/iconify-ep'
+
+import 'default-passive-events'
+
+declare global {
+  interface Window {
+    $echarts: any
+  }
+}
+
+window.$echarts = echarts
 
 autofit.init({
   el: '#app',

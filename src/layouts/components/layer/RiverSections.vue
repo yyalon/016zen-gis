@@ -13,7 +13,7 @@ const sectionTypes = [
 export default {
   components: { DrawerRiverSection: drawerRiverSection },
   data() {
-    return { sectionTypes, sectionType: 135, riverSections: [], drawerVisible: false, drawerData: {} }
+    return { sectionTypes, sectionType: 135, riverSections: { 135: [], 145: [] }, drawerVisible: false, drawerData: {}, watersheds: [], watershed: '' }
   },
   watch: {
     sectionType() {
@@ -29,19 +29,66 @@ export default {
     }
   },
   methods: {
+    selectWatersed() {
+      if (_layers[this.sectionType]) {
+        const layer = _layers[this.sectionType]
+        layer.clear()
+        this.riverSections[this.sectionType].forEach((riverSection) => {
+          if (!this.watershed || riverSection.watershed === this.watershed) {
+            const graphic = new window.$ZMap.graphic.Marker({
+              latlng: [riverSection.latitude, riverSection.longitude],
+              style: {
+                image: '/img/marker/river.png',
+                horizontalOrigin: window.$ZMap.HorizontalOrigin.CENTER,
+                verticalOrigin: window.$ZMap.VerticalOrigin.BOTTOM,
+              },
+              attr: riverSection,
+            })
+
+            graphic.bindTooltip(null, {
+              className: 'custom_tooltp',
+            })
+
+            graphic.on(window.$ZMap.EventType.click, (e) => {
+              this.drawerData = e.target.attr
+              this.drawerData.sectionType = this.sectionType
+              this.drawerVisible = true
+            })
+
+            graphic.on(window.$ZMap.EventType.tooltipopen, (e) => {
+              e.target.setTooltipContent(window.$ZMap.loadComponentContent(e.target, PopupRiverSection, { popupData: e.target.attr }))
+            })
+
+            graphic.on(window.$ZMap.EventType.tooltipclose, (e) => {
+              window.$ZMap.unloadComponentContent(e.target)
+            })
+            layer.addGraphic(graphic)
+          }
+        })
+      }
+    },
+    calcWatersheds() {
+      this.watersheds = []
+      this.riverSections[this.sectionType].forEach((riverSection) => {
+        if (!this.watersheds.includes(riverSection.watershed)) {
+          this.watersheds.push(riverSection.watershed)
+        }
+      })
+    },
     async getData() {
       if (this.sectionType === 135) {
         const { code, data } = await apiData.get135RiverSections()
         if (code === 1000) {
-          this.riverSections = data
+          this.riverSections[this.sectionType] = data
         }
       }
       else {
         const { code, data } = await apiData.get145RiverSections()
         if (code === 1000) {
-          this.riverSections = data
+          this.riverSections[this.sectionType] = data
         }
       }
+      this.calcWatersheds()
     },
     async showLayer() {
       const loading = this.$loading({
@@ -55,6 +102,7 @@ export default {
       }
       if (_layers[this.sectionType]) {
         _layers[this.sectionType].show = true
+        this.selectWatersed()
       }
       else {
         _layers[this.sectionType] = new window.$ZMap.layer.ClusterLayer({
@@ -67,37 +115,39 @@ export default {
 
         await this.getData()
 
-        for (let i = 0, len = this.riverSections.length; i < len; i++) {
-          const item = this.riverSections[i]
-          const graphic = new window.$ZMap.graphic.Marker({
-            latlng: [item.latitude, item.longitude],
-            style: {
-              image: '/img/marker/river.png',
-              horizontalOrigin: window.$ZMap.HorizontalOrigin.CENTER,
-              verticalOrigin: window.$ZMap.VerticalOrigin.BOTTOM,
-            },
-            attr: item,
-          })
+        for (let i = 0, len = this.riverSections[this.sectionType].length; i < len; i++) {
+          const item = this.riverSections[this.sectionType][i]
+          if (!this.watershed || item.watershed === this.watershed) {
+            const graphic = new window.$ZMap.graphic.Marker({
+              latlng: [item.latitude, item.longitude],
+              style: {
+                image: '/img/marker/river.png',
+                horizontalOrigin: window.$ZMap.HorizontalOrigin.CENTER,
+                verticalOrigin: window.$ZMap.VerticalOrigin.BOTTOM,
+              },
+              attr: item,
+            })
 
-          graphic.bindTooltip(null, {
-            className: 'custom_tooltp',
-          })
+            graphic.bindTooltip(null, {
+              className: 'custom_tooltp',
+            })
 
-          graphic.on(window.$ZMap.EventType.click, (e) => {
-            this.drawerData = e.target.attr
-            this.drawerData.sectionType = this.sectionType
-            this.drawerVisible = true
-          })
+            graphic.on(window.$ZMap.EventType.click, (e) => {
+              this.drawerData = e.target.attr
+              this.drawerData.sectionType = this.sectionType
+              this.drawerVisible = true
+            })
 
-          graphic.on(window.$ZMap.EventType.tooltipopen, (e) => {
-            e.target.setTooltipContent(window.$ZMap.loadComponentContent(e.target, PopupRiverSection, { popupData: e.target.attr }))
-          })
+            graphic.on(window.$ZMap.EventType.tooltipopen, (e) => {
+              e.target.setTooltipContent(window.$ZMap.loadComponentContent(e.target, PopupRiverSection, { popupData: e.target.attr }))
+            })
 
-          graphic.on(window.$ZMap.EventType.tooltipclose, (e) => {
-            window.$ZMap.unloadComponentContent(e.target)
-          })
+            graphic.on(window.$ZMap.EventType.tooltipclose, (e) => {
+              window.$ZMap.unloadComponentContent(e.target)
+            })
 
-          _layers[this.sectionType].addGraphic(graphic)
+            _layers[this.sectionType].addGraphic(graphic)
+          }
         }
       }
 
@@ -112,11 +162,21 @@ export default {
 
 <template>
   <div class="river-sections">
-    <el-radio-group v-model="sectionType" size="large" style="visibility: hidden;">
-      <el-radio-button v-for="(item, index) in sectionTypes" :key="index" :label="item.value">
-        {{ item.label }}
-      </el-radio-button>
-    </el-radio-group>
+    <el-form :inline="true">
+      <el-form-item>
+        <el-radio-group v-model="sectionType" size="large">
+          <el-radio-button v-for="(item, index) in sectionTypes" :key="index" :label="item.value">
+            {{ item.label }}
+          </el-radio-button>
+        </el-radio-group>
+      </el-form-item>
+      <el-form-item>
+        <el-select v-model="watershed" placeholder="请选择流域" size="large" @change="selectWatersed()">
+          <el-option v-for="(item, index) in watersheds" :key="index" :label="item" :value="item" />
+        </el-select>
+      </el-form-item>
+    </el-form>
+
     <DrawerRiverSection :drawer-data="drawerData" :visible="drawerVisible" @close="drawerVisible = false" />
   </div>
 </template>
@@ -135,5 +195,9 @@ export default {
   margin: auto;
   left: 0;
   right: 0;
+
+  .el-form--inline .el-form-item {
+    margin-right: 10px;
+  }
 }
 </style>

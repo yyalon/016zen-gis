@@ -27,6 +27,8 @@
     "autofit.js": "^3.0.0",
     "axios": "^1.3.6",
     "dayjs": "^1.11.7",
+    "default-passive-events": "^2.0.0",
+    "echarts": "^5.4.2",
     "element-plus": "^2.3.3",
     "eruda": "^3.0.0",
     "hotkeys-js": "^3.10.2",
