@@ -1,6 +1,5 @@
 import './utils/system.copyright'
 import ElementPlus from 'element-plus'
-import autofit from 'autofit.js'
 import * as echarts from 'echarts'
 import App from './App.vue'
 import pinia from './store'
@@ -20,8 +19,6 @@ import '@/assets/styles/globals.scss'
 // 加载 iconify 图标（element plus）
 import { downloadAndInstall } from '@/iconify-ep'
 
-import 'default-passive-events'
-
 declare global {
   interface Window {
     $echarts: any
@@ -29,13 +26,6 @@ declare global {
 }
 
 window.$echarts = echarts
-
-autofit.init({
-  el: '#app',
-  dw: 1440,
-  dh: 1050,
-  resize: true,
-})
 
 const app = createApp(App)
 
@@ -47,6 +37,5 @@ directive(app)
 if (useSettingsStore().settings.app.iconifyOfflineUse) {
   downloadAndInstall()
 }
-setTimeout(() => {
-  app.mount('#app')
-}, 1000)
+
+app.mount('#app')

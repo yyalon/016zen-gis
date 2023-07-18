@@ -1,4 +1,5 @@
 <script lang="ts"  name="Layout">
+import autofit from 'autofit.js'
 import dayjs from 'dayjs'
 import LayerSeaShanghai from './components/layer/SeaShanghai.vue'
 import LayerSeaJiangsu from './components/layer/SeaJiangsu.vue'
@@ -10,7 +11,7 @@ import LayergetMeteorologyStations from './components/layer/MeteorologyStations.
 import LayerReservoirs from './components/layer/Reservoirs.vue'
 import LayerRiverChannels from './components/layer/RiverChannels.vue'
 
-// import LayerAllBorderMask from './components/layer/AllBorderMask.vue'
+import LayerAllBorderMask from './components/layer/AllBorderMask.vue'
 import GraphSwitcher from './components/GraphSwitcher.vue'
 import GraphOutfall from './components/graph/Outfall.vue'
 import GraphRiver from './components/graph/River.vue'
@@ -35,7 +36,7 @@ export default {
     LayerLandJiangsu,
     LayerLandShanghai,
     LayerLandZhejiang,
-    // LayerAllBorderMask,
+    LayerAllBorderMask,
     LayergetMeteorologyStations,
     LayerReservoirs,
     LayerRiverChannels,
@@ -72,6 +73,13 @@ export default {
     },
   },
   async mounted() {
+    autofit.init({
+      el: '.layout',
+      dw: 1440,
+      dh: 1050,
+      resize: true,
+      ignore: ['.leaflet-container'],
+    })
     // getGeoSerevrLayers().then((res) => {
     //   console.error(res)
     // })
@@ -160,7 +168,7 @@ export default {
     <LayerReservoirs v-if="visibilities.layerReservoirs" />
     <LayerRiverChannels v-if="visibilities.layerRiverChannels" />
     <Toolbar :buttons="buttons" @excute-command="excuteCommand" />
-    <!-- <LayerAllBorderMask /> -->
+    <LayerAllBorderMask />
     <div class="layout-container">
       <div class="layout-header">
         <div class="title" @click="toAdminIndex()">

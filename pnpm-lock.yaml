@@ -1,5 +1,9 @@
 lockfileVersion: '6.0'
 
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
 dependencies:
   '@turf/turf':
     specifier: ^6.5.0
@@ -19,9 +23,6 @@ dependencies:
   dayjs:
     specifier: ^1.11.7
     version: 1.11.7
-  default-passive-events:
-    specifier: ^2.0.0
-    version: 2.0.0
   echarts:
     specifier: ^5.4.2
     version: 5.4.2
@@ -38,8 +39,8 @@ dependencies:
     specifier: ^4.17.21
     version: 4.17.21
   mars2d:
-    specifier: ^3.1.16
-    version: 3.1.16
+    specifier: ^3.1.17
+    version: 3.1.17
   mitt:
     specifier: ^3.0.0
     version: 3.0.0
@@ -3785,10 +3786,6 @@ packages:
     resolution: {integrity: sha512-oIPzksmTg4/MriiaYGO+okXDT7ztn/w3Eptv/+gSIdMdKsJo0u4CfYNFJPy+4SKMuCqGw2wxnA+URMg3t8a/bQ==}
     dev: true
 
-  /default-passive-events@2.0.0:
-    resolution: {integrity: sha512-eMtt76GpDVngZQ3ocgvRcNCklUMwID1PaNbCNxfpDXuiOXttSh0HzBbda1HU9SIUsDc02vb7g9+3I5tlqe/qMQ==}
-    dev: false
-
   /defaults@1.0.4:
     resolution: {integrity: sha512-eFuaLoy/Rxalv2kr+lqMlUnrDWV+3j4pljOIJgLIhI058IQfWJ7vXhyEIHu+HtC738klGALYxOKDO0bQP3tg8A==}
     dependencies:
@@ -6904,8 +6901,8 @@ packages:
       object-visit: 1.0.1
     dev: true
 
-  /mars2d@3.1.16:
-    resolution: {integrity: sha512-Xdbztr1pOAYmIENzIoodDDkLQQx0sVFQhppg6E6Kpxbw/9JuFjPR96Srl7+UUilTHJU32L1IEDtgUFQiOtT5mA==}
+  /mars2d@3.1.17:
+    resolution: {integrity: sha512-O2U2COr14FJq4kHopJxNETfiDdK5JFwTEgDuPMUDBXCKEYJNCX7Fq8GUcaLW0/JE2FMbrdbzIVS0ltg6FG51cQ==}
     dependencies:
       leaflet: 1.9.4
     dev: false
@@ -10104,7 +10101,3 @@ packages:
     dependencies:
       tslib: 2.3.0
     dev: false
-
-settings:
-  autoInstallPeers: true
-  excludeLinksFromLockfile: false

@@ -37,12 +37,12 @@ export default {
           symbol: {
             styleOptions: {
               fill: true,
-              fillColor: '#ffffff',
-              fillOpacity: 0.3,
+              fillColor: '#C0C0C0',
+              fillOpacity: 0.6,
               outline: true,
-              outlineColor: '#ffffff',
-              outlineWidth: 6,
-              outlineOpacity: 0.5,
+              outlineColor: 'green',
+              outlineWidth: 20,
+              outlineOpacity: 0.2,
             },
           },
         })

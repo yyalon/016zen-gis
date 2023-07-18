@@ -1,5 +1,5 @@
 <script>
-const layers = {}
+const geoFeatures = {}
 let currentlayer = null
 
 let shanghai = null
@@ -13,19 +13,24 @@ const seas = [
   { value: 'zhejiang', label: '浙江海域' },
 ]
 
-const legendWQ = [
-  { color: '#73b2ff', label: '一类' },
-  { color: '#b2ddf7', label: '二类' },
-  { color: '#beb1a1', label: '三类' },
-  { color: '#9b856e', label: '四类' },
-  { color: '#7a624a', label: '劣四类' },
-]
+const legendWQ = {
+  1:
+    { color: '#73b2ff', label: '一类' },
+  2:
+    { color: '#b2ddf7', label: '二类' },
+  3:
+    { color: '#beb1a1', label: '三类' },
+  4:
+    { color: '#9b856e', label: '四类' },
+  5:
+    { color: '#7a624a', label: '劣四类' },
+}
 
-const legendE = [
-  { color: '#ffff00', label: '轻度富营养化' },
-  { color: '#ff9900', label: '中度富营养化' },
-  { color: '#ff0000', label: '重度富营养化' },
-]
+const legendE = {
+  2: { color: '#ffff00', label: '轻度富营养化' },
+  3: { color: '#ff9900', label: '中度富营养化' },
+  4: { color: '#ff0000', label: '重度富营养化' },
+}
 
 const years = [
   { value: 2017, label: 2017 },
@@ -48,9 +53,6 @@ const types = [
 ]
 
 export default {
-  props: {
-
-  },
   data() {
     return { seas, legendWQ, legendE, years, seasons, types, year: 2022, season: 'spring', type: 'wq', sea: '' }
   },
@@ -72,16 +74,19 @@ export default {
         this.setOpacity(zhejiang, 0)
       }
       else if (this.sea === 'shanghai') {
+        window.$zMap.fitBounds(shanghai.getBounds(), { padding: [40, 40], duration: 5 })
         this.setOpacity(shanghai, 0.01)
         this.setOpacity(jiangsu, 0.8)
         this.setOpacity(zhejiang, 0.8)
       }
       else if (this.sea === 'zhejiang') {
+        window.$zMap.fitBounds(zhejiang.getBounds(), { padding: [40, 40], duration: 5 })
         this.setOpacity(zhejiang, 0.01)
         this.setOpacity(shanghai, 0.8)
         this.setOpacity(jiangsu, 0.8)
       }
       else if (this.sea === 'jiangsu') {
+        window.$zMap.fitBounds(jiangsu.getBounds(), { padding: [40, 40], duration: 5 })
         this.setOpacity(jiangsu, 0.01)
         this.setOpacity(shanghai, 0.8)
         this.setOpacity(zhejiang, 0.8)
@@ -93,12 +98,42 @@ export default {
     jiangsu = window.$zMap.getLayerById(2001)
     zhejiang = window.$zMap.getLayerById(2002)
     this.sea = 'all'
+    currentlayer = new window.$ZMap.layer.GeoJsonLayer({
+      name: 'SeaWaterQuality',
+      symbol: {
+        type: 'polygon',
+        styleOptions: {
+          fill: true,
+          fillColor: 'white',
+          fillOpacity: 1,
+          outline: true,
+          outlineWidth: 1,
+          outlineOpacity: 0.5,
+          outlineColor: 'white',
+        },
+        callback: (attr) => {
+          let fillColor = ''
+          if (this.type === 'wq') {
+            fillColor = legendWQ[attr.Value] ? legendWQ[attr.Value].color : '#00000000'
+          }
+          else {
+            fillColor = legendE[attr.Value] ? legendE[attr.Value].color : '#00000000'
+          }
+          return {
+            fillColor,
+          }
+        },
+      },
+      tooltip: (attr) => {
+        console.log(attr)
+      },
+    })
+
+    window.$zMap.addLayer(currentlayer)
     this.showLayer()
   },
   unmounted() {
-    for (const key in layers) {
-      layers[key].show = false
-    }
+    window.$zMap.removeLayer(currentlayer)
     this.setOpacity(shanghai, 0.2)
     this.setOpacity(jiangsu, 0.2)
     this.setOpacity(zhejiang, 0.2)
@@ -116,13 +151,48 @@ export default {
         })
       }
     },
+    // showLayer() {
+    //   const name = this.type + this.year + this.season
+    //   for (const key in layers) {
+    //     layers[key].show = false
+    //   }
+    //   if (layers[name]) {
+    //     layers[name].show = true
+    //   }
+    //   else {
+    //     const loading = this.$loading({
+    //       lock: true,
+    //       text: '正在加载地图数据...',
+    //       spinner: 'el-icon-loading',
+    //       background: '#100d17e3',
+    //     })
+    //     const tileLayer = new window.$ZMap.layer.WmsLayer({
+    //       name,
+    //       type: 'wms',
+    //       zIndex: 300,
+    //       url: 'http://139.9.41.23:8078/geoserver/sea/wms',
+    //       layers: `sea:${name}`,
+    //       tiled: true,
+    //       VERSION: '1.3.0',
+    //       format: 'image/png',
+    //       transparent: true,
+    //       show: false,
+    //     })
+    //     tileLayer.on(window.$ZMap.EventType.load, () => {
+    //       setTimeout(() => {
+    //         tileLayer.show = true
+    //         loading.close()
+    //       }, 500)
+    //     })
+    //     window.$zMap.addLayer(tileLayer)
+    //     layers[name] = tileLayer
+    //     currentlayer = tileLayer
+    //   }
+    // },
     showLayer() {
       const name = this.type + this.year + this.season
-      for (const key in layers) {
-        layers[key].show = false
-      }
-      if (layers[name]) {
-        layers[name].show = true
+      if (geoFeatures[name]) {
+        currentlayer.load({ data: geoFeatures[name] })
       }
       else {
         const loading = this.$loading({
@@ -131,27 +201,22 @@ export default {
           spinner: 'el-icon-loading',
           background: '#100d17e3',
         })
-        const tileLayer = new window.$ZMap.layer.WmsLayer({
-          name,
-          type: 'wms',
-          zIndex: 300,
-          url: 'http://139.9.41.23:8078/geoserver/sea/wms',
-          layers: `sea:${name}`,
-          tiled: true,
-          VERSION: '1.3.0',
-          format: 'image/png',
-          transparent: true,
-          show: false,
+        const queryMapServer = new window.$ZMap.query.QueryGeoServer({
+          url: 'http://139.9.41.23:8078/geoserver/sea/ows',
+          layer: `sea:${name}`,
         })
-        tileLayer.on(window.$ZMap.EventType.load, () => {
-          setTimeout(() => {
-            tileLayer.show = true
+
+        queryMapServer.query({
+          success: (result) => {
             loading.close()
-          }, 500)
+            if (result && result.count > 0) {
+              geoFeatures[name] = result.geojson
+              currentlayer.load({ data: geoFeatures[name] })
+            }
+          },
+          error: (error, msg) => {
+          },
         })
-        window.$zMap.addLayer(tileLayer)
-        layers[name] = tileLayer
-        currentlayer = tileLayer
       }
     },
   },
