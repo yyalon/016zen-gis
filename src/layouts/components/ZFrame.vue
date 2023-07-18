@@ -52,7 +52,7 @@ export default {
     font-style: normal;
     text-decoration: none;
     text-shadow: rgb(11 113 230 / 0%) 1px 1px 1px;
-    font-size: 20px;
+    font-size: 1em;
     text-indent: 0;
     letter-spacing: 0;
     text-align: left;

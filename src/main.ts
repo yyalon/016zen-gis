@@ -32,8 +32,8 @@ window.$echarts = echarts
 
 autofit.init({
   el: '#app',
-  dw: 1920,
-  dh: 1080,
+  dw: 1440,
+  dh: 1050,
   resize: true,
 })
 

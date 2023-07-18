@@ -103,6 +103,9 @@ export default {
     margin-bottom: 5px;
     transition: all 0.3s linear;
     cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 
     &.active {
       background: #fffb75;
@@ -123,10 +126,10 @@ export default {
     }
 
     .name {
-      font-size: 1em;
+      font-size: .8em;
       position: absolute;
-      left: 2em;
-      top: 2px;
+      left: 2.4em;
+      top: 6px;
       height: 1.6em;
       transition: background-color 0.3s;
       text-shadow: 0 0 4px black;

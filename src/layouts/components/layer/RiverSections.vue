@@ -2,6 +2,7 @@
 import drawerRiverSection from '../drawer/RiverSection.vue'
 import PopupRiverSection from '../popup/RiverSection.vue'
 import apiData from '@/api/modules/data'
+import areas from '@/utils/area.json'
 
 const _layers = {}
 
@@ -13,7 +14,18 @@ const sectionTypes = [
 export default {
   components: { DrawerRiverSection: drawerRiverSection },
   data() {
-    return { sectionTypes, sectionType: 135, riverSections: { 135: [], 145: [] }, drawerVisible: false, drawerData: {}, watersheds: [], watershed: '' }
+    return {
+      areas: areas.filter(zone => ['上海市', '浙江省', '江苏省'].includes(zone.label),
+      ),
+      selectedArea: '',
+      sectionTypes,
+      sectionType: 135,
+      riverSections: { 135: [], 145: [] },
+      drawerVisible: false,
+      drawerData: {},
+      watersheds: [],
+      watershed: '',
+    }
   },
   watch: {
     sectionType() {
@@ -164,11 +176,13 @@ export default {
   <div class="river-sections">
     <el-form :inline="true">
       <el-form-item>
-        <el-radio-group v-model="sectionType" size="large">
-          <el-radio-button v-for="(item, index) in sectionTypes" :key="index" :label="item.value">
-            {{ item.label }}
-          </el-radio-button>
-        </el-radio-group>
+        <el-select v-model="sectionType" size="large">
+          <el-option v-for="(item, index) in sectionTypes" :key="index" :label="item.label" :value="item.value" />
+        </el-select>
+      </el-form-item>
+      <el-form-item>
+        <el-tree-select v-model="selectedArea" :data="areas" :render-after-expand="false" node-key="label" check-strictly
+          size="large" />
       </el-form-item>
       <el-form-item>
         <el-select v-model="watershed" placeholder="请选择流域" size="large" @change="selectWatersed()">
@@ -193,6 +207,7 @@ export default {
   pointer-events: auto;
   position: fixed;
   margin: auto;
+  top: 120px;
   left: 0;
   right: 0;
 

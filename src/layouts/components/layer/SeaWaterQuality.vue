@@ -18,13 +18,13 @@ const legendWQ = [
   { color: '#b2ddf7', label: '二类' },
   { color: '#beb1a1', label: '三类' },
   { color: '#9b856e', label: '四类' },
-  { color: '#7a624a', label: '劣五类' },
+  { color: '#7a624a', label: '劣四类' },
 ]
 
 const legendE = [
   { color: '#ffff00', label: '轻度富营养化' },
   { color: '#ff9900', label: '中度富营养化' },
-  { color: '#ff0000', label: '中毒富营养化' },
+  { color: '#ff0000', label: '重度富营养化' },
 ]
 
 const years = [
@@ -173,6 +173,9 @@ export default {
       </div>
     </div>
     <div class="filters">
+      <el-select v-model="sea" placeholder="请选择海域">
+        <el-option v-for="item in seas" :key="item.value" :label="item.label" :value="item.value" />
+      </el-select>
       <el-select v-model="year" placeholder="请选择年份">
         <el-option v-for="item in years" :key="item.value" :label="item.label" :value="item.value" />
       </el-select>
@@ -181,9 +184,6 @@ export default {
       </el-select>
       <el-select v-model="type" placeholder="请选择类型">
         <el-option v-for="item in types" :key="item.value" :label="item.label" :value="item.value" />
-      </el-select>
-      <el-select v-model="sea" placeholder="请选择海域">
-        <el-option v-for="item in seas" :key="item.value" :label="item.label" :value="item.value" />
       </el-select>
     </div>
   </div>
