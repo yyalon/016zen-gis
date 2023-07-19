@@ -168,7 +168,7 @@ export default {
     <LayerReservoirs v-if="visibilities.layerReservoirs" />
     <LayerRiverChannels v-if="visibilities.layerRiverChannels" />
     <Toolbar :buttons="buttons" @excute-command="excuteCommand" />
-    <LayerAllBorderMask />
+    <!-- <LayerAllBorderMask /> -->
     <div class="layout-container">
       <div class="layout-header">
         <div class="title" @click="toAdminIndex()">
