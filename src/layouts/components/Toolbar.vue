@@ -28,6 +28,10 @@ export default {
     flyHome() {
       window.$zMap.flyHome()
     },
+    reload() {
+      history.go(0)
+    },
+    fullScreen() { window.$zMap.toggleFullscreen() },
   },
 }
 </script>
@@ -47,6 +51,16 @@ export default {
     <div class="button zoom-out" @click="zoomOut()">
       <el-icon>
         <svg-icon name="ep:minus" />
+      </el-icon>
+    </div>
+    <div class="button zoom-out" @click="reload()">
+      <el-icon>
+        <svg-icon name="ep:refresh" />
+      </el-icon>
+    </div>
+    <div class="button zoom-out" @click="fullScreen()">
+      <el-icon>
+        <svg-icon name="ep:full-screen" />
       </el-icon>
     </div>
     <div class="button-grounp">

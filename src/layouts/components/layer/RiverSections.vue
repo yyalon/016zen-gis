@@ -1,5 +1,5 @@
 <script>
-import drawerRiverSection from '../drawer/RiverSection.vue'
+import DrawerRiverSection from '../drawer/RiverSection.vue'
 import PopupRiverSection from '../popup/RiverSection.vue'
 import apiData from '@/api/modules/data'
 import areas from '@/utils/area.json'
@@ -12,7 +12,7 @@ const sectionTypes = [
 ]
 
 export default {
-  components: { DrawerRiverSection: drawerRiverSection },
+  components: { DrawerRiverSection },
   data() {
     return {
       areas: areas.filter(zone => ['上海市', '浙江省', '江苏省'].includes(zone.label),

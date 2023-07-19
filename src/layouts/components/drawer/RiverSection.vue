@@ -88,11 +88,10 @@ export default {
 </script>
 
 <template>
-  <div v-loading="loading" clase="drawer-river-section">
-    <el-drawer
-      v-model="drawerVisible" class="drawer-river-section" :append-to-body="true" direction="btt"
-      :close-on-press-escape="false" :close-on-click-modal="false" :show-close="false" @close="handleClose()"
-    >
+  <div v-loading="loading">
+    <el-drawer v-model="drawerVisible" class="drawer-container" :append-to-body="true" direction="btt"
+      :close-on-press-escape="false" :close-on-click-modal="false" :show-close="false" :with-header="false"
+      @close="handleClose()">
       <template #default>
         <div>
           <el-button v-loading="loading" class="close-button" type="primary" circle size="large" @click="handleClose">
@@ -107,12 +106,17 @@ export default {
 </template>
 
 <style lang="scss">
-.drawer-river-section {
+.drawer-container {
   overflow: visible;
+
+  .el-drawer__body {
+    padding: 0;
+  }
 
   .close-button {
     position: absolute;
     top: -20px;
+    left: 20px;
   }
 
   .el-icon {

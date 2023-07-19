@@ -1,5 +1,9 @@
 <script>
-const currentlayer = null
+import DrawerSeaWaterStation from '../drawer/SeaWaterStation.vue'
+import PopupSeaWaterStation from '../popup/SeaWaterStation.vue'
+import apiData from '@/api/modules/data'
+
+let stationlayer = null
 const layers = {}
 
 let shanghai = null
@@ -53,8 +57,23 @@ const types = [
 ]
 
 export default {
+  components: { PopupSeaWaterStation, DrawerSeaWaterStation },
   data() {
-    return { seas, legendWQ, legendE, years, seasons, types, year: 2022, season: 'spring', type: 'wq', sea: '' }
+    return {
+      seas,
+      legendWQ,
+      legendE,
+      years,
+      seasons,
+      types,
+      year: 2022,
+      season: 'spring',
+      type: 'wq',
+      sea: '',
+      seaWaterStations: [],
+      drawerVisible: false,
+      drawerData: {},
+    }
   },
   watch: {
     year() {
@@ -93,12 +112,13 @@ export default {
       }
     },
   },
-  mounted() {
+  async mounted() {
     shanghai = window.$zMap.getLayerById(2000)
     jiangsu = window.$zMap.getLayerById(2001)
     zhejiang = window.$zMap.getLayerById(2002)
     this.sea = 'all'
     this.showLayer()
+    await this.showStationLayer()
   },
   unmounted() {
     this.setOpacity(shanghai, 0.2)
@@ -106,6 +126,69 @@ export default {
     this.setOpacity(zhejiang, 0.2)
   },
   methods: {
+    async getData() {
+      const { code, data } = await apiData.getSeaWaterStation()
+      if (code === 1000) {
+        this.seaWaterStations = data
+      }
+    },
+    async showStationLayer() {
+      const loading = this.$loading({
+        lock: true,
+        text: '正在加载地图数据...',
+        spinner: 'el-icon-loading',
+        background: '#100d17e3',
+      })
+      stationlayer = new window.$ZMap.layer.ClusterLayer({
+        show: false,
+        maxClusterRadius: 70,
+        chunkedLoading: true, // 间隔添加数据，以便页面不冻结。
+        showCoverageOnHover: false, // 是否显示聚合标记的边界。
+        disableClusteringAtZoom: 10, // 此级别下不聚合
+      })
+      window.$zMap.addLayer(stationlayer)
+
+      await this.getData()
+
+      for (let i = 0, len = this.seaWaterStations.length; i < len; i++) {
+        const item = this.seaWaterStations[i]
+        const graphic = new window.$ZMap.graphic.Marker({
+          latlng: [item.lat, item.lon],
+          style: {
+            width: 24,
+            height: 24,
+            image: '/img/marker/river.png',
+            horizontalOrigin: window.$ZMap.HorizontalOrigin.CENTER,
+            verticalOrigin: window.$ZMap.VerticalOrigin.BOTTOM,
+          },
+          attr: item,
+        })
+
+        graphic.bindTooltip(null, {
+          className: 'custom_tooltp',
+        })
+
+        graphic.on(window.$ZMap.EventType.click, (e) => {
+          this.drawerData = e.target.attr
+          this.drawerVisible = true
+        })
+
+        graphic.on(window.$ZMap.EventType.tooltipopen, (e) => {
+          e.target.setTooltipContent(window.$ZMap.loadComponentContent(e.target, PopupSeaWaterStation, { popupData: e.target.attr }))
+        })
+
+        graphic.on(window.$ZMap.EventType.tooltipclose, (e) => {
+          window.$ZMap.unloadComponentContent(e.target)
+        })
+
+        stationlayer.addGraphic(graphic)
+      }
+
+      setTimeout(() => {
+        stationlayer.show = true
+        loading.close()
+      }, 500)
+    },
     resetLayerStyle() {
       const name = this.type + this.year + this.season
       const graphics = layers[name].getGraphics()
@@ -208,7 +291,6 @@ export default {
                     }
                   },
                 },
-                popup: 'all',
               })
               window.$zMap.addLayer(layers[name])
               layers[name].load({ data: geojson })
@@ -272,6 +354,7 @@ export default {
         <el-option v-for="item in types" :key="item.value" :label="item.label" :value="item.value" />
       </el-select>
     </div>
+    <DrawerSeaWaterStation :drawer-data="drawerData" :visible="drawerVisible" @close="drawerVisible = false" />
   </div>
 </template>
 

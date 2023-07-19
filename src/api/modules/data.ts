@@ -22,6 +22,9 @@ export default {
   // 获取排污口列表
   getSewageOutfalls: () => api.post('/app/data/sewage-outfall/list'),
 
+  // 获取海水水质监测站列表
+  getSeaWaterStation: () => api.post('/app/data/sea-water-station/list'),
+
   // 获取排污口详细信息
   getSewageOutfallInfo: (params: any) => api.get('/app/data/sewage-outfall/info', { params }),
 
