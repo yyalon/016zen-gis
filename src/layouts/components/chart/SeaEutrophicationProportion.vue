@@ -11,11 +11,9 @@ const seasons = {
 
 const data = []
 const colors = [
-  '#73b2ff',
-  '#b2ddf7',
-  '#beb1a1',
-  '#9b856e',
-  '#7a624a',
+  '#ffff00',
+  '#ff9900',
+  '#ff0000',
 ]
 export default {
   components: { ZFrame, Echart },
@@ -53,7 +51,7 @@ export default {
         series: [
           {
             top: '10%',
-            name: '水质类别',
+            name: '富营养化',
             type: 'pie',
             left: '0',
             radius: ['30%', '70%'],
@@ -68,8 +66,8 @@ export default {
               fontSize: 14,
             },
             labelLine: {
-              length: 1,
-              length2: 5,
+              length: 2,
+              length2: 12,
             },
             data: data.map((it, i) => {
               return {
@@ -88,6 +86,7 @@ export default {
   watch: {
     chartData() {
       this.update()
+      this.visible = true
     },
   },
   mounted() {
@@ -98,6 +97,7 @@ export default {
     update() {
       const { areas } = this.chartData
       if (areas && areas.length > 0) {
+        if (areas.length !== 3) { areas.shift() }
         this.options.series[0].data = areas.map((it, i) => {
           return {
             value: it.value,
@@ -114,7 +114,7 @@ export default {
 </script>
 
 <template>
-  <ZFrame :height="220" :title="`${chartData.year || ''}年${seasons[chartData.season] || ''}海水水质类别面积占比`">
+  <ZFrame :height="220" :title="`${chartData.year || ''}年${seasons[chartData.season] || ''}富营养化面积占比`">
     <Echart v-if="visible" :options="options" height="190px" width="375px" />
   </ZFrame>
 </template>

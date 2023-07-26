@@ -1,8 +1,19 @@
 <script>
-export default {
-  components: {},
-  props: {
+import ChartSeaStationKeyIndicatorsTrend from '../chart/SeaStationKeyIndicatorsTrend.vue'
+import ChartSeaStationKeyIndicatorsYearAverageTrend from '../chart/SeaStationKeyIndicatorsYearAverageTrend.vue'
+import ChartSeaStationEutrophicationIndexTrend from '../chart/SeaStationEutrophicationIndexTrend.vue'
+import ChartSeaStationEutrophicationYearAverageTrend from '../chart/SeaStationEutrophicationYearAverageTrend.vue'
+import apiData from '@/api/modules/data'
 
+const legendE = {
+  2: { color: '#ffff00', label: '轻度富营养化', checked: true },
+  3: { color: '#ff9900', label: '中度富营养化', checked: true },
+  4: { color: '#ff0000', label: '重度富营养化', checked: true },
+}
+
+export default {
+  components: { ChartSeaStationKeyIndicatorsTrend, ChartSeaStationKeyIndicatorsYearAverageTrend, ChartSeaStationEutrophicationIndexTrend, ChartSeaStationEutrophicationYearAverageTrend },
+  props: {
     visible: {
       type: Boolean,
       default: false,
@@ -14,7 +25,7 @@ export default {
   },
   emits: ['close'],
   data() {
-    return { drawerVisible: false, seaWaterStationInfo: [], seaWaterQuality: {}, loading: false }
+    return { drawerVisible: false, seaWaterStationInfo: [], seaWaterQuality: {}, loading: false, chartData: { items: [] } }
   },
   watch: {
     async visible() {
@@ -31,7 +42,10 @@ export default {
   },
   methods: {
     async getData() {
-      console.log(this.drawerData)
+      const { code, data } = await apiData.getSeaWaterQuality({ site: this.drawerData.site })
+      if (code === 1000 && data.length > 0) {
+        this.chartData.items = data
+      }
     },
     handleClose() {
       this.$emit('close')
@@ -72,6 +86,12 @@ export default {
               </el-descriptions-item>
             </el-descriptions>
           </div>
+          <div class="sea-water-station-chart">
+            <ChartSeaStationKeyIndicatorsTrend :chart-data="chartData" />
+            <ChartSeaStationKeyIndicatorsYearAverageTrend :chart-data="chartData" />
+            <ChartSeaStationEutrophicationIndexTrend :chart-data="chartData" />
+            <ChartSeaStationEutrophicationYearAverageTrend :chart-data="chartData" />
+          </div>
         </div>
       </template>
     </el-drawer>
@@ -104,10 +124,17 @@ export default {
     .sea-water-station-info {
       padding: 20px 20px 20px 50px;
       background: #f9f9f9;
+      flex: none;
 
       :deep .el-descriptions__body {
         background-color: #f9f9f9;
       }
+    }
+
+    .sea-water-station-chart {
+      flex: 1;
+      overflow: auto;
+      display: flex;
     }
   }
 }

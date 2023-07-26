@@ -1,6 +1,6 @@
 <script>
 import ChartSeaWaterQualityProportion from '../chart/SeaWaterQualityProportion.vue'
-import ChartEutrophicWaterAreaTrend from '../chart/EutrophicWaterAreaTrend.vue'
+import ChartSeaEutrophicationProportion from '../chart/SeaEutrophicationProportion.vue'
 import LayerSeaWaterQuality from '../layer/SeaWaterQuality.vue'
 import RightDrawer from '../RightDrawer.vue'
 
@@ -9,7 +9,7 @@ export default {
     RightDrawer,
     LayerSeaWaterQuality,
     ChartSeaWaterQualityProportion,
-    ChartEutrophicWaterAreaTrend,
+    ChartSeaEutrophicationProportion,
   },
   props: {
     visible: {
@@ -17,15 +17,29 @@ export default {
       default: false,
     },
   },
+  data() {
+    return {
+      chartDataWQ: {}, chartDataE: {},
+    }
+  },
+  methods: {
+    refreshSeaWaterQualityProportion(chartData) {
+      this.chartDataWQ = chartData
+    },
+    refreshSeaEutrophicationProportion(chartData) {
+      this.chartDataE = chartData
+    },
+  },
 }
 </script>
 
 <template>
   <div>
-    <LayerSeaWaterQuality v-if="visible" />
+    <LayerSeaWaterQuality v-if="visible" @refresh-sea-water-quality-proportion="refreshSeaWaterQualityProportion"
+      @refresh-sea-eutrophication-proportion="refreshSeaEutrophicationProportion" />
     <RightDrawer :drawer-visible="visible">
-      <ChartSeaWaterQualityProportion />
-      <ChartEutrophicWaterAreaTrend />
+      <ChartSeaWaterQualityProportion :chart-data="chartDataWQ" />
+      <ChartSeaEutrophicationProportion :chart-data="chartDataE" />
     </RightDrawer>
   </div>
 </template>

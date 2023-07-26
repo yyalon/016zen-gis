@@ -1,6 +1,8 @@
 <script>
+import dayjs from 'dayjs'
 import DrawerSeaWaterStation from '../drawer/SeaWaterStation.vue'
 import PopupSeaWaterStation from '../popup/SeaWaterStation.vue'
+import ZFrame from '../ZFrame.vue'
 import apiData from '@/api/modules/data'
 
 let stationlayer = null
@@ -31,9 +33,10 @@ const legendWQ = {
 }
 
 const legendE = {
-  2: { color: '#ffff00', label: '轻度富营养化', checked: true },
-  3: { color: '#ff9900', label: '中度富营养化', checked: true },
-  4: { color: '#ff0000', label: '重度富营养化', checked: true },
+  1: { color: '#ffff0000', label: '正常', checked: true },
+  2: { color: '#ffff00', label: '轻度', checked: true },
+  3: { color: '#ff9900', label: '中度', checked: true },
+  4: { color: '#ff0000', label: '重度', checked: true },
 }
 
 const years = [
@@ -48,8 +51,15 @@ const years = [
 const seasons = [
   { value: 'spring', label: '春季' },
   { value: 'summer', label: '夏季' },
-  { value: 'winter', label: '冬季' },
+  { value: 'autumn', label: '秋季' },
+  { value: 'average', label: '年平均' },
 ]
+
+const objSeasons = {
+  spring: '春季',
+  summer: '夏季',
+  autumn: '秋季',
+}
 
 const types = [
   { value: 'wq', label: '水质评价' },
@@ -57,7 +67,8 @@ const types = [
 ]
 
 export default {
-  components: { PopupSeaWaterStation, DrawerSeaWaterStation },
+  components: { PopupSeaWaterStation, DrawerSeaWaterStation, ZFrame },
+  emits: ['refreshSeaWaterQualityProportion', 'refreshSeaEutrophicationProportion'],
   data() {
     return {
       seas,
@@ -65,13 +76,17 @@ export default {
       legendE,
       years,
       seasons,
+      objSeasons,
       types,
       year: 2022,
       season: 'spring',
       type: 'wq',
       sea: '',
       seaWaterStations: [],
+      seaWaterQualites: [],
+      filteredSeaWaterQualites: [],
       drawerVisible: false,
+      loadingSeaWaterQualites: false,
       drawerData: {},
     }
   },
@@ -118,7 +133,8 @@ export default {
     zhejiang = window.$zMap.getLayerById(2002)
     this.sea = 'all'
     this.showLayer()
-    await this.showStationLayer()
+    this.getSeaWaterQuality()
+    this.showStationLayer()
   },
   unmounted() {
     this.setOpacity(shanghai, 0.2)
@@ -130,6 +146,17 @@ export default {
       const { code, data } = await apiData.getSeaWaterStation()
       if (code === 1000) {
         this.seaWaterStations = data
+      }
+    },
+    async getSeaWaterQuality() {
+      this.loadingSeaWaterQualites = true
+      const { code, data } = await apiData.getSeaWaterQuality()
+      this.loadingSeaWaterQualites = false
+      if (code === 1000) {
+        this.seaWaterQualites = data.map((item) => {
+          return { ...item, year: dayjs(item.minitor_month).year() }
+        })
+        this.filteredSeaWaterQualites = this.seaWaterQualites.filter(item => item.year === this.year && item.season === this.season)
       }
     },
     async showStationLayer() {
@@ -234,6 +261,55 @@ export default {
         })
       }
     },
+    updateChartData(type) {
+      const name = `${type}${this.year}${this.season}`
+      const graphics = layers[name].getGraphics()
+      const areas = {}
+      graphics.forEach((graphic) => {
+        if (graphic.area && graphic.attr && graphic.attr.Value) {
+          areas[graphic.attr.Value] = areas[graphic.attr.Value] ? (areas[graphic.attr.Value] + graphic.area) : graphic.area
+        }
+      })
+      const objLegend = (type === 'wq') ? legendWQ : legendE
+      const eventName = (type === 'wq') ? 'refreshSeaWaterQualityProportion' : 'refreshSeaEutrophicationProportion'
+      const chartData = {
+        year: this.year,
+        season: this.season,
+        areas: Object.entries(areas).map(([key, value]) => ({ label: objLegend[key].label, value })),
+      }
+      this.$emit(eventName, chartData)
+    },
+    createNewGeoLayer(name) {
+      return new window.$ZMap.layer.GeoJsonLayer({
+        show: false,
+        name,
+        zIndex: 100,
+        symbol: {
+          type: 'polygon',
+          styleOptions: {
+            fill: true,
+            fillColor: 'white',
+            fillOpacity: 1,
+            outline: true,
+            outlineWidth: 1,
+            outlineOpacity: 0.5,
+            outlineColor: 'white',
+          },
+          callback: (attr) => {
+            let fillColor = ''
+            if (this.type === 'wq') {
+              fillColor = (legendWQ[attr.Value] && legendWQ[attr.Value].checked) ? legendWQ[attr.Value].color : '#00000000'
+            }
+            else {
+              fillColor = (legendE[attr.Value] && legendE[attr.Value].checked) ? legendE[attr.Value].color : '#00000000'
+            }
+            return {
+              fillColor,
+            }
+          },
+        },
+      })
+    },
     showLayer() {
       for (const key in this.legendE) {
         this.legendE[key].checked = true
@@ -241,13 +317,17 @@ export default {
       for (const key in this.legendWQ) {
         this.legendWQ[key].checked = true
       }
-      const name = this.type + this.year + this.season
+
       for (const key in layers) {
         layers[key].show = false
       }
+      this.sea = 'all'
+      const name = `${this.type}${this.year}${this.season}`
       if (layers[name]) {
         this.resetLayerStyle()
         layers[name].show = true
+        this.updateChartData('wq')
+        this.updateChartData('e')
       }
       else {
         const loading = this.$loading({
@@ -256,48 +336,48 @@ export default {
           spinner: 'el-icon-loading',
           background: '#100d17e3',
         })
-        const queryMapServer = new window.$ZMap.query.QueryGeoServer({
+        const wqName = `wq${this.year}${this.season}`
+        let queryMapServer = new window.$ZMap.query.QueryGeoServer({
           url: 'http://139.9.41.23:8078/geoserver/sea/ows',
-          layer: `sea:${name}`,
+          layer: `sea:${wqName}`,
         })
 
         queryMapServer.query({
           success: (result) => {
             const { count, geojson } = result
             if (count > 0) {
-              layers[name] = new window.$ZMap.layer.GeoJsonLayer({
-                name,
-                symbol: {
-                  type: 'polygon',
-                  styleOptions: {
-                    fill: true,
-                    fillColor: 'white',
-                    fillOpacity: 1,
-                    outline: true,
-                    outlineWidth: 1,
-                    outlineOpacity: 0.5,
-                    outlineColor: 'white',
-                  },
-                  callback: (attr) => {
-                    let fillColor = ''
-                    if (this.type === 'wq') {
-                      fillColor = (legendWQ[attr.Value] && legendWQ[attr.Value].checked) ? legendWQ[attr.Value].color : '#00000000'
-                    }
-                    else {
-                      fillColor = (legendE[attr.Value] && legendE[attr.Value].checked) ? legendE[attr.Value].color : '#00000000'
-                    }
-                    return {
-                      fillColor,
-                    }
-                  },
-                },
-              })
-              window.$zMap.addLayer(layers[name])
-              layers[name].load({ data: geojson })
+              layers[wqName] = this.createNewGeoLayer(wqName)
+              window.$zMap.addLayer(layers[wqName])
+              layers[wqName].load({ data: geojson })
+              if (name === wqName) {
+                layers[wqName].show = true
+              }
+              this.updateChartData('wq')
               loading.close()
             }
           },
-          error: (error, msg) => {
+        })
+
+        const eName = `e${this.year}${this.season}`
+        queryMapServer = new window.$ZMap.query.QueryGeoServer({
+          url: 'http://139.9.41.23:8078/geoserver/sea/ows',
+          layer: `sea:${eName}`,
+        })
+
+        queryMapServer.query({
+          success: (result) => {
+            const { count, geojson } = result
+            if (count > 0) {
+              layers[eName] = this.createNewGeoLayer(eName)
+              window.$zMap.addLayer(layers[eName])
+              layers[eName].load({ data: geojson })
+              if (name === eName) {
+                layers[eName].show = true
+              }
+
+              this.updateChartData('e')
+              loading.close()
+            }
           },
         })
       }
@@ -326,8 +406,8 @@ export default {
         </div>
       </div>
       <div v-if="type === 'e'" class="legend-e">
-        <div v-for="(item, key) in legendE" :key="item.color" class="legend-item" :style="{ background: item.color }"
-          @click="checkLegendItem(key)">
+        <div v-for="(item, key) in legendE" :key="item.color" class="legend-item"
+          :style="{ background: item.color, display: key == 1 ? 'none' : 'flex' }" @click="checkLegendItem(key)">
           <div class="icon">
             <el-icon v-if="item.checked">
               <svg-icon name="ep:circle-check-filled" />
@@ -336,7 +416,7 @@ export default {
               <svg-icon name="ep:circle-check" />
             </el-icon>
           </div>
-          {{ item.label }}
+          {{ item.label }}富营养化
         </div>
       </div>
     </div>
@@ -355,37 +435,45 @@ export default {
       </el-select>
     </div>
     <DrawerSeaWaterStation :drawer-data="drawerData" :visible="drawerVisible" @close="drawerVisible = false" />
+    <div class="sea-station-list">
+      <ZFrame width="100%" height="100%">
+        <el-table v-loading="loadingSeaWaterQualites" row-key="id" :data="filteredSeaWaterQualites" style="width: 100%"
+          height="100%">
+          <el-table-column prop="sea" label="海区" width="60" fixed />
+          <el-table-column prop="year" label="年份" width="80" />
+          <el-table-column label="季节" width="80">
+            <template #default="scope">
+              {{ objSeasons[scope.row.season] }}
+            </template>
+          </el-table-column>
+          <el-table-column prop="province" label="省份" width="80" />
+          <el-table-column prop="site" label="点位编码" />
+          <el-table-column prop="pH" label="pH" />
+          <el-table-column prop="rjy" label="溶解氧" />
+          <el-table-column prop="hxxyl" label="化学需氧量" />
+          <el-table-column prop="wjd" label="无机氮" />
+          <el-table-column prop="hxlxy" label="活性磷酸盐" />
+          <el-table-column prop="syl" label="石油类" />
+          <el-table-column prop="szlb" label="水质类别" width="80" />
+        </el-table>
+      </ZFrame>
+    </div>
   </div>
 </template>
 
 <style lang="scss" scoped>
 .work-zone {
   display: flex;
-}
 
-.filters {
-  padding: 10px;
-
-  :deep .el-select {
-    margin-right: 10px;
-    width: 140px;
-
-    &:hover .el-input__wrapper {
-      box-shadow: none;
-      border: 1px solid #72b3f0;
-    }
-
-    .el-input__wrapper {
-      border: 1px solid #64b4ff;
-      background: #070e14;
-      color: #64b4ff;
-      box-shadow: none;
-    }
-
-    .el-input__inner {
-      cursor: pointer;
-      color: #64b4ff;
-    }
+  .sea-station-list {
+    position: absolute;
+    left: 146px;
+    top: 150px;
+    width: 1200px;
+    height: 800px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    pointer-events: all;
   }
 }
 

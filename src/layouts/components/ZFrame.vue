@@ -8,11 +8,11 @@ export default {
       default: '',
     },
     width: {
-      type: Number,
+      type: [Number, String],
       default: 375,
     },
     height: {
-      type: Number,
+      type: [Number, String],
       default: 220,
     },
   },
@@ -27,7 +27,8 @@ export default {
 </script>
 
 <template>
-  <div class="z-frame" :style="{ width: `${width}px`, height: `${height}px` }">
+  <div class="z-frame"
+    :style="{ width: typeof width === 'Number' ? `${width}px` : width, height: typeof height === 'Number' ? `${height}px` : height }">
     <div class="z-frame-title">
       {{ title }}
     </div>
@@ -41,6 +42,9 @@ export default {
 .z-frame {
   display: flex;
   flex-direction: column;
+  background: #00000021;
+  border-radius: 5px;
+  margin: 5px;
 
   .z-frame-title {
     user-select: none;

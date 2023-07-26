@@ -86,3 +86,30 @@ textarea {
 .el-loading-mask {
   z-index: 900 !important;
 }
+
+
+.filters {
+  padding: 10px;
+
+ .el-select {
+    margin-right: 10px;
+    width: 140px;
+
+    &:hover .el-input__wrapper {
+      box-shadow: none;
+      border: 1px solid #72b3f0;
+    }
+
+    .el-input__wrapper {
+      border: 1px solid #64b4ff;
+      background: #070e14;
+      color: #64b4ff;
+      box-shadow: none;
+    }
+
+    .el-input__inner {
+      cursor: pointer;
+      color: #64b4ff;
+    }
+  }
+}
