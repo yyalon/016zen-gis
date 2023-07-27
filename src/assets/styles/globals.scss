@@ -87,11 +87,10 @@ textarea {
   z-index: 900 !important;
 }
 
-
 .filters {
   padding: 10px;
 
- .el-select {
+  .el-select {
     margin-right: 10px;
     width: 140px;
 
@@ -112,4 +111,26 @@ textarea {
       color: #64b4ff;
     }
   }
+
+  .el-switch {
+    pointer-events: all;
+  }
+}
+
+.el-table-v2__main {
+  background-color: #00000042;
+}
+
+.el-table-v2__header-cell {
+  color: white;
+  background-color: unset;
+}
+
+.el-table-v2__row {
+  border-bottom: 1px solid  #ffffff59;
+}
+
+.el-table-v2__row:hover {
+  background-color: #fffb75;
+  color: black;
 }

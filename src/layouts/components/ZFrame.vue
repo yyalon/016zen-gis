@@ -29,7 +29,7 @@ export default {
 <template>
   <div class="z-frame"
     :style="{ width: typeof width === 'Number' ? `${width}px` : width, height: typeof height === 'Number' ? `${height}px` : height }">
-    <div class="z-frame-title">
+    <div v-if="title" class="z-frame-title">
       {{ title }}
     </div>
     <div class="z-frame-content">
@@ -44,7 +44,6 @@ export default {
   flex-direction: column;
   background: #00000021;
   border-radius: 5px;
-  margin: 5px;
 
   .z-frame-title {
     user-select: none;
@@ -71,7 +70,7 @@ export default {
     align-items: center;
     background-image: url("@/assets/images/frame_title_bg.png");
     background-repeat: no-repeat;
-    background-size: 100% 100%;
+    background-size: 370px 36px;
   }
 
   .z-frame-content {

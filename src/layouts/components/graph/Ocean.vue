@@ -38,7 +38,7 @@ export default {
     <LayerSeaWaterQuality v-if="visible" @refresh-sea-water-quality-proportion="refreshSeaWaterQualityProportion"
       @refresh-sea-eutrophication-proportion="refreshSeaEutrophicationProportion" />
     <RightDrawer :drawer-visible="visible">
-      <ChartSeaWaterQualityProportion :chart-data="chartDataWQ" />
+      <ChartSeaWaterQualityProportion :chart-data="chartDataWQ" /> <br> <br>
       <ChartSeaEutrophicationProportion :chart-data="chartDataE" />
     </RightDrawer>
   </div>

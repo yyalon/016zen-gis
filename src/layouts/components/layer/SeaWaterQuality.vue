@@ -1,5 +1,6 @@
 <script>
 import dayjs from 'dayjs'
+import { ElTag } from 'element-plus'
 import DrawerSeaWaterStation from '../drawer/SeaWaterStation.vue'
 import PopupSeaWaterStation from '../popup/SeaWaterStation.vue'
 import ZFrame from '../ZFrame.vue'
@@ -66,8 +67,89 @@ const types = [
   { value: 'e', label: '富营养化' },
 ]
 
+const columns = [{
+  key: 2,
+  dataKey: 'sea',
+  prop: 'sea',
+  title: '海区',
+  width: 60,
+}, {
+  key: 3,
+  dataKey: 'province',
+  prop: 'province',
+  title: '省份',
+  width: 80,
+}, {
+  key: 4,
+  dataKey: 'site',
+  prop: 'site',
+  title: '点位编码',
+  width: 120,
+}, {
+  key: 5,
+  dataKey: 'pH',
+  prop: 'pH',
+  title: 'PH',
+  width: 120,
+}, {
+  key: 6,
+  dataKey: 'rjy',
+  prop: 'rjy',
+  title: '溶解氧',
+  width: 120,
+}, {
+  key: 7,
+  dataKey: 'hxxyl',
+  prop: 'hxxyl',
+  title: '化学需氧量',
+  width: 120,
+}, {
+  key: 8,
+  dataKey: 'wjd',
+  prop: 'wjd',
+  title: '无机氮',
+  width: 120,
+}, {
+  key: 9,
+  dataKey: 'hxlxy',
+  prop: 'hxlxy',
+  title: '活性磷酸盐',
+  width: 120,
+}, {
+  key: 10,
+  dataKey: 'syl',
+  prop: 'syl',
+  title: '石油类',
+  width: 120,
+}, {
+  key: 11,
+  dataKey: 'szlb',
+  prop: 'szlb',
+  title: '水质类别',
+  width: 120,
+  cellRenderer: (scope) => {
+    const { rowData, cellData } = scope
+    return h(
+      'ElTag',
+      {
+        hit: true,
+        effect: 'dark',
+        color: legendWQ[rowData.wqLevel].color,
+      },
+      { default: () => cellData },
+    )
+  }
+
+  ,
+}]
+/*
+<el-table-column label="季节" width="80">
+  <template #default="scope">
+    {{ objSeasons[scope.row.season] }}
+  </template>
+</el-table-column>  */
 export default {
-  components: { PopupSeaWaterStation, DrawerSeaWaterStation, ZFrame },
+  components: { PopupSeaWaterStation, DrawerSeaWaterStation, ZFrame, ElTag },
   emits: ['refreshSeaWaterQualityProportion', 'refreshSeaEutrophicationProportion'],
   data() {
     return {
@@ -88,14 +170,20 @@ export default {
       drawerVisible: false,
       loadingSeaWaterQualites: false,
       drawerData: {},
+      showList: false,
+      columns,
     }
   },
   watch: {
     year() {
       this.showLayer()
+      this.getSeaWaterQuality()
     },
     season() {
       this.showLayer()
+      if (this.season !== 'average') {
+        this.getSeaWaterQuality()
+      }
     },
     type() {
       this.showLayer()
@@ -150,7 +238,7 @@ export default {
     },
     async getSeaWaterQuality() {
       this.loadingSeaWaterQualites = true
-      const { code, data } = await apiData.getSeaWaterQuality()
+      const { code, data } = await apiData.getSeaWaterQuality({ keyWord: this.year, season: this.season })
       this.loadingSeaWaterQualites = false
       if (code === 1000) {
         this.seaWaterQualites = data.map((item) => {
@@ -433,29 +521,18 @@ export default {
       <el-select v-model="type" placeholder="请选择类型">
         <el-option v-for="item in types" :key="item.value" :label="item.label" :value="item.value" />
       </el-select>
+
+      <el-switch v-model="showList" active-text="显示列表" />
     </div>
     <DrawerSeaWaterStation :drawer-data="drawerData" :visible="drawerVisible" @close="drawerVisible = false" />
-    <div class="sea-station-list">
+    <div v-if="showList" class="sea-station-list">
       <ZFrame width="100%" height="100%">
-        <el-table v-loading="loadingSeaWaterQualites" row-key="id" :data="filteredSeaWaterQualites" style="width: 100%"
-          height="100%">
-          <el-table-column prop="sea" label="海区" width="60" fixed />
-          <el-table-column prop="year" label="年份" width="80" />
-          <el-table-column label="季节" width="80">
-            <template #default="scope">
-              {{ objSeasons[scope.row.season] }}
-            </template>
-          </el-table-column>
-          <el-table-column prop="province" label="省份" width="80" />
-          <el-table-column prop="site" label="点位编码" />
-          <el-table-column prop="pH" label="pH" />
-          <el-table-column prop="rjy" label="溶解氧" />
-          <el-table-column prop="hxxyl" label="化学需氧量" />
-          <el-table-column prop="wjd" label="无机氮" />
-          <el-table-column prop="hxlxy" label="活性磷酸盐" />
-          <el-table-column prop="syl" label="石油类" />
-          <el-table-column prop="szlb" label="水质类别" width="80" />
-        </el-table>
+        <el-auto-resizer>
+          <template #default="{ height, width }">
+            <el-table-v2 v-loading="loadingSeaWaterQualites" row-key="id" :data="filteredSeaWaterQualites" :width="width"
+              :height="height" :columns="columns" :cache="filteredSeaWaterQualites.length" />
+          </template>
+        </el-auto-resizer>
       </ZFrame>
     </div>
   </div>
