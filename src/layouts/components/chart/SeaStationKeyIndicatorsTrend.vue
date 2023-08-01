@@ -172,7 +172,7 @@ export default {
   }
 
   .select-type {
-    width: 120px
+    width: 120px;
   }
 }
 </style>

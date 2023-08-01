@@ -62,6 +62,3 @@ export default {
 <template>
   <div :id="id" :class="className" :style="{ height, width }" />
 </template>
-
-<style>
-</style>

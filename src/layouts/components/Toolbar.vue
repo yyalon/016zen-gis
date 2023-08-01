@@ -64,8 +64,10 @@ export default {
       </el-icon>
     </div>
     <div class="button-grounp">
-      <div v-for="(button, index) in buttons" :key="index" class="button" :class="button.visibility ? 'active' : ''"
-        @click="excuteCommand(button.command, button.value)">
+      <div
+        v-for="(button, index) in buttons" :key="index" class="button" :class="button.visibility ? 'active' : ''"
+        @click="excuteCommand(button.command, button.value)"
+      >
         <el-icon>
           <svg-icon :name="button.icon" />
         </el-icon>
@@ -92,7 +94,7 @@ export default {
     &::after {
       inset: -1em 0;
       width: 2.2em;
-      background-color: rgba(63, 158, 255, 0.6);
+      background-color: rgb(63 158 255 / 60%);
       border-radius: 1.1em;
       position: absolute;
       z-index: -1;
@@ -113,7 +115,7 @@ export default {
     height: 1.8em;
     border-radius: 50%;
     color: white;
-    background-color: rgba(63, 158, 255, 0.6);
+    background-color: rgb(63 158 255 / 60%);
     margin-bottom: 5px;
     transition: all 0.3s linear;
     cursor: pointer;
@@ -135,12 +137,12 @@ export default {
     }
 
     &:hover {
-      background-color: rgba(63, 158, 255, 1);
+      background-color: rgb(63 158 255 / 100%);
       color: white;
     }
 
     .name {
-      font-size: .8em;
+      font-size: 0.8em;
       position: absolute;
       left: 2.4em;
       top: 6px;
@@ -148,7 +150,7 @@ export default {
       transition: background-color 0.3s;
       text-shadow: 0 0 4px black;
       line-height: 1.6em;
-      border-radius: .8em;
+      border-radius: 0.8em;
       text-align: left;
       width: max-content;
       padding: 0 10px;
@@ -158,7 +160,6 @@ export default {
         background-color: #3f9eff;
       }
     }
-
   }
 }
 </style>

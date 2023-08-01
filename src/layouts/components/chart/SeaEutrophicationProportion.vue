@@ -97,7 +97,9 @@ export default {
     update() {
       const { areas } = this.chartData
       if (areas && areas.length > 0) {
-        if (areas.length !== 3) { areas.shift() }
+        if (areas.length !== 3) {
+          areas.shift()
+        }
         this.options.series[0].data = areas.map((it, i) => {
           return {
             value: it.value,
