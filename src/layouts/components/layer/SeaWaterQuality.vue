@@ -1,6 +1,5 @@
 <script>
 import dayjs from 'dayjs'
-import { ElTag } from 'element-plus'
 import DrawerSeaWaterStation from '../drawer/SeaWaterStation.vue'
 import PopupSeaWaterStation from '../popup/SeaWaterStation.vue'
 import ZFrame from '../ZFrame.vue'
@@ -149,7 +148,7 @@ const columns = [{
   </template>
 </el-table-column>  */
 export default {
-  components: { PopupSeaWaterStation, DrawerSeaWaterStation, ZFrame, ElTag },
+  components: { DrawerSeaWaterStation, ZFrame },
   emits: ['refreshSeaWaterQualityProportion', 'refreshSeaEutrophicationProportion'],
   data() {
     return {
@@ -478,8 +477,10 @@ export default {
   <div class="work-zone">
     <div class="legend">
       <div v-if="type === 'wq'" class="legend-wq">
-        <div v-for="(item, key) in legendWQ" :key="item.color" class="legend-item" :style="{ background: item.color }"
-          @click="checkLegendItem(key)">
+        <div
+          v-for="(item, key) in legendWQ" :key="item.color" class="legend-item" :style="{ background: item.color }"
+          @click="checkLegendItem(key)"
+        >
           <div class="icon">
             <el-icon v-if="item.checked">
               <svg-icon name="ep:circle-check-filled" />
@@ -494,8 +495,10 @@ export default {
         </div>
       </div>
       <div v-if="type === 'e'" class="legend-e">
-        <div v-for="(item, key) in legendE" :key="item.color" class="legend-item"
-          :style="{ background: item.color, display: key == 1 ? 'none' : 'flex' }" @click="checkLegendItem(key)">
+        <div
+          v-for="(item, key) in legendE" :key="item.color" class="legend-item"
+          :style="{ background: item.color, display: key === 1 ? 'none' : 'flex' }" @click="checkLegendItem(key)"
+        >
           <div class="icon">
             <el-icon v-if="item.checked">
               <svg-icon name="ep:circle-check-filled" />
@@ -529,8 +532,10 @@ export default {
       <ZFrame width="100%" height="100%">
         <el-auto-resizer>
           <template #default="{ height, width }">
-            <el-table-v2 v-loading="loadingSeaWaterQualites" row-key="id" :data="filteredSeaWaterQualites" :width="width"
-              :height="height" :columns="columns" :cache="filteredSeaWaterQualites.length" />
+            <el-table-v2
+              v-loading="loadingSeaWaterQualites" row-key="id" :data="filteredSeaWaterQualites" :width="width"
+              :height="height" :columns="columns" :cache="filteredSeaWaterQualites.length"
+            />
           </template>
         </el-auto-resizer>
       </ZFrame>
@@ -577,7 +582,7 @@ export default {
       pointer-events: all;
 
       &:hover {
-        opacity: .8;
+        opacity: 0.8;
       }
 
       .icon {
@@ -588,7 +593,7 @@ export default {
         font-size: 16px;
         justify-content: center;
         color: #3b3b3b;
-        background-color: rgba(255, 255, 255, 0.178);
+        background-color: rgb(255 255 255 / 17.8%);
       }
 
       .name {

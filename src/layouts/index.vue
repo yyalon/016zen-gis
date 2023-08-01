@@ -11,7 +11,6 @@ import LayergetMeteorologyStations from './components/layer/MeteorologyStations.
 import LayerReservoirs from './components/layer/Reservoirs.vue'
 import LayerRiverChannels from './components/layer/RiverChannels.vue'
 
-import LayerAllBorderMask from './components/layer/AllBorderMask.vue'
 import GraphSwitcher from './components/GraphSwitcher.vue'
 import GraphOutfall from './components/graph/Outfall.vue'
 import GraphRiver from './components/graph/River.vue'
@@ -36,7 +35,6 @@ export default {
     LayerLandJiangsu,
     LayerLandShanghai,
     LayerLandZhejiang,
-    LayerAllBorderMask,
     LayergetMeteorologyStations,
     LayerReservoirs,
     LayerRiverChannels,
@@ -269,9 +267,11 @@ export default {
         text-align: center;
         user-select: none;
         background:
-          linear-gradient(360deg,
+          linear-gradient(
+            360deg,
             rgb(155 155 155) 0%,
-            rgb(255 255 255) 100%);
+            rgb(255 255 255) 100%
+          );
         background-clip: text !important;
       }
 

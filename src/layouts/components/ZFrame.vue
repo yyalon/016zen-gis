@@ -27,8 +27,10 @@ export default {
 </script>
 
 <template>
-  <div class="z-frame"
-    :style="{ width: typeof width === 'Number' ? `${width}px` : width, height: typeof height === 'Number' ? `${height}px` : height }">
+  <div
+    class="z-frame"
+    :style="{ width: typeof width === 'Number' ? `${width}px` : width, height: typeof height === 'Number' ? `${height}px` : height }"
+  >
     <div v-if="title" class="z-frame-title">
       {{ title }}
     </div>
