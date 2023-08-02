@@ -137,9 +137,17 @@ const columns = [{
       },
       { default: () => cellData },
     )
-  }
-
-  ,
+  },
+}, {
+  key: 11,
+  dataKey: 'eIndex',
+  prop: 'eIndex',
+  title: '富营养化',
+  width: 120,
+  cellRenderer: (scope) => {
+    const { rowData, cellData } = scope
+    return legendE[rowData.eLevel].label
+  },
 }]
 /*
 <el-table-column label="季节" width="80">
@@ -180,9 +188,7 @@ export default {
     },
     season() {
       this.showLayer()
-      if (this.season !== 'average') {
-        this.getSeaWaterQuality()
-      }
+      this.getSeaWaterQuality()
     },
     type() {
       this.showLayer()
@@ -224,6 +230,9 @@ export default {
     this.showStationLayer()
   },
   unmounted() {
+    for (const key in layers) {
+      layers[key].show = false
+    }
     this.setOpacity(shanghai, 0.2)
     this.setOpacity(jiangsu, 0.2)
     this.setOpacity(zhejiang, 0.2)
@@ -237,13 +246,80 @@ export default {
     },
     async getSeaWaterQuality() {
       this.loadingSeaWaterQualites = true
-      const { code, data } = await apiData.getSeaWaterQuality({ keyWord: this.year, season: this.season })
+      const query = { keyWord: this.year }
+
+      if (this.season !== 'average') {
+        query.season = this.season
+      }
+      const { code, data } = await apiData.getSeaWaterQuality(query)
       this.loadingSeaWaterQualites = false
       if (code === 1000) {
         this.seaWaterQualites = data.map((item) => {
           return { ...item, year: dayjs(item.minitor_month).year() }
         })
-        this.filteredSeaWaterQualites = this.seaWaterQualites.filter(item => item.year === this.year && item.season === this.season)
+        if (this.season === 'average') {
+          const objSeaWaterQualites = {}
+          this.seaWaterQualites.forEach((item) => {
+            if (objSeaWaterQualites[item.site]) {
+              objSeaWaterQualites[item.site].push(item)
+            }
+            else {
+              objSeaWaterQualites[item.site] = [item]
+            }
+          })
+          this.filteredSeaWaterQualites = []
+          for (const key in objSeaWaterQualites) {
+            const aryYearQualites = objSeaWaterQualites[key]
+            const objYearQualites = {
+              ...objSeaWaterQualites[key][0],
+              ...{
+                eIndex: 0,
+                hxlxy: 0,
+                hxxyl: 0,
+                pH: 0,
+                rjy: 0,
+                syl: 0,
+                wjd: 0,
+              },
+            }
+            for (let i = 0; i < aryYearQualites.length; i++) {
+              objYearQualites.eIndex += aryYearQualites[i].eIndex
+              objYearQualites.hxlxy += aryYearQualites[i].hxlxy
+              objYearQualites.hxxyl += aryYearQualites[i].hxxyl
+              objYearQualites.pH += aryYearQualites[i].pH
+              objYearQualites.rjy += aryYearQualites[i].rjy
+              objYearQualites.syl += aryYearQualites[i].syl
+              objYearQualites.wjd += aryYearQualites[i].wjd
+            }
+
+            objYearQualites.eIndex = objYearQualites.eIndex / aryYearQualites.length
+            objYearQualites.hxlxy = objYearQualites.hxlxy / aryYearQualites.length
+            objYearQualites.hxxyl = objYearQualites.hxxyl / aryYearQualites.length
+            objYearQualites.pH = objYearQualites.pH / aryYearQualites.length
+            objYearQualites.rjy = objYearQualites.rjy / aryYearQualites.length
+            objYearQualites.syl = objYearQualites.syl / aryYearQualites.length
+            objYearQualites.wjd = objYearQualites.wjd / aryYearQualites.length
+
+            objYearQualites.eIndex = objYearQualites.eIndex ? objYearQualites.eIndex.toFixed(5) : '-'
+
+            objYearQualites.hxlxy = objYearQualites.hxlxy ? objYearQualites.hxlxy.toFixed(3) : '-'
+
+            objYearQualites.hxxyl = objYearQualites.hxxyl ? objYearQualites.hxxyl.toFixed(2) : '-'
+
+            objYearQualites.pH = objYearQualites.pH ? objYearQualites.pH.toFixed(2) : '-'
+
+            objYearQualites.rjy = objYearQualites.rjy ? objYearQualites.rjy.toFixed(2) : '-'
+
+            objYearQualites.syl = objYearQualites.syl ? objYearQualites.syl.toFixed(4) : '-'
+
+            objYearQualites.wjd = objYearQualites.wjd ? objYearQualites.wjd.toFixed(3) : '-'
+
+            this.filteredSeaWaterQualites.push(objYearQualites)
+          }
+        }
+        else {
+          this.filteredSeaWaterQualites = this.seaWaterQualites.filter(item => item.year === this.year && item.season === this.season)
+        }
       }
     },
     async showStationLayer() {
@@ -544,6 +620,14 @@ export default {
 </template>
 
 <style lang="scss" scoped>
+:deep .el-switch__label {
+  color: white;
+}
+
+:deep .el-loading-mask {
+  background-color: rgb(0 0 0 / 80%);
+}
+
 .work-zone {
   display: flex;
 
