@@ -154,8 +154,8 @@ export default {
             }
           })
           const average = sum / count
-          this.options.xAxis[0].data.unshift(key)
-          this.options.series[0].data.unshift(average.toFixed(5))
+          this.options.xAxis[0].data.push(key)
+          this.options.series[0].data.push(average.toFixed(5))
         }
         this.visible = true
       }
