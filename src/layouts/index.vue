@@ -77,6 +77,8 @@ export default {
       dh: 1050,
       resize: true,
       ignore: ['.leaflet-container'],
+      transition: 0,
+      delay: 0,
     })
     // getGeoSerevrLayers().then((res) => {
     //   console.error(res)
@@ -139,8 +141,9 @@ export default {
           this.toggleLayer(data.value)
       }
     },
-    toggleLayer(name: any) {
-      this.visibilities[name] = !this.visibilities[name]
+    toggleLayer(name: keyof typeof this.visibilities) {
+      const key: keyof typeof this.visibilities = name
+      this.visibilities[key] = !this.visibilities[key]
       this.buttons.forEach((button) => {
         if (button.value === name) {
           button.visibility = !button.visibility

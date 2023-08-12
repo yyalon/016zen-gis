@@ -10,6 +10,7 @@ declare global {
   interface Window {
     $ZMap: any
     $zMap: any
+    $Utitls: any
   }
 }
 
@@ -37,7 +38,9 @@ function unloadComponentContent(target: any) {
 export default {
   install(app: App<Element>) {
     window.$ZMap = mars2d
-    window.$ZMap.loadComponentContent = loadComponentContent
-    window.$ZMap.unloadComponentContent = unloadComponentContent
+    window.$Utitls = {
+      loadComponentContent,
+      unloadComponentContent,
+    }
   },
 }

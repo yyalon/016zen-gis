@@ -68,11 +68,11 @@ export default {
             })
 
             graphic.on(window.$ZMap.EventType.tooltipopen, (e) => {
-              e.target.setTooltipContent(window.$ZMap.loadComponentContent(e.target, PopupRiverSection, { popupData: e.target.attr }))
+              e.target.setTooltipContent(window.$Utitls.loadComponentContent(e.target, PopupRiverSection, { popupData: e.target.attr }))
             })
 
             graphic.on(window.$ZMap.EventType.tooltipclose, (e) => {
-              window.$ZMap.unloadComponentContent(e.target)
+              window.$Utitls.unloadComponentContent(e.target)
             })
             layer.addGraphic(graphic)
           }
@@ -151,11 +151,11 @@ export default {
             })
 
             graphic.on(window.$ZMap.EventType.tooltipopen, (e) => {
-              e.target.setTooltipContent(window.$ZMap.loadComponentContent(e.target, PopupRiverSection, { popupData: e.target.attr }))
+              e.target.setTooltipContent(window.$Utitls.loadComponentContent(e.target, PopupRiverSection, { popupData: e.target.attr }))
             })
 
             graphic.on(window.$ZMap.EventType.tooltipclose, (e) => {
-              window.$ZMap.unloadComponentContent(e.target)
+              window.$Utitls.unloadComponentContent(e.target)
             })
 
             _layers[this.sectionType].addGraphic(graphic)
@@ -181,8 +181,10 @@ export default {
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-tree-select v-model="selectedArea" :data="areas" :render-after-expand="false" node-key="label" check-strictly
-          size="large" />
+        <el-tree-select
+          v-model="selectedArea" :data="areas" :render-after-expand="false" node-key="label" check-strictly
+          size="large"
+        />
       </el-form-item>
       <el-form-item>
         <el-select v-model="watershed" placeholder="请选择流域" size="large" @change="selectWatersed()">

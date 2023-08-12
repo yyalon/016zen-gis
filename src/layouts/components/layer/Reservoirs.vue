@@ -72,11 +72,11 @@ export default {
             })
 
             graphic.on(window.$ZMap.EventType.tooltipopen, async (e) => {
-              e.target.setTooltipContent(window.$ZMap.loadComponentContent(e.target, PopupReservoir, { popupData: e.target.attr }))
+              e.target.setTooltipContent(window.$Utitls.loadComponentContent(e.target, PopupReservoir, { popupData: e.target.attr }))
             })
 
             graphic.on(window.$ZMap.EventType.tooltipclose, (e) => {
-              window.$ZMap.unloadComponentContent(e.target)
+              window.$Utitls.unloadComponentContent(e.target)
             })
 
             _layer.addGraphic(graphic)

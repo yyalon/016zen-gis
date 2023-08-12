@@ -9,7 +9,9 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     const encodedData = btoa('test:123456')
-    config.headers.Authorization = `Basic ${encodedData}`
+    if (config && config.headers) {
+      config.headers.Authorization = `Basic ${encodedData}`
+    }
     return config
   },
 )
