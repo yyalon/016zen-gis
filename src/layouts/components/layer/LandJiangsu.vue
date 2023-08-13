@@ -21,7 +21,7 @@ export default {
           id: 1101,
           zIndex: 1101,
           name: '江苏省陆域',
-          url: 'file/json/land_jiangsu.json',
+          url: '/file/json/land_jiangsu.json',
           allowDrillPick: false,
           symbol: {
             styleOptions: {

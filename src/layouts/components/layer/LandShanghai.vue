@@ -21,7 +21,7 @@ export default {
           id: 1100,
           zIndex: 1100,
           name: '上海市陆域',
-          url: 'file/json/land_shanghai.json',
+          url: '/file/json/land_shanghai.json',
           allowDrillPick: true,
           symbol: {
             styleOptions: {

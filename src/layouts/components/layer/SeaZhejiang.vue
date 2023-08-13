@@ -21,7 +21,7 @@ export default {
           id: 2002,
           zIndex: 2002,
           name: '浙江省海域',
-          url: 'file/json/sea_zhejiang.json',
+          url: '/file/json/sea_zhejiang.json',
           allowDrillPick: true,
           symbol: {
             styleOptions: {

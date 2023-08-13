@@ -21,7 +21,7 @@ export default {
           id: 2001,
           zIndex: 2001,
           name: '江苏省海域',
-          url: 'file/json/sea_jiangsu.json',
+          url: '/file/json/sea_jiangsu.json',
           symbol: {
             styleOptions: {
               fillColor: '#3388ff',

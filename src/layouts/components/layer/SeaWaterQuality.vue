@@ -233,6 +233,7 @@ export default {
     for (const key in layers) {
       layers[key].show = false
     }
+    stationlayer.show = false
     this.setOpacity(shanghai, 0.2)
     this.setOpacity(jiangsu, 0.2)
     this.setOpacity(zhejiang, 0.2)
@@ -329,55 +330,61 @@ export default {
         spinner: 'el-icon-loading',
         background: '#100d17e3',
       })
-      stationlayer = new window.$ZMap.layer.ClusterLayer({
-        show: false,
-        maxClusterRadius: 70,
-        chunkedLoading: true, // 间隔添加数据，以便页面不冻结。
-        showCoverageOnHover: false, // 是否显示聚合标记的边界。
-        disableClusteringAtZoom: 10, // 此级别下不聚合
-      })
-      window.$zMap.addLayer(stationlayer)
-
-      await this.getData()
-
-      for (let i = 0, len = this.seaWaterStations.length; i < len; i++) {
-        const item = this.seaWaterStations[i]
-        const graphic = new window.$ZMap.graphic.Marker({
-          latlng: [item.lat, item.lon],
-          style: {
-            width: 24,
-            height: 24,
-            image: '/img/marker/river.png',
-            horizontalOrigin: window.$ZMap.HorizontalOrigin.CENTER,
-            verticalOrigin: window.$ZMap.VerticalOrigin.BOTTOM,
-          },
-          attr: item,
-        })
-
-        graphic.bindTooltip(null, {
-          className: 'custom_tooltp',
-        })
-
-        graphic.on(window.$ZMap.EventType.click, (e) => {
-          this.drawerData = e.target.attr
-          this.drawerVisible = true
-        })
-
-        graphic.on(window.$ZMap.EventType.tooltipopen, (e) => {
-          e.target.setTooltipContent(window.$Utitls.loadComponentContent(e.target, PopupSeaWaterStation, { popupData: e.target.attr }))
-        })
-
-        graphic.on(window.$ZMap.EventType.tooltipclose, (e) => {
-          window.$Utitls.unloadComponentContent(e.target)
-        })
-
-        stationlayer.addGraphic(graphic)
-      }
-
-      setTimeout(() => {
+      if (stationlayer) {
         stationlayer.show = true
         loading.close()
-      }, 500)
+      }
+      else {
+        stationlayer = new window.$ZMap.layer.ClusterLayer({
+          show: false,
+          maxClusterRadius: 70,
+          chunkedLoading: true, // 间隔添加数据，以便页面不冻结。
+          showCoverageOnHover: false, // 是否显示聚合标记的边界。
+          disableClusteringAtZoom: 10, // 此级别下不聚合
+        })
+        window.$zMap.addLayer(stationlayer)
+
+        await this.getData()
+
+        for (let i = 0, len = this.seaWaterStations.length; i < len; i++) {
+          const item = this.seaWaterStations[i]
+          const graphic = new window.$ZMap.graphic.Marker({
+            latlng: [item.lat, item.lon],
+            style: {
+              width: 24,
+              height: 24,
+              image: '/img/marker/river.png',
+              horizontalOrigin: window.$ZMap.HorizontalOrigin.CENTER,
+              verticalOrigin: window.$ZMap.VerticalOrigin.BOTTOM,
+            },
+            attr: item,
+          })
+
+          graphic.bindTooltip(null, {
+            className: 'custom_tooltp',
+          })
+
+          graphic.on(window.$ZMap.EventType.click, (e) => {
+            this.drawerData = e.target.attr
+            this.drawerVisible = true
+          })
+
+          graphic.on(window.$ZMap.EventType.tooltipopen, (e) => {
+            e.target.setTooltipContent(window.$Utitls.loadComponentContent(e.target, PopupSeaWaterStation, { popupData: e.target.attr }))
+          })
+
+          graphic.on(window.$ZMap.EventType.tooltipclose, (e) => {
+            window.$Utitls.unloadComponentContent(e.target)
+          })
+
+          stationlayer.addGraphic(graphic)
+        }
+
+        setTimeout(() => {
+          stationlayer.show = true
+          loading.close()
+        }, 500)
+      }
     },
     resetLayerStyle() {
       const name = this.type + this.year + this.season

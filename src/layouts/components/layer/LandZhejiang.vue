@@ -21,7 +21,7 @@ export default {
           id: 1102,
           zIndex: 1102,
           name: '浙江省陆域',
-          url: 'file/json/land_zhejiang.json',
+          url: '/file/json/land_zhejiang.json',
           allowDrillPick: true,
           symbol: {
             styleOptions: {

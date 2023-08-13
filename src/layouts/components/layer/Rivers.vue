@@ -58,7 +58,7 @@ export default {
         const tileLayer = new window.$ZMap.layer.GeoJsonLayer({
           zIndex: 1,
           name: 'layerRiver',
-          url: `file/json/${name}.json`,
+          url: `/file/json/${name}.json`,
           symbol: {
             styleOptions: {
               width: 3,

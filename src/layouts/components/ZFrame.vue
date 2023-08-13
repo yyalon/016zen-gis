@@ -44,8 +44,17 @@ export default {
 .z-frame {
   display: flex;
   flex-direction: column;
-  background: #00000021;
+  background: rgb(0 0 0 / 44%);
   border-radius: 5px;
+
+  &::after {
+    content: " ";
+    backdrop-filter: blur(3px);
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+  }
 
   .z-frame-title {
     user-select: none;

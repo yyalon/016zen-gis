@@ -21,7 +21,7 @@ export default {
           id: 2000,
           zIndex: 2000,
           name: '上海市海域',
-          url: 'file/json/sea_shanghai.json',
+          url: '/file/json/sea_shanghai.json',
           symbol: {
             styleOptions: {
               fillColor: '#3388ff',

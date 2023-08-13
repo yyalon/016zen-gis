@@ -30,7 +30,7 @@ export default {
         _layer = new window.$ZMap.layer.GeoJsonLayer({
           id: 3001,
           name: '全域边界',
-          url: 'file/json/all_border.json',
+          url: '/file/json/all_border.json',
           mask: true,
           show: false,
           interactive: false,
