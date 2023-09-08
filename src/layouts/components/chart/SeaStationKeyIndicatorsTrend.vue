@@ -140,8 +140,8 @@ export default {
         this.options.xAxis[0].data = []
         this.options.series[0].data = []
         this.chartData.items.forEach((item) => {
-          this.options.xAxis[0].data.unshift(`${dayjs(item.minitor_month).format('YYYY')}\n${seasons[item.season]}`)
-          this.options.series[0].data.unshift(item[this.type])
+          this.options.xAxis[0].data.push(`${dayjs(item.minitor_month).format('YYYY')}\n${seasons[item.season]}`)
+          this.options.series[0].data.push(item[this.type])
         })
         this.visible = true
       }

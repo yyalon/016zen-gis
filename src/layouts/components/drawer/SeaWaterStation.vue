@@ -56,9 +56,11 @@ export default {
 
 <template>
   <div v-loading="loading">
-    <el-drawer v-model="drawerVisible" class="drawer-container" :append-to-body="true" direction="btt"
+    <el-drawer
+      v-model="drawerVisible" class="drawer-container" :append-to-body="true" direction="btt"
       :close-on-press-escape="false" :close-on-click-modal="false" :show-close="false" :with-header="false"
-      @close="handleClose()">
+      @close="handleClose()"
+    >
       <template #default>
         <div>
           <el-button v-loading="loading" class="close-button" type="primary" circle size="large" @click="handleClose">
