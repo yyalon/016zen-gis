@@ -10,7 +10,7 @@ export default {
     },
     id: {
       type: String,
-      default: 'chart',
+      default: `chart${+new Date()}`,
     },
     width: {
       type: String,
@@ -41,9 +41,7 @@ export default {
   },
   mounted() {
     window.$echarts.registerTheme('tdTheme', tdTheme) // 覆盖默认主题
-    // setTimeout(() => {
     this.initChart()
-    // }, 500)
   },
   beforeUnmount() {
     this.chart.dispose()
@@ -60,5 +58,5 @@ export default {
 </script>
 
 <template>
-  <div :id="id" :class="className" :style="{ height, width }" />
+  <div :id="id" :class="className" style="height: 100%;width: 100%;" :style="{ height, width }" />
 </template>

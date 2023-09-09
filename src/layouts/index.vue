@@ -1,4 +1,4 @@
-<script lang="ts"  name="Layout">
+<script lang="ts" name="Layout">
 import autofit from 'autofit.js'
 import dayjs from 'dayjs'
 import LayerSeaShanghai from './components/layer/SeaShanghai.vue'
@@ -47,10 +47,42 @@ export default {
       activeGraph: 'river',
       settings,
       buttons: [
-        { name: '水库', value: 'layerReservoirs', command: 'toggleLayer', visibility: false, icon: 'ep:map-location' },
-        { name: '河道', value: 'layerRiverChannels', command: 'toggleLayer', visibility: false, icon: 'ep:map-location' }, { name: '气象站', value: 'layergetMeteorologyStations', command: 'toggleLayer', visibility: false, icon: 'ep:map-location' },
-        { name: '海域', value: 'sea', command: 'toggleLayer', visibility: true, icon: 'ep:reading' },
-        { name: '陆域', value: 'land', command: 'toggleLayer', visibility: true, icon: 'ep:reading' }],
+        {
+          name: '水库',
+          value: 'layerReservoirs',
+          command: 'toggleLayer',
+          visibility: false,
+          icon: 'ep:map-location',
+        },
+        {
+          name: '河道',
+          value: 'layerRiverChannels',
+          command: 'toggleLayer',
+          visibility: false,
+          icon: 'ep:map-location',
+        },
+        {
+          name: '气象站',
+          value: 'layergetMeteorologyStations',
+          command: 'toggleLayer',
+          visibility: false,
+          icon: 'ep:map-location',
+        },
+        {
+          name: '海域',
+          value: 'sea',
+          command: 'toggleLayer',
+          visibility: true,
+          icon: 'ep:reading',
+        },
+        {
+          name: '陆域',
+          value: 'land',
+          command: 'toggleLayer',
+          visibility: true,
+          icon: 'ep:reading',
+        },
+      ],
       visibilities: {
         sea: true,
         land: true,
@@ -118,11 +150,10 @@ export default {
 
     this.activeGraph = 'river'
   },
-  unmounted() { },
+  unmounted() {},
   methods: {
     mapLoaded() {
-      window.$zMap.on(window.$ZMap.EventType.zoom, () => {
-      })
+      window.$zMap.on(window.$ZMap.EventType.zoom, () => {})
     },
     toLogin() {
       toAdmin('/logout')
@@ -165,7 +196,9 @@ export default {
     <LayerLandJiangsu v-if="visibilities.land" />
     <LayerLandShanghai v-if="visibilities.land" />
     <LayerLandZhejiang v-if="visibilities.land" />
-    <LayergetMeteorologyStations v-if="visibilities.layergetMeteorologyStations" />
+    <LayergetMeteorologyStations
+      v-if="visibilities.layergetMeteorologyStations"
+    />
     <LayerReservoirs v-if="visibilities.layerReservoirs" />
     <LayerRiverChannels v-if="visibilities.layerRiverChannels" />
     <Toolbar :buttons="buttons" @excute-command="excuteCommand" />
@@ -179,13 +212,13 @@ export default {
           {{ settings.app.titleEn }}
         </div>
         <div class="time" @click="toLogin()">
-          {{ moment(null, 'HH:mm') }}
+          {{ moment(null, "HH:mm") }}
         </div>
         <div class="date">
-          {{ moment(null, 'YYYY-MM-DD') }}
+          {{ moment(null, "YYYY-MM-DD") }}
         </div>
         <div class="weekday">
-          {{ moment(null, 'dddd') }}
+          {{ moment(null, "dddd") }}
         </div>
       </div>
       <div class="layout-body">
@@ -202,7 +235,11 @@ export default {
 
 <style>
 .label-name {
-  text-shadow: -1px 0 1px rgb(0 0 0 / 60%), 1px 0 1px rgb(0 0 0 / 60%), 0 1px 1px rgb(0 0 0 / 60%), 0 -1px 1px rgb(0 0 0 / 60%);
+  text-shadow:
+    -1px 0 1px rgb(0 0 0 / 60%),
+ 1px 0 1px rgb(0 0 0 / 60%),
+    0 1px 1px rgb(0 0 0 / 60%),
+ 0 -1px 1px rgb(0 0 0 / 60%);
 }
 </style>
 

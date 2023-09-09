@@ -40,8 +40,8 @@ export default {
       @refresh-sea-eutrophication-proportion="refreshSeaEutrophicationProportion"
     />
     <RightDrawer :drawer-visible="visible">
-      <ChartSeaWaterQualityProportion :chart-data="chartDataWQ" /> <br> <br>
-      <ChartSeaEutrophicationProportion :chart-data="chartDataE" />
+      <ChartSeaWaterQualityProportion :chart-data="chartDataWQ" /> <br>
+      <ChartSeaEutrophicationProportion v-if="visible" :chart-data="chartDataE" />
     </RightDrawer>
   </div>
 </template>

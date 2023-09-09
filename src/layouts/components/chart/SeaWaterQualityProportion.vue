@@ -52,12 +52,12 @@ export default {
         },
         series: [
           {
-            top: '10%',
+            top: '0%',
             name: '水质类别',
             type: 'pie',
             left: '0',
             radius: ['30%', '70%'],
-            center: ['40%', '50%'],
+            center: ['50%', '50%'],
             roseType: 'radius',
             label: {
               show: true,
@@ -66,6 +66,7 @@ export default {
               },
               position: 'outside',
               fontSize: 14,
+              color: 'white',
             },
             labelLine: {
               length: 1,

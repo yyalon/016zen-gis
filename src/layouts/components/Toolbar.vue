@@ -10,11 +10,10 @@ export default {
   },
   emits: ['excuteCommand'],
   data() {
-    return {
-    }
+    return {}
   },
   computed: {},
-  mounted() { },
+  mounted() {},
   methods: {
     excuteCommand(command, value) {
       this.$emit('excuteCommand', { command, value })
@@ -31,14 +30,16 @@ export default {
     reload() {
       history.go(0)
     },
-    fullScreen() { window.$zMap.toggleFullscreen() },
+    fullScreen() {
+      window.$zMap.toggleFullscreen()
+    },
   },
 }
 </script>
 
 <template>
   <div class="toolbar">
-    <div class="button home " @click="flyHome()">
+    <div class="button home" @click="flyHome()">
       <el-icon>
         <svg-icon name="ep:home-filled" />
       </el-icon>
@@ -65,7 +66,10 @@ export default {
     </div>
     <div class="button-grounp">
       <div
-        v-for="(button, index) in buttons" :key="index" class="button" :class="button.visibility ? 'active' : ''"
+        v-for="(button, index) in buttons"
+        :key="index"
+        class="button"
+        :class="button.visibility ? 'active' : ''"
         @click="excuteCommand(button.command, button.value)"
       >
         <el-icon>
@@ -92,10 +96,10 @@ export default {
     margin-top: 2em;
 
     &::after {
-      inset: -1em 0;
+      inset: 0;
       width: 2.2em;
       background-color: rgb(63 158 255 / 60%);
-      border-radius: 1.1em;
+      border-radius: 8px;
       position: absolute;
       z-index: -1;
       content: "";
@@ -113,7 +117,7 @@ export default {
     text-align: center;
     width: 1.8em;
     height: 1.8em;
-    border-radius: 50%;
+    border-radius: 8px;
     color: white;
     background-color: rgb(63 158 255 / 60%);
     margin-bottom: 5px;
