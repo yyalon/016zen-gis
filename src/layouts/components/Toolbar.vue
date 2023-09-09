@@ -65,13 +65,7 @@ export default {
       </el-icon>
     </div>
     <div class="button-grounp">
-      <div
-        v-for="(button, index) in buttons"
-        :key="index"
-        class="button"
-        :class="button.visibility ? 'active' : ''"
-        @click="excuteCommand(button.command, button.value)"
-      >
+      <div v-for="(button, index) in buttons" :key="index" class="button" :class="button.visibility ? 'active' : ''" @click="excuteCommand(button.command, button.value)">
         <el-icon>
           <svg-icon :name="button.icon" />
         </el-icon>
@@ -102,7 +96,7 @@ export default {
       border-radius: 8px;
       position: absolute;
       z-index: -1;
-      content: "";
+      content: " ";
     }
 
     .button {

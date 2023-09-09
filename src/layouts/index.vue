@@ -162,9 +162,7 @@ export default {
       toAdmin('')
     },
     moment(date: any, format: any) {
-      return date
-        ? dayjs(date).locale('zh-cn').format(format)
-        : dayjs().locale('zh-cn').format(format)
+      return date ? dayjs(date).locale('zh-cn').format(format) : dayjs().locale('zh-cn').format(format)
     },
     excuteCommand(data: any) {
       switch (data.command) {
@@ -196,9 +194,7 @@ export default {
     <LayerLandJiangsu v-if="visibilities.land" />
     <LayerLandShanghai v-if="visibilities.land" />
     <LayerLandZhejiang v-if="visibilities.land" />
-    <LayergetMeteorologyStations
-      v-if="visibilities.layergetMeteorologyStations"
-    />
+    <LayergetMeteorologyStations v-if="visibilities.layergetMeteorologyStations" />
     <LayerReservoirs v-if="visibilities.layerReservoirs" />
     <LayerRiverChannels v-if="visibilities.layerRiverChannels" />
     <Toolbar :buttons="buttons" @excute-command="excuteCommand" />
@@ -212,13 +208,13 @@ export default {
           {{ settings.app.titleEn }}
         </div>
         <div class="time" @click="toLogin()">
-          {{ moment(null, "HH:mm") }}
+          {{ moment(null, 'HH:mm') }}
         </div>
         <div class="date">
-          {{ moment(null, "YYYY-MM-DD") }}
+          {{ moment(null, 'YYYY-MM-DD') }}
         </div>
         <div class="weekday">
-          {{ moment(null, "dddd") }}
+          {{ moment(null, 'dddd') }}
         </div>
       </div>
       <div class="layout-body">
@@ -235,11 +231,7 @@ export default {
 
 <style>
 .label-name {
-  text-shadow:
-    -1px 0 1px rgb(0 0 0 / 60%),
- 1px 0 1px rgb(0 0 0 / 60%),
-    0 1px 1px rgb(0 0 0 / 60%),
- 0 -1px 1px rgb(0 0 0 / 60%);
+  text-shadow: -1px 0 1px rgb(0 0 0 / 60%), 1px 0 1px rgb(0 0 0 / 60%), 0 1px 1px rgb(0 0 0 / 60%), 0 -1px 1px rgb(0 0 0 / 60%);
 }
 </style>
 
@@ -306,12 +298,7 @@ export default {
         color: transparent;
         text-align: center;
         user-select: none;
-        background:
-          linear-gradient(
-            360deg,
-            rgb(155 155 155) 0%,
-            rgb(255 255 255) 100%
-          );
+        background: linear-gradient(360deg, rgb(155 155 155) 0%, rgb(255 255 255) 100%);
         background-clip: text !important;
       }
 
