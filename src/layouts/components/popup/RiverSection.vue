@@ -11,11 +11,9 @@ export default {
       },
     },
   },
-  mounted() {
-  },
-  unmounted() { },
-  methods: {
-  },
+  mounted() {},
+  unmounted() {},
+  methods: {},
 }
 </script>
 
@@ -100,11 +98,11 @@ export default {
 
 <style lang="scss" scoped>
 .popup-container {
-  :deep .el-descriptions__title {
+  :deep(.el-descriptions__title) {
     text-wrap: wrap;
   }
 
-  :deep .el-descriptions__body {
+  :deep(.el-descriptions__body) {
     max-width: 450px;
 
     .el-descriptions__content {

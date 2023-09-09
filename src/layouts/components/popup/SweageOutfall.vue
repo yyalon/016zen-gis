@@ -11,13 +11,14 @@ export default {
       },
     },
   },
-  data() { return { details: {} } },
+  data() {
+    return { details: {} }
+  },
   async mounted() {
     this.details = this.popupData
   },
-  unmounted() { },
-  methods: {
-  },
+  unmounted() {},
+  methods: {},
 }
 </script>
 
@@ -99,11 +100,11 @@ export default {
 
 <style lang="scss" scoped>
 .popup-sewage-outfall {
-  :deep .el-descriptions__title {
+  :deep(.el-descriptions__title) {
     text-wrap: wrap;
   }
 
-  :deep .el-descriptions__body {
+  :deep(.el-descriptions__body) {
     max-width: 450px;
 
     .el-descriptions__content {

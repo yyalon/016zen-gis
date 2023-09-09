@@ -136,7 +136,7 @@ export default {
 .filters {
   padding: 10px;
 
-  :deep .el-select {
+  :deep(.el-select) {
     margin-right: 10px;
     width: 140px;
 

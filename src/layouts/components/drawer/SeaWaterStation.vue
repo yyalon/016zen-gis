@@ -12,7 +12,12 @@ const legendE = {
 }
 
 export default {
-  components: { ChartSeaStationKeyIndicatorsTrend, ChartSeaStationKeyIndicatorsYearAverageTrend, ChartSeaStationEutrophicationIndexTrend, ChartSeaStationEutrophicationYearAverageTrend },
+  components: {
+    ChartSeaStationKeyIndicatorsTrend,
+    ChartSeaStationKeyIndicatorsYearAverageTrend,
+    ChartSeaStationEutrophicationIndexTrend,
+    ChartSeaStationEutrophicationYearAverageTrend,
+  },
   props: {
     visible: {
       type: Boolean,
@@ -20,7 +25,9 @@ export default {
     },
     drawerData: {
       type: Object,
-      default() { return {} },
+      default() {
+        return {}
+      },
     },
   },
   emits: ['close'],
@@ -35,8 +42,7 @@ export default {
       }
     },
   },
-  async mounted() {
-  },
+  async mounted() {},
   unmounted() {
     this.handleClose()
   },
@@ -57,8 +63,14 @@ export default {
 <template>
   <div v-loading="loading">
     <el-drawer
-      v-model="drawerVisible" class="drawer-container" :append-to-body="true" direction="btt"
-      :close-on-press-escape="false" :close-on-click-modal="false" :show-close="false" :with-header="false"
+      v-model="drawerVisible"
+      class="drawer-container"
+      :append-to-body="true"
+      direction="btt"
+      :close-on-press-escape="false"
+      :close-on-click-modal="false"
+      :show-close="false"
+      :with-header="false"
       @close="handleClose()"
     >
       <template #default>
@@ -128,7 +140,7 @@ export default {
       background: #f9f9f9;
       flex: none;
 
-      :deep .el-descriptions__body {
+      :deep(.el-descriptions__body) {
         background-color: #f9f9f9;
       }
     }

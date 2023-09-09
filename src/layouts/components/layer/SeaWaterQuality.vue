@@ -20,16 +20,15 @@ const seas = [
 ]
 
 const legendWQ = {
-  1:
-    { color: '#73b2ff', label: '一类', checked: true },
-  2:
-    { color: '#b2ddf7', label: '二类', checked: true },
-  3:
-    { color: '#beb1a1', label: '三类', checked: true },
-  4:
-    { color: '#9b856e', label: '四类', checked: true },
-  5:
-    { color: '#7a624a', label: '劣四类', checked: true },
+  1: {
+    color: '#73b2ff',
+    label: '一类',
+    checked: true,
+  },
+  2: { color: '#b2ddf7', label: '二类', checked: true },
+  3: { color: '#beb1a1', label: '三类', checked: true },
+  4: { color: '#9b856e', label: '四类', checked: true },
+  5: { color: '#7a624a', label: '劣四类', checked: true },
 }
 
 const legendE = {
@@ -66,89 +65,101 @@ const types = [
   { value: 'e', label: '富营养化' },
 ]
 
-const columns = [{
-  key: 2,
-  dataKey: 'sea',
-  prop: 'sea',
-  title: '海区',
-  width: 60,
-}, {
-  key: 3,
-  dataKey: 'province',
-  prop: 'province',
-  title: '省份',
-  width: 80,
-}, {
-  key: 4,
-  dataKey: 'site',
-  prop: 'site',
-  title: '点位编码',
-  width: 120,
-}, {
-  key: 5,
-  dataKey: 'pH',
-  prop: 'pH',
-  title: 'PH',
-  width: 120,
-}, {
-  key: 6,
-  dataKey: 'rjy',
-  prop: 'rjy',
-  title: '溶解氧',
-  width: 120,
-}, {
-  key: 7,
-  dataKey: 'hxxyl',
-  prop: 'hxxyl',
-  title: '化学需氧量',
-  width: 120,
-}, {
-  key: 8,
-  dataKey: 'wjd',
-  prop: 'wjd',
-  title: '无机氮',
-  width: 120,
-}, {
-  key: 9,
-  dataKey: 'hxlxy',
-  prop: 'hxlxy',
-  title: '活性磷酸盐',
-  width: 120,
-}, {
-  key: 10,
-  dataKey: 'syl',
-  prop: 'syl',
-  title: '石油类',
-  width: 120,
-}, {
-  key: 11,
-  dataKey: 'szlb',
-  prop: 'szlb',
-  title: '水质类别',
-  width: 120,
-  cellRenderer: (scope) => {
-    const { rowData, cellData } = scope
-    return h(
-      'ElTag',
-      {
-        hit: true,
-        effect: 'dark',
-        color: legendWQ[rowData.wqLevel].color,
-      },
-      { default: () => cellData },
-    )
+const columns = [
+  {
+    key: 2,
+    dataKey: 'sea',
+    prop: 'sea',
+    title: '海区',
+    width: 60,
   },
-}, {
-  key: 11,
-  dataKey: 'eIndex',
-  prop: 'eIndex',
-  title: '富营养化',
-  width: 120,
-  cellRenderer: (scope) => {
-    const { rowData, cellData } = scope
-    return legendE[rowData.eLevel].label
+  {
+    key: 3,
+    dataKey: 'province',
+    prop: 'province',
+    title: '省份',
+    width: 80,
   },
-}]
+  {
+    key: 4,
+    dataKey: 'site',
+    prop: 'site',
+    title: '点位编码',
+    width: 120,
+  },
+  {
+    key: 5,
+    dataKey: 'pH',
+    prop: 'pH',
+    title: 'PH',
+    width: 120,
+  },
+  {
+    key: 6,
+    dataKey: 'rjy',
+    prop: 'rjy',
+    title: '溶解氧',
+    width: 120,
+  },
+  {
+    key: 7,
+    dataKey: 'hxxyl',
+    prop: 'hxxyl',
+    title: '化学需氧量',
+    width: 120,
+  },
+  {
+    key: 8,
+    dataKey: 'wjd',
+    prop: 'wjd',
+    title: '无机氮',
+    width: 120,
+  },
+  {
+    key: 9,
+    dataKey: 'hxlxy',
+    prop: 'hxlxy',
+    title: '活性磷酸盐',
+    width: 120,
+  },
+  {
+    key: 10,
+    dataKey: 'syl',
+    prop: 'syl',
+    title: '石油类',
+    width: 120,
+  },
+  {
+    key: 11,
+    dataKey: 'szlb',
+    prop: 'szlb',
+    title: '水质类别',
+    width: 120,
+    cellRenderer: (scope) => {
+      const { rowData, cellData } = scope
+      return h(
+        'ElTag',
+        {
+          hit: true,
+          effect: 'dark',
+          color: legendWQ[rowData.wqLevel].color,
+        },
+        { default: () => cellData },
+      )
+    },
+  },
+  {
+    key: 11,
+    dataKey: 'eIndex',
+    prop: 'eIndex',
+    title: '富营养化',
+    width: 120,
+    cellRenderer: (scope) => {
+      const { rowData, cellData } = scope
+      return legendE[rowData.eLevel].label
+    },
+  },
+]
 /*
 <el-table-column label="季节" width="80">
   <template #default="scope">
@@ -395,10 +406,10 @@ export default {
 
         let fillColor = ''
         if (this.type === 'wq') {
-          fillColor = (legendWQ[value] && legendWQ[value].checked) ? legendWQ[value].color : '#00000000'
+          fillColor = legendWQ[value]?.checked ? legendWQ[value].color : '#00000000'
         }
         else {
-          fillColor = (legendE[value] && legendE[value].checked) ? legendE[value].color : '#00000000'
+          fillColor = legendE[value]?.checked ? legendE[value].color : '#00000000'
         }
         graphic.setStyle({ fillColor })
       }
@@ -437,11 +448,11 @@ export default {
       const areas = {}
       graphics.forEach((graphic) => {
         if (graphic.area && graphic.attr && graphic.attr.Value) {
-          areas[graphic.attr.Value] = areas[graphic.attr.Value] ? (areas[graphic.attr.Value] + graphic.area) : graphic.area
+          areas[graphic.attr.Value] = areas[graphic.attr.Value] ? areas[graphic.attr.Value] + graphic.area : graphic.area
         }
       })
-      const objLegend = (type === 'wq') ? legendWQ : legendE
-      const eventName = (type === 'wq') ? 'refreshSeaWaterQualityProportion' : 'refreshSeaEutrophicationProportion'
+      const objLegend = type === 'wq' ? legendWQ : legendE
+      const eventName = type === 'wq' ? 'refreshSeaWaterQualityProportion' : 'refreshSeaEutrophicationProportion'
       const chartData = {
         year: this.year,
         season: this.season,
@@ -468,10 +479,10 @@ export default {
           callback: (attr) => {
             let fillColor = ''
             if (this.type === 'wq') {
-              fillColor = (legendWQ[attr.Value] && legendWQ[attr.Value].checked) ? legendWQ[attr.Value].color : '#00000000'
+              fillColor = legendWQ[attr.Value]?.checked ? legendWQ[attr.Value].color : '#00000000'
             }
             else {
-              fillColor = (legendE[attr.Value] && legendE[attr.Value].checked) ? legendE[attr.Value].color : '#00000000'
+              fillColor = legendE[attr.Value]?.checked ? legendE[attr.Value].color : '#00000000'
             }
             return {
               fillColor,
@@ -560,10 +571,7 @@ export default {
   <div class="work-zone">
     <div class="legend">
       <div v-if="type === 'wq'" class="legend-wq">
-        <div
-          v-for="(item, key) in legendWQ" :key="item.color" class="legend-item" :style="{ background: item.color }"
-          @click="checkLegendItem(key)"
-        >
+        <div v-for="(item, key) in legendWQ" :key="item.color" class="legend-item" :style="{ background: item.color }" @click="checkLegendItem(key)">
           <div class="icon">
             <el-icon v-if="item.checked">
               <svg-icon name="ep:circle-check-filled" />
@@ -579,8 +587,11 @@ export default {
       </div>
       <div v-if="type === 'e'" class="legend-e">
         <div
-          v-for="(item, key) in legendE" :key="item.color" class="legend-item"
-          :style="{ background: item.color, display: key === 1 ? 'none' : 'flex' }" @click="checkLegendItem(key)"
+          v-for="(item, key) in legendE"
+          :key="item.color"
+          class="legend-item"
+          :style="{ background: item.color, display: key === 1 ? 'none' : 'flex' }"
+          @click="checkLegendItem(key)"
         >
           <div class="icon">
             <el-icon v-if="item.checked">
@@ -616,8 +627,13 @@ export default {
         <el-auto-resizer>
           <template #default="{ height, width }">
             <el-table-v2
-              v-loading="loadingSeaWaterQualites" row-key="id" :data="filteredSeaWaterQualites" :width="width"
-              :height="height" :columns="columns" :cache="filteredSeaWaterQualites.length"
+              v-loading="loadingSeaWaterQualites"
+              row-key="id"
+              :data="filteredSeaWaterQualites"
+              :width="width"
+              :height="height"
+              :columns="columns"
+              :cache="filteredSeaWaterQualites.length"
             />
           </template>
         </el-auto-resizer>
@@ -627,11 +643,11 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-:deep .el-switch__label {
+:deep(.el-switch__label) {
   color: white;
 }
 
-:deep .el-loading-mask {
+:deep(.el-loading-mask) {
   background-color: rgb(0 0 0 / 80%);
 }
 
