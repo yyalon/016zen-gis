@@ -9,7 +9,6 @@ import LayerRiverSections from '../layer/RiverSections.vue'
 export default {
   components: {
     LayerRiverSections,
-    LayerRivers,
     RightDrawer,
     ChartRiverWaterQualityProportion,
     ChartWaterQualityComplianceStatus,
@@ -27,7 +26,6 @@ export default {
 
 <template>
   <div>
-    <LayerRivers v-if="visible" />
     <LayerRiverSections v-if="visible" />
     <RightDrawer :drawer-visible="visible">
       <ChartRiverWaterQualityProportion />

@@ -72,7 +72,7 @@ export default {
           :class="button.visibility ? 'active' : ''"
           @click="button.showSubButtons = !button.showSubButtons"
         >
-          <div class="button">
+          <div class="button" :class="button.visibility ? 'active' : ''">
             <el-icon>
               <svg-icon :name="button.icon" />
             </el-icon>

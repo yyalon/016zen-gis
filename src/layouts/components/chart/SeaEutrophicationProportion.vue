@@ -10,19 +10,16 @@ const seasons = {
 }
 
 const data = []
-const colors = [
-  '#ffff00',
-  '#ff9900',
-  '#ff0000',
-]
+const colors = ['#ffff00', '#ff9900', '#ff0000']
 export default {
   components: { ZFrame, Echart },
   props: {
     chartData: {
       type: Object,
-      default() { return { year: '', season: '' } },
+      default() {
+        return { year: '', season: '' }
+      },
     },
-
   },
   data() {
     return {

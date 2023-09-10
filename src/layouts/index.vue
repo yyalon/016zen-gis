@@ -1,6 +1,7 @@
 <script lang="ts" name="Layout">
 import autofit from 'autofit.js'
 import dayjs from 'dayjs'
+import LayerRivers from './components/layer/Rivers.vue'
 import LayerSeaShanghai from './components/layer/SeaShanghai.vue'
 import LayerSeaJiangsu from './components/layer/SeaJiangsu.vue'
 import LayerSeaZhejiang from './components/layer/SeaZhejiang.vue'
@@ -17,6 +18,7 @@ import GraphRiver from './components/graph/River.vue'
 import GraphOcean from './components/graph/Ocean.vue'
 import GraphBiology from './components/graph/Biology.vue'
 import GraphMeteorology from './components/graph/Meteorology.vue'
+
 import Toolbar from './components/Toolbar.vue'
 import settings from '@/settings.default'
 import { toAdmin } from '@/utils/index'
@@ -38,6 +40,7 @@ export default {
     LayergetMeteorologyStations,
     LayerReservoirs,
     LayerRiverChannels,
+    LayerRivers,
     GraphMeteorology,
     Toolbar,
   },
@@ -63,13 +66,14 @@ export default {
         },
         {
           name: '气象站',
-          value: 'layergetMeteorologyStations',
+          value: 'layerMeteorologyStations',
           command: 'toggleLayer',
           visibility: false,
           icon: 'meteorology-station',
         },
         {
           name: '河流',
+          value: 'layerRiver',
           icon: 'river',
           visibility: false,
           showSubButtons: false,
@@ -122,7 +126,9 @@ export default {
         layerReservoirs: false,
         layerRiverChannels: false,
         layergetMeteorologyStations: false,
+        layerRiver: false,
       },
+      riverLevel: null,
     }
   },
   watch: {
@@ -201,6 +207,29 @@ export default {
       switch (data.command) {
         case 'toggleLayer':
           this.toggleLayer(data.value)
+          break
+        case 'switchRiverLayer':
+          this.switchRiverLayer(data.value)
+      }
+    },
+    switchRiverLayer(riverLevel: any) {
+      if (riverLevel !== this.riverLevel) {
+        this.riverLevel = riverLevel
+        this.visibilities.layerRiver = true
+        this.buttons.forEach((button) => {
+          if (button.value === 'layerRiver') {
+            button.visibility = true
+          }
+        })
+      }
+      else {
+        this.riverLevel = null
+        this.visibilities.layerRiver = false
+        this.buttons.forEach((button) => {
+          if (button.value === 'layerRiver') {
+            button.visibility = false
+          }
+        })
       }
     },
     toggleLayer(name: keyof typeof this.visibilities) {
@@ -230,6 +259,7 @@ export default {
     <LayergetMeteorologyStations v-if="visibilities.layergetMeteorologyStations" />
     <LayerReservoirs v-if="visibilities.layerReservoirs" />
     <LayerRiverChannels v-if="visibilities.layerRiverChannels" />
+    <LayerRivers v-if="visibilities.layerRiver" :river-level="riverLevel" />
     <Toolbar :buttons="buttons" @excute-command="excuteCommand" />
     <!-- <LayerAllBorderMask /> -->
     <div class="layout-container">

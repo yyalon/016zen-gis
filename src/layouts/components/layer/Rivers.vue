@@ -3,16 +3,14 @@ const _layers = {}
 
 const _nameLayers = {}
 
-const riverLevels = [
-  { value: '1p', label: '一级河流' },
-  { value: '23p', label: '二级,三级河流' },
-  { value: 4, label: '四级河流' },
-  { value: 5, label: '五级河流' },
-]
-
 export default {
-  data() {
-    return { riverLevels, riverLevel: 4 }
+  props: {
+    riverLevel: {
+      type: String,
+      default() {
+        return '4'
+      },
+    },
   },
   watch: {
     riverLevel() {
@@ -115,13 +113,7 @@ export default {
 </script>
 
 <template>
-  <div>
-    <div class="filters">
-      <el-select v-model="riverLevel" placeholder="请选择河流等级">
-        <el-option v-for="item in riverLevels" :key="item.value" :label="item.label" :value="item.value" />
-      </el-select>
-    </div>
-  </div>
+  <div />
 </template>
 
 <style>
