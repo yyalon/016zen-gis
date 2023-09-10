@@ -65,14 +65,38 @@ export default {
       </el-icon>
     </div>
     <div class="button-grounp">
-      <div v-for="(button, index) in buttons" :key="index" class="button" :class="button.visibility ? 'active' : ''" @click="excuteCommand(button.command, button.value)">
-        <el-icon>
-          <svg-icon :name="button.icon" />
-        </el-icon>
-        <div class="name">
-          {{ button.name }}
+      <template v-for="(button, index) in buttons" :key="index">
+        <div
+          v-if="button.subButtons && button.subButtons.length > 0"
+          class="button"
+          :class="button.visibility ? 'active' : ''"
+          @click="button.showSubButtons = !button.showSubButtons"
+        >
+          <div class="button">
+            <el-icon>
+              <svg-icon :name="button.icon" />
+            </el-icon>
+            <div class="name">
+              {{ button.name }}
+            </div>
+          </div>
+          <div v-if="button.showSubButtons" class="sub-buttons">
+            <div v-for="(sb, sIndex) in button.subButtons" :key="sIndex" class="sub-button" @click.stop="excuteCommand(sb.command, sb.value)">
+              <div class="name">
+                {{ sb.name }}
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
+        <div v-else class="button" :class="button.visibility ? 'active' : ''" @click="excuteCommand(button.command, button.value)">
+          <el-icon>
+            <svg-icon :name="button.icon" />
+          </el-icon>
+          <div class="name">
+            {{ button.name }}
+          </div>
+        </div>
+      </template>
     </div>
   </div>
 </template>
@@ -106,11 +130,11 @@ export default {
 
   .button {
     position: relative;
-    font-size: 1.2em;
-    line-height: 2em;
+    font-size: 20px;
+    line-height: 20px;
     text-align: center;
-    width: 1.8em;
-    height: 1.8em;
+    width: 36px;
+    min-height: 36px;
     border-radius: 8px;
     color: white;
     background-color: rgb(63 158 255 / 60%);
@@ -120,6 +144,7 @@ export default {
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-direction: column;
 
     &.active {
       background: #fffb75;
@@ -137,6 +162,23 @@ export default {
     &:hover {
       background-color: rgb(63 158 255 / 100%);
       color: white;
+    }
+
+    .sub-buttons {
+      display: flex;
+      flex-direction: column;
+
+      .sub-button {
+        height: 36px;
+        width: 36px;
+        font-size: 16px;
+        position: relative;
+
+        .name {
+          left: 38px;
+          position: absolute;
+        }
+      }
     }
 
     .name {

@@ -4,7 +4,6 @@ import ChartRiverWaterQualityProportion from '../chart/RiverWaterQualityProporti
 import ChartWaterQualityComplianceStatus from '../chart/WaterQualityComplianceStatus.vue'
 import ChartNitrogenComplianceStatus from '../chart/NitrogenComplianceStatus.vue'
 import ChartMajorPollutantsConcentrationsTrend from '../chart/MajorPollutantsConcentrationsTrend.vue'
-import LayerRivers from '../layer/Rivers.vue'
 import LayerRiverSections from '../layer/RiverSections.vue'
 
 export default {

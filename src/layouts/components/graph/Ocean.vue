@@ -19,7 +19,8 @@ export default {
   },
   data() {
     return {
-      chartDataWQ: {}, chartDataE: {},
+      chartDataWQ: {},
+      chartDataE: {},
     }
   },
   methods: {
@@ -36,11 +37,12 @@ export default {
 <template>
   <div>
     <LayerSeaWaterQuality
-      v-if="visible" @refresh-sea-water-quality-proportion="refreshSeaWaterQualityProportion"
+      v-if="visible"
+      @refresh-sea-water-quality-proportion="refreshSeaWaterQualityProportion"
       @refresh-sea-eutrophication-proportion="refreshSeaEutrophicationProportion"
     />
     <RightDrawer :drawer-visible="visible">
-      <ChartSeaWaterQualityProportion :chart-data="chartDataWQ" /> <br>
+      <ChartSeaWaterQualityProportion v-if="visible" :chart-data="chartDataWQ" /> <br>
       <ChartSeaEutrophicationProportion v-if="visible" :chart-data="chartDataE" />
     </RightDrawer>
   </div>
