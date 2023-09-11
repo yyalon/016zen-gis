@@ -81,18 +81,21 @@ export default {
             {
               name: '一级河流',
               value: '1p',
+              active: false,
               command: 'switchRiverLayer',
               visibility: false,
             },
             {
               name: '二级，三级河流',
               value: '23p',
+              active: false,
               command: 'switchRiverLayer',
               visibility: false,
             },
             {
               name: '四级河流',
               value: '4',
+              active: false,
               command: 'switchRiverLayer',
               visibility: false,
               icon: 'river',
@@ -100,6 +103,7 @@ export default {
             {
               name: '五级河流',
               value: '5',
+              active: false,
               command: 'switchRiverLayer',
               visibility: false,
             },
@@ -219,6 +223,12 @@ export default {
         this.buttons.forEach((button) => {
           if (button.value === 'layerRiver') {
             button.visibility = true
+            button.subButtons?.forEach((subButton) => {
+              subButton.active = false
+              if (subButton.value === riverLevel) {
+                subButton.active = true
+              }
+            })
           }
         })
       }
@@ -228,6 +238,9 @@ export default {
         this.buttons.forEach((button) => {
           if (button.value === 'layerRiver') {
             button.visibility = false
+            button.subButtons?.forEach((subButton) => {
+              subButton.active = false
+            })
           }
         })
       }

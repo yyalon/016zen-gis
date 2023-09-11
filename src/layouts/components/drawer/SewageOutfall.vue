@@ -10,7 +10,9 @@ export default {
     },
     drawerData: {
       type: Object,
-      default() { return {} },
+      default() {
+        return {}
+      },
     },
   },
   emits: ['close'],
@@ -25,8 +27,7 @@ export default {
       }
     },
   },
-  async mounted() {
-  },
+  async mounted() {},
   unmounted() {
     this.handleClose()
   },
@@ -47,8 +48,14 @@ export default {
 <template>
   <div>
     <el-drawer
-      v-model="drawerVisible" class="drawer-container" :append-to-body="true" direction="btt"
-      :close-on-press-escape="false" :close-on-click-modal="false" :show-close="false" :with-header="false"
+      v-model="drawerVisible"
+      class="drawer-container"
+      :append-to-body="true"
+      direction="btt"
+      :close-on-press-escape="false"
+      :close-on-click-modal="false"
+      :show-close="false"
+      :with-header="false"
       @close="handleClose()"
     >
       <template #default>
@@ -64,7 +71,7 @@ export default {
   </div>
 </template>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .drawer-container {
   overflow: visible;
 

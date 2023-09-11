@@ -8,7 +8,7 @@ export default {
   getRiverSectionInfo: (params: any) => api.get('/app/data/river-section/info', { params }),
 
   // 通过断面编码获取单个断面水质信息
-  get135WaterQualityBySectionCode: (params: any) => api.post('/app/data/river-water-quality-monthly/list', {}, { params }),
+  getWaterQualityBySectionCode: (data: any) => api.post('/app/data/river-water-quality-monthly/list', data),
 
   // 获取排污口列表
   getSewageOutfalls: () => api.post('/app/data/sewage-outfall/list'),

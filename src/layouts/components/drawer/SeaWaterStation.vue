@@ -112,10 +112,14 @@ export default {
   </div>
 </template>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .drawer-container {
   overflow: visible;
+}
+</style>
 
+<style lang="scss" scoped>
+.drawer-container {
   .el-drawer__body {
     padding: 0;
   }

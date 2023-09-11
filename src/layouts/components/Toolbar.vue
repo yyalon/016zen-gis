@@ -72,7 +72,7 @@ export default {
           :class="button.visibility ? 'active' : ''"
           @click="button.showSubButtons = !button.showSubButtons"
         >
-          <div class="button" :class="button.visibility ? 'active' : ''">
+          <div class="button" style="margin: 0;" :class="button.visibility ? 'active' : ''">
             <el-icon>
               <svg-icon :name="button.icon" />
             </el-icon>
@@ -81,7 +81,7 @@ export default {
             </div>
           </div>
           <div v-if="button.showSubButtons" class="sub-buttons">
-            <div v-for="(sb, sIndex) in button.subButtons" :key="sIndex" class="sub-button" @click.stop="excuteCommand(sb.command, sb.value)">
+            <div v-for="(sb, sIndex) in button.subButtons" :key="sIndex" class="sub-button" :class="sb.active ? 'active' : ''" @click.stop="excuteCommand(sb.command, sb.value)">
               <div class="name">
                 {{ sb.name }}
               </div>
@@ -173,6 +173,12 @@ export default {
         width: 36px;
         font-size: 16px;
         position: relative;
+
+        &.active {
+          .name {
+            background-color: #fffb75;
+          }
+        }
 
         .name {
           left: 38px;
