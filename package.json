@@ -4,7 +4,7 @@
   "private": true,
   "author": "lihr",
   "scripts": {
-    "dev": "pnpm vite",
+    "dev": "pnpm vite --host 0.0.0.0",
     "build:test": "vue-tsc --noEmit && vite build --mode test",
     "build": "vue-tsc --noEmit && vite build",
     "serve:test": "http-server ./dist-test -o ",
