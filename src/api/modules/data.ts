@@ -28,6 +28,6 @@ export default {
   // 获取重点水库测站列表
   getReservoirs: (params: any) => api.post('/app/data/reservoir/list'),
 
-  // 获取重点水道测站列表
+  // 获取重点河道测站列表
   getRiverChannels: (params: any) => api.post('/app/data/river-channel/list'),
 }

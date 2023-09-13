@@ -328,10 +328,10 @@ export default {
                 </el-table-column>
               </el-table>
             </el-tab-pane>
-            <el-tab-pane label="附近水库" name="reservoir">
+            <el-tab-pane label="附近水库站" name="reservoir">
               Config
             </el-tab-pane>
-            <el-tab-pane label="附近水道" name="riverChannel">
+            <el-tab-pane label="附近河道站" name="riverChannel">
               Role
             </el-tab-pane>
             <el-tab-pane label="附近气象站" name="meteorologyStation">
