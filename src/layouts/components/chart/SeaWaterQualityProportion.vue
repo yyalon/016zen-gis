@@ -10,21 +10,16 @@ const seasons = {
 }
 
 const data = []
-const colors = [
-  '#73b2ff',
-  '#b2ddf7',
-  '#beb1a1',
-  '#9b856e',
-  '#7a624a',
-]
+const colors = ['#73b2ff', '#b2ddf7', '#beb1a1', '#9b856e', '#7a624a']
 export default {
   components: { ZFrame, Echart },
   props: {
     chartData: {
       type: Object,
-      default() { return { year: '', season: '' } },
+      default() {
+        return { year: '', season: '' }
+      },
     },
-
   },
   data() {
     return {
@@ -35,7 +30,7 @@ export default {
           orient: 'vertical',
           top: 'center',
           right: '10%',
-          data: data.map(it => it.label),
+          data: data.map((it) => it.label),
           textStyle: {
             color: '#fff',
             fontSize: 12,
@@ -115,7 +110,7 @@ export default {
 </script>
 
 <template>
-  <ZFrame :height="220" :title="`${chartData.year || ''}年${seasons[chartData.season] || ''}海水水质类别面积占比`">
+  <ZFrame :height="220" :title="`${chartData.province}${chartData.year || ''}年${seasons[chartData.season] || ''}海水水质类别面积占比`">
     <Echart v-if="visible" :options="options" height="190px" width="375px" />
   </ZFrame>
 </template>

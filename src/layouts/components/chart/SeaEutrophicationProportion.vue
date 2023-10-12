@@ -30,7 +30,7 @@ export default {
           orient: 'vertical',
           top: 'center',
           right: '10%',
-          data: data.map(it => it.label),
+          data: data.map((it) => it.label),
           textStyle: {
             color: '#fff',
             fontSize: 12,
@@ -114,7 +114,7 @@ export default {
 </script>
 
 <template>
-  <ZFrame :height="220" :title="`${chartData.year || ''}年${seasons[chartData.season] || ''}富营养化面积占比`">
+  <ZFrame :height="220" :title="`${chartData.province}${chartData.year || ''}年${seasons[chartData.season] || ''}富营养化面积占比`">
     <Echart v-if="visible" :options="options" height="190px" width="375px" />
   </ZFrame>
 </template>

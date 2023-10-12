@@ -13,10 +13,10 @@ let jiangsu = null
 let zhejiang = null
 
 const seas = [
-  { value: 'all', label: '所有海域' },
-  { value: 'shanghai', label: '上海海域' },
-  { value: 'jiangsu', label: '江苏海域' },
-  { value: 'zhejiang', label: '浙江海域' },
+  { value: 'all', label: '所有海域', name: '所有海域', short: '所有' },
+  { value: 'shanghai', label: '上海海域', name: '上海市', short: '上海' },
+  { value: 'jiangsu', label: '江苏海域', name: '江苏省', short: '江苏' },
+  { value: 'zhejiang', label: '浙江海域', name: '浙江省', short: '浙江' },
 ]
 
 const legendWQ = {
@@ -24,18 +24,19 @@ const legendWQ = {
     color: '#73b2ff',
     label: '一类',
     checked: true,
+    show: true,
   },
-  2: { color: '#b2ddf7', label: '二类', checked: true },
-  3: { color: '#beb1a1', label: '三类', checked: true },
-  4: { color: '#9b856e', label: '四类', checked: true },
-  5: { color: '#7a624a', label: '劣四类', checked: true },
+  2: { color: '#b2ddf7', label: '二类', checked: true, show: true },
+  3: { color: '#beb1a1', label: '三类', checked: true, show: true },
+  4: { color: '#9b856e', label: '四类', checked: true, show: true },
+  5: { color: '#7a624a', label: '劣四类', checked: true, show: true },
 }
 
 const legendE = {
-  1: { color: '#ffff0000', label: '正常', checked: true },
-  2: { color: '#ffff00', label: '轻度', checked: true },
-  3: { color: '#ff9900', label: '中度', checked: true },
-  4: { color: '#ff0000', label: '重度', checked: true },
+  1: { color: '#ffff0000', label: '正常', checked: true, show: false },
+  2: { color: '#ffff00', label: '轻度', checked: true, show: true },
+  3: { color: '#ff9900', label: '中度', checked: true, show: true },
+  4: { color: '#ff0000', label: '重度', checked: true, show: true },
 }
 
 const years = [
@@ -63,6 +64,11 @@ const objSeasons = {
 const types = [
   { value: 'wq', label: '水质评价' },
   { value: 'e', label: '富营养化' },
+  { value: 'hxxyl', label: '化学需氧量' },
+  { value: 'hxlsy', label: '活性磷酸盐' },
+  { value: 'rjy', label: '溶解氧' },
+  { value: 'syl', label: '石油类' },
+  { value: 'wjd', label: '无机氮' },
 ]
 
 const columns = [
@@ -144,7 +150,7 @@ const columns = [
           effect: 'dark',
           color: legendWQ[rowData.wqLevel].color,
         },
-        { default: () => cellData },
+        { default: () => cellData }
       )
     },
   },
@@ -210,25 +216,24 @@ export default {
         this.setOpacity(shanghai, 0)
         this.setOpacity(jiangsu, 0)
         this.setOpacity(zhejiang, 0)
-      }
-      else if (this.sea === 'shanghai') {
+      } else if (this.sea === 'shanghai') {
         window.$zMap.fitBounds(shanghai.getBounds(), { padding: [40, 40], duration: 5 })
         this.setOpacity(shanghai, 0.01)
         this.setOpacity(jiangsu, 0.8)
         this.setOpacity(zhejiang, 0.8)
-      }
-      else if (this.sea === 'zhejiang') {
+      } else if (this.sea === 'zhejiang') {
         window.$zMap.fitBounds(zhejiang.getBounds(), { padding: [40, 40], duration: 5 })
         this.setOpacity(zhejiang, 0.01)
         this.setOpacity(shanghai, 0.8)
         this.setOpacity(jiangsu, 0.8)
-      }
-      else if (this.sea === 'jiangsu') {
+      } else if (this.sea === 'jiangsu') {
         window.$zMap.fitBounds(jiangsu.getBounds(), { padding: [40, 40], duration: 5 })
         this.setOpacity(jiangsu, 0.01)
         this.setOpacity(shanghai, 0.8)
         this.setOpacity(zhejiang, 0.8)
       }
+      // this.showLayer()
+      this.getSeaWaterQuality()
     },
   },
   async mounted() {
@@ -263,6 +268,16 @@ export default {
       if (this.season !== 'average') {
         query.season = this.season
       }
+
+      if (this.sea !== 'all') {
+        let province = ''
+        seas.forEach((sea) => {
+          if (sea.value === this.sea) {
+            province = sea.short
+          }
+        })
+        query.province = province
+      }
       const { code, data } = await apiData.getSeaWaterQuality(query)
       this.loadingSeaWaterQualites = false
       if (code === 1000) {
@@ -274,8 +289,7 @@ export default {
           this.seaWaterQualites.forEach((item) => {
             if (objSeaWaterQualites[item.site]) {
               objSeaWaterQualites[item.site].push(item)
-            }
-            else {
+            } else {
               objSeaWaterQualites[item.site] = [item]
             }
           })
@@ -328,9 +342,8 @@ export default {
 
             this.filteredSeaWaterQualites.push(objYearQualites)
           }
-        }
-        else {
-          this.filteredSeaWaterQualites = this.seaWaterQualites.filter(item => item.year === this.year && item.season === this.season)
+        } else {
+          this.filteredSeaWaterQualites = this.seaWaterQualites.filter((item) => item.year === this.year && item.season === this.season)
         }
       }
     },
@@ -344,8 +357,7 @@ export default {
       if (stationlayer) {
         stationlayer.show = true
         loading.close()
-      }
-      else {
+      } else {
         stationlayer = new window.$ZMap.layer.ClusterLayer({
           show: false,
           maxClusterRadius: 70,
@@ -407,8 +419,7 @@ export default {
         let fillColor = ''
         if (this.type === 'wq') {
           fillColor = legendWQ[value]?.checked ? legendWQ[value].color : '#00000000'
-        }
-        else {
+        } else {
           fillColor = legendE[value]?.checked ? legendE[value].color : '#00000000'
         }
         graphic.setStyle({ fillColor })
@@ -423,8 +434,7 @@ export default {
       })
       if (this.type === 'wq') {
         this.legendWQ[value].checked = !this.legendWQ[value].checked
-      }
-      else {
+      } else {
         this.legendE[value].checked = !this.legendE[value].checked
       }
       this.resetLayerStyle()
@@ -451,11 +461,18 @@ export default {
           areas[graphic.attr.Value] = areas[graphic.attr.Value] ? areas[graphic.attr.Value] + graphic.area : graphic.area
         }
       })
+      let province = ''
+      seas.forEach((sea) => {
+        if (sea.value === this.sea) {
+          province = sea.name
+        }
+      })
       const objLegend = type === 'wq' ? legendWQ : legendE
       const eventName = type === 'wq' ? 'refreshSeaWaterQualityProportion' : 'refreshSeaEutrophicationProportion'
       const chartData = {
         year: this.year,
         season: this.season,
+        province,
         areas: Object.entries(areas).map(([key, value]) => ({ label: objLegend[key].label, value })),
       }
       this.$emit(eventName, chartData)
@@ -480,8 +497,7 @@ export default {
             let fillColor = ''
             if (this.type === 'wq') {
               fillColor = legendWQ[attr.Value]?.checked ? legendWQ[attr.Value].color : '#00000000'
-            }
-            else {
+            } else {
               fillColor = legendE[attr.Value]?.checked ? legendE[attr.Value].color : '#00000000'
             }
             return {
@@ -500,17 +516,18 @@ export default {
       }
 
       for (const key in layers) {
+        console.log('隐藏图层', key)
         layers[key].show = false
       }
-      this.sea = 'all'
+      // this.sea = 'all'
       const name = `${this.type}${this.year}${this.season}`
+      console.log('显示图层', name)
       if (layers[name]) {
         this.resetLayerStyle()
         layers[name].show = true
         this.updateChartData('wq')
         this.updateChartData('e')
-      }
-      else {
+      } else {
         const loading = this.$loading({
           lock: true,
           text: '正在加载地图数据...',
@@ -571,38 +588,36 @@ export default {
   <div class="work-zone">
     <div class="legend">
       <div v-if="type === 'wq'" class="legend-wq">
-        <div v-for="(item, key) in legendWQ" :key="item.color" class="legend-item" :style="{ background: item.color }" @click="checkLegendItem(key)">
-          <div class="icon">
-            <el-icon v-if="item.checked">
-              <svg-icon name="ep:circle-check-filled" />
-            </el-icon>
-            <el-icon v-if="!item.checked">
-              <svg-icon name="ep:circle-check" />
-            </el-icon>
+        <template v-for="(item, key) in legendWQ" :key="item.color">
+          <div v-if="item.show" class="legend-item" :style="{ background: item.color }" @click="checkLegendItem(key)">
+            <div class="icon">
+              <el-icon v-if="item.checked">
+                <svg-icon name="ep:circle-check-filled" />
+              </el-icon>
+              <el-icon v-if="!item.checked">
+                <svg-icon name="ep:circle-check" />
+              </el-icon>
+            </div>
+            <div class="name">
+              {{ item.label }}
+            </div>
           </div>
-          <div class="name">
-            {{ item.label }}
-          </div>
-        </div>
+        </template>
       </div>
       <div v-if="type === 'e'" class="legend-e">
-        <div
-          v-for="(item, key) in legendE"
-          :key="item.color"
-          class="legend-item"
-          :style="{ background: item.color, display: key === 1 ? 'none' : 'flex' }"
-          @click="checkLegendItem(key)"
-        >
-          <div class="icon">
-            <el-icon v-if="item.checked">
-              <svg-icon name="ep:circle-check-filled" />
-            </el-icon>
-            <el-icon v-if="!item.checked">
-              <svg-icon name="ep:circle-check" />
-            </el-icon>
+        <template v-for="(item, key) in legendE" :key="item.color">
+          <div v-if="item.show" class="legend-item" :style="{ background: item.color, display: key === 1 ? 'none' : 'flex' }" @click="checkLegendItem(key)">
+            <div class="icon">
+              <el-icon v-if="item.checked">
+                <svg-icon name="ep:circle-check-filled" />
+              </el-icon>
+              <el-icon v-if="!item.checked">
+                <svg-icon name="ep:circle-check" />
+              </el-icon>
+            </div>
+            {{ item.label }}富营养化
           </div>
-          {{ item.label }}富营养化
-        </div>
+        </template>
       </div>
     </div>
     <div class="filters">

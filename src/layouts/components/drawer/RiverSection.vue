@@ -117,14 +117,12 @@ export default {
               </el-descriptions-item>
             </el-descriptions>
           </div>
-          <br>
+          <br />
           <el-tabs v-model="activeName" class="demo-tabs">
             <el-tab-pane label="水质数据" name="waterQuality">
               <el-table :data="waterQualityData" :height="tableHeight" size="small">
                 <el-table-column label="监测时间" fixed>
-                  <template #default="scope">
-                    {{ scope.row.WQ_INF_YEAR }}-{{ scope.row.WQ_INF_MONTH }}
-                  </template>
+                  <template #default="scope"> {{ scope.row.WQ_INF_YEAR }}-{{ scope.row.WQ_INF_MONTH }} </template>
                 </el-table-column>
                 <el-table-column label="水质类别" fixed>
                   <template #default="scope">
@@ -328,15 +326,9 @@ export default {
                 </el-table-column>
               </el-table>
             </el-tab-pane>
-            <el-tab-pane label="附近水库站" name="reservoir">
-              Config
-            </el-tab-pane>
-            <el-tab-pane label="附近河道站" name="riverChannel">
-              Role
-            </el-tab-pane>
-            <el-tab-pane label="附近气象站" name="meteorologyStation">
-              Task
-            </el-tab-pane>
+            <el-tab-pane label="附近水库站" name="reservoir" />
+            <el-tab-pane label="附近河道站" name="riverChannel" />
+            <el-tab-pane label="附近气象站" name="meteorologyStation" />
           </el-tabs>
         </div>
       </template>
