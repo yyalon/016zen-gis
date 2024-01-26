@@ -9,6 +9,17 @@ export default {
 
   // 通过断面编码获取单个断面水质信息
   getWaterQualityBySectionCode: (data: any) => api.post('/app/data/river-water-quality-monthly/list', data),
+  // 水质类别面积占比
+  getRiverSectionAreaRatio: (data: any) => api.post('/app/data/river-section/areaRatio', data),
+
+  // 水质总体达标情况
+  getRiverSectionOverall: () => api.get('/app/data/river-section/overall'),
+
+  // 入海河流断面总氮达标情况
+  getRiverSectionTotalDan: () => api.get('/app/data/river-section/totalDan'),
+
+  // 主要污染物浓度趋势图
+  getPollutionConcentrationTrend: () => api.get('/app/data/river-section/concentrationTrend'),
 
   // 获取排污口列表
   getSewageOutfalls: () => api.post('/app/data/sewage-outfall/list'),

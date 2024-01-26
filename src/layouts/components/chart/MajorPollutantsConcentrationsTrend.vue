@@ -2,6 +2,7 @@
 import { random, round } from 'lodash-es'
 import ZFrame from '../ZFrame.vue'
 import Echart from '@/lib/echart/index.vue'
+import ApiData from '@/api/modules/data'
 
 const types = {
   oils: '石油类(mg/L)',
@@ -170,7 +171,9 @@ export default {
       },
     }
   },
-  mounted() {
+  async mounted() {
+    const res = await ApiData.getPollutionConcentrationTrend()
+    // console.log('getPollutionConcentrationTrend', res)
     this.options.xAxis[0].data = [
       '202101',
       '202102',

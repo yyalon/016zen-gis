@@ -150,7 +150,7 @@ const columns = [
           effect: 'dark',
           color: legendWQ[rowData.wqLevel].color,
         },
-        { default: () => cellData }
+        { default: () => cellData },
       )
     },
   },
@@ -216,17 +216,20 @@ export default {
         this.setOpacity(shanghai, 0)
         this.setOpacity(jiangsu, 0)
         this.setOpacity(zhejiang, 0)
-      } else if (this.sea === 'shanghai') {
+      }
+      else if (this.sea === 'shanghai') {
         window.$zMap.fitBounds(shanghai.getBounds(), { padding: [40, 40], duration: 5 })
         this.setOpacity(shanghai, 0.01)
         this.setOpacity(jiangsu, 0.8)
         this.setOpacity(zhejiang, 0.8)
-      } else if (this.sea === 'zhejiang') {
+      }
+      else if (this.sea === 'zhejiang') {
         window.$zMap.fitBounds(zhejiang.getBounds(), { padding: [40, 40], duration: 5 })
         this.setOpacity(zhejiang, 0.01)
         this.setOpacity(shanghai, 0.8)
         this.setOpacity(jiangsu, 0.8)
-      } else if (this.sea === 'jiangsu') {
+      }
+      else if (this.sea === 'jiangsu') {
         window.$zMap.fitBounds(jiangsu.getBounds(), { padding: [40, 40], duration: 5 })
         this.setOpacity(jiangsu, 0.01)
         this.setOpacity(shanghai, 0.8)
@@ -289,7 +292,8 @@ export default {
           this.seaWaterQualites.forEach((item) => {
             if (objSeaWaterQualites[item.site]) {
               objSeaWaterQualites[item.site].push(item)
-            } else {
+            }
+            else {
               objSeaWaterQualites[item.site] = [item]
             }
           })
@@ -342,8 +346,9 @@ export default {
 
             this.filteredSeaWaterQualites.push(objYearQualites)
           }
-        } else {
-          this.filteredSeaWaterQualites = this.seaWaterQualites.filter((item) => item.year === this.year && item.season === this.season)
+        }
+        else {
+          this.filteredSeaWaterQualites = this.seaWaterQualites.filter(item => item.year === this.year && item.season === this.season)
         }
       }
     },
@@ -357,7 +362,8 @@ export default {
       if (stationlayer) {
         stationlayer.show = true
         loading.close()
-      } else {
+      }
+      else {
         stationlayer = new window.$ZMap.layer.ClusterLayer({
           show: false,
           maxClusterRadius: 70,
@@ -419,7 +425,8 @@ export default {
         let fillColor = ''
         if (this.type === 'wq') {
           fillColor = legendWQ[value]?.checked ? legendWQ[value].color : '#00000000'
-        } else {
+        }
+        else {
           fillColor = legendE[value]?.checked ? legendE[value].color : '#00000000'
         }
         graphic.setStyle({ fillColor })
@@ -434,7 +441,8 @@ export default {
       })
       if (this.type === 'wq') {
         this.legendWQ[value].checked = !this.legendWQ[value].checked
-      } else {
+      }
+      else {
         this.legendE[value].checked = !this.legendE[value].checked
       }
       this.resetLayerStyle()
@@ -497,7 +505,8 @@ export default {
             let fillColor = ''
             if (this.type === 'wq') {
               fillColor = legendWQ[attr.Value]?.checked ? legendWQ[attr.Value].color : '#00000000'
-            } else {
+            }
+            else {
               fillColor = legendE[attr.Value]?.checked ? legendE[attr.Value].color : '#00000000'
             }
             return {
@@ -516,18 +525,19 @@ export default {
       }
 
       for (const key in layers) {
-        console.log('隐藏图层', key)
+        // console.log('隐藏图层', key)
         layers[key].show = false
       }
       // this.sea = 'all'
       const name = `${this.type}${this.year}${this.season}`
-      console.log('显示图层', name)
+      // console.log('显示图层', name)
       if (layers[name]) {
         this.resetLayerStyle()
         layers[name].show = true
         this.updateChartData('wq')
         this.updateChartData('e')
-      } else {
+      }
+      else {
         const loading = this.$loading({
           lock: true,
           text: '正在加载地图数据...',
