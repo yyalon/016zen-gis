@@ -52,6 +52,7 @@ export default {
     }
   },
   async mounted() {
+    await this.delay(1000)
     const res = await ApiData.getRiverSectionOverall()
     // console.log('getRiverSectionOverall:', res)
     if (res && res.code === 1000) {
@@ -68,6 +69,13 @@ export default {
       this.visible = true
     }
     this.visible = true
+  },
+  methods: {
+    delay(ms) {
+      return new Promise((resolve) => {
+        setTimeout(resolve, ms)
+      })
+    },
   },
 }
 </script>
