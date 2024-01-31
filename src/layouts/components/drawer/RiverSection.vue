@@ -117,12 +117,14 @@ export default {
               </el-descriptions-item>
             </el-descriptions>
           </div>
-          <br />
+          <br>
           <el-tabs v-model="activeName" class="demo-tabs">
             <el-tab-pane label="水质数据" name="waterQuality">
               <el-table :data="waterQualityData" :height="tableHeight" size="small">
                 <el-table-column label="监测时间" fixed>
-                  <template #default="scope"> {{ scope.row.WQ_INF_YEAR }}-{{ scope.row.WQ_INF_MONTH }} </template>
+                  <template #default="scope">
+                    {{ scope.row.WQ_INF_YEAR }}-{{ scope.row.WQ_INF_MONTH }}
+                  </template>
                 </el-table-column>
                 <el-table-column label="水质类别" fixed>
                   <template #default="scope">

@@ -1,7 +1,7 @@
 <script>
-import { random, round } from 'lodash-es'
 import ZFrame from '../ZFrame.vue'
 import Echart from '@/lib/echart/index.vue'
+import ApiData from '@/api/modules/data'
 
 const types = {
   oils: '石油类(mg/L)',
@@ -168,29 +168,42 @@ export default {
           },
         ],
       },
+      year: 2022,
     }
   },
-  mounted() {
-    this.options.xAxis[0].data = [
-      '202101',
-      '202102',
-      '202103',
-      '202104',
-      '202105',
-      '202106',
-    ]
-    const data = []
-    for (let i = 0; i < 6; i++) {
-      data.push(round(random(1.1, 6.9), 1))
+  computed: {
+    combinedTitle() {
+      return `${this.year}主要污染物浓度趋势图`
+    },
+  },
+  async mounted() {
+    const res = await ApiData.getPollutionConcentrationTrend()
+    // console.log('getPollutionConcentrationTrend', res)
+    if (res && res.code === 1000) {
+      this.options.xAxis[0].data = res.data.map(e => e.WQ_INF_MONTH)
+      this.options.series[0].data = res.data.map(e => Math.round(e.value))
     }
-    this.options.series[0].data = data
+
+    // this.options.xAxis[0].data = [
+    //   '202101',
+    //   '202102',
+    //   '202103',
+    //   '202104',
+    //   '202105',
+    //   '202106',
+    // ]
+    // const data = []
+    // for (let i = 0; i < 6; i++) {
+    //   data.push(round(random(1.1, 6.9), 1))
+    // }
+    // this.options.series[0].data = data
     this.visible = true
   },
 }
 </script>
 
 <template>
-  <ZFrame :height="220" title="主要污染物浓度趋势图">
+  <ZFrame :height="220" :title="combinedTitle">
     <Echart v-if="visible" :options="options" height="190px" width="375px" />
   </ZFrame>
 </template>
