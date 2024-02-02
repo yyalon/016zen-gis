@@ -92,6 +92,31 @@ export default {
       river: '',
       columns,
       showList: false,
+      timeSlot: ref(''),
+      shortcuts: [
+        {
+          text: '本月',
+          value: [new Date(), new Date()],
+        },
+        {
+          text: '本年',
+          value: () => {
+            const end = new Date()
+            const start = new Date(new Date().getFullYear(), 0)
+            return [start, end]
+          },
+        },
+        {
+          text: '最近半年',
+          value: () => {
+            const end = new Date()
+            const start = new Date()
+            start.setMonth(start.getMonth() - 6)
+            return [start, end]
+          },
+        },
+      ],
+
     }
   },
   watch: {},
@@ -256,6 +281,14 @@ export default {
       <el-select v-model="river" filterable placeholder="请选择水体" size="large" @change="filterRiverSections()">
         <el-option v-for="(item, index) in rivers" :key="index" :label="item" :value="item" />
       </el-select>
+      <el-date-picker
+        v-model="timeSlot"
+        type="monthrange"
+        range-separator="-"
+        start-placeholder="开始月份"
+        end-placeholder="结束月份"
+        :shortcuts="shortcuts"
+      />
       <el-switch v-model="estuary" active-text="入海口" @change="filterRiverSections()" />
       <el-switch v-model="showList" active-text="显示列表" />
     </div>
