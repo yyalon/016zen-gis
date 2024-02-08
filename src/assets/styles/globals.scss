@@ -112,6 +112,24 @@ textarea {
     }
   }
 
+  .elDatePicker.el-picker-panel {
+    color: #fff;
+    background: #002450;
+    border: 1px solid #1384b4;
+
+    .el-picker-panel__icon-btn {
+      color: #fff;
+    }
+
+    .el-date-picker__header-label {
+      color: #fff;
+    }
+
+    .el-date-table th {
+      color: #fff;
+    }
+  }
+
   .el-switch {
     pointer-events: all;
   }

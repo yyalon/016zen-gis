@@ -1,5 +1,11 @@
 [
   {
+    "label": "全部",
+    "abbreviate": "",
+    "code": "000000"
+
+  },
+  {
     "label": "北京市",
     "abbreviate": "京",
     "code": "110000",

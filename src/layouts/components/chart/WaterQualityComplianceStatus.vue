@@ -2,6 +2,7 @@
 import ZFrame from '../ZFrame.vue'
 import Echart from '@/lib/echart/index.vue'
 import ApiData from '@/api/modules/data'
+import eventBus from '@/utils/eventBus'
 
 export default {
   components: { ZFrame, Echart },
@@ -69,6 +70,13 @@ export default {
       this.visible = true
     }
     this.visible = true
+
+    eventBus.on('filterparam', (param) => {
+      // console.log('water:filterparam:', param)
+    })
+    onBeforeUnmount(() => {
+      eventBus.off('filterparam')
+    })
   },
   methods: {
     delay(ms) {
@@ -76,7 +84,11 @@ export default {
         setTimeout(resolve, ms)
       })
     },
+    handleSearch(data) {
+      // console.log('handleSearch')
+    },
   },
+
 }
 </script>
 

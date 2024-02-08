@@ -13,13 +13,13 @@ export default {
   getRiverSectionAreaRatio: (data: any) => api.post('/app/data/river-section/areaRatio', data),
 
   // 水质总体达标情况
-  getRiverSectionOverall: () => api.get('/app/data/river-section/overall'),
+  getRiverSectionOverall: (data: any) => api.post('/app/data/river-section/overall', data),
 
   // 入海河流断面总氮达标情况
-  getRiverSectionTotalDan: () => api.get('/app/data/river-section/totalDan'),
+  getRiverSectionTotalDan: (data: any) => api.post('/app/data/river-section/totalDan', data),
 
   // 主要污染物浓度趋势图
-  getPollutionConcentrationTrend: () => api.get('/app/data/river-section/concentrationTrend'),
+  getPollutionConcentrationTrend: (data: any) => api.post('/app/data/river-section/concentrationTrend', data),
 
   // 获取排污口列表
   getSewageOutfalls: () => api.post('/app/data/sewage-outfall/list'),

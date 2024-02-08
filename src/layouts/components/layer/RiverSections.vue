@@ -2,6 +2,7 @@
 import DrawerRiverSection from '../drawer/RiverSection.vue'
 import PopupRiverSection from '../popup/RiverSection.vue'
 import ZFrame from '../ZFrame.vue'
+import eventBus from '@/utils/eventBus'
 import apiData from '@/api/modules/data'
 import areas from '@/utils/area.json'
 
@@ -76,12 +77,14 @@ const columns = [
 
 export default {
   components: { DrawerRiverSection, ZFrame },
+  emits: ['filterparam'],
   data() {
     return {
       loadingRiverSections: false,
-      areas: areas.filter(zone => ['上海市', '浙江省', '江苏省'].includes(zone.label)),
+      areas: areas.filter(zone => ['全部', '上海市', '浙江省', '江苏省'].includes(zone.label)),
       estuary: false,
       selectedArea: '',
+      selectedAreaNode: null,
       riverSections: [],
       filteredRiverSections: [],
       drawerVisible: false,
@@ -92,19 +95,11 @@ export default {
       river: '',
       columns,
       showList: false,
-      timeSlot: ref(''),
+      timeSlot: ref([new Date(), new Date()]),
       shortcuts: [
         {
           text: '本月',
           value: [new Date(), new Date()],
-        },
-        {
-          text: '本年',
-          value: () => {
-            const end = new Date()
-            const start = new Date(new Date().getFullYear(), 0)
-            return [start, end]
-          },
         },
         {
           text: '最近半年',
@@ -112,6 +107,15 @@ export default {
             const end = new Date()
             const start = new Date()
             start.setMonth(start.getMonth() - 6)
+            return [start, end]
+          },
+        },
+        {
+          text: '最近一年',
+          value: () => {
+            const end = new Date()
+            const start = new Date()
+            start.setMonth(start.getMonth() - 12)
             return [start, end]
           },
         },
@@ -129,7 +133,7 @@ export default {
     _layer = null
   },
   methods: {
-    filterRiverSections() {
+    filterRiverSections(value) {
       this.loadingRiverSections = true
       this.filteredRiverSections = []
 
@@ -141,7 +145,7 @@ export default {
         if (this.estuary && !section.type?.includes('入海口')) {
           _qualitied = false
         }
-        if (this.river && section.at !== this.river) {
+        if (this.river && section.name !== this.river) {
           _qualitied = false
         }
         if (_qualitied) {
@@ -152,6 +156,7 @@ export default {
       setTimeout(() => {
         this.loadingRiverSections = false
       }, 1000)
+      this.sendRiverFilterParam()
     },
     refreshLayer() {
       _layer.clear()
@@ -230,18 +235,19 @@ export default {
         }
       })
     },
-    calcRivers() {
+    calcRivers(code) {
       this.rivers = []
+      !code && this.rivers.push('全部')
       this.riverSections.forEach((riverSection) => {
-        if (!this.rivers.includes(riverSection.at)) {
-          this.rivers.push(riverSection.at)
+        if (!this.rivers.includes(riverSection.name) && (!code || riverSection.code.startsWith(code))) {
+          this.rivers.push(riverSection.name)
         }
       })
     },
     async getData() {
-      const { code, data } = await apiData.getRiverSections()
-      if (code === 1000) {
-        this.riverSections = data
+      const res = await apiData.getRiverSections()
+      if (res && res.code === 1000) {
+        this.riverSections = res.data
       }
       this.calcRivers()
     },
@@ -269,6 +275,46 @@ export default {
         loading.close()
       }, 500)
     },
+    selectedTimeSlot() {
+      this.sendRiverFilterParam()
+    },
+    sendRiverFilterParam() {
+      let city = ''
+      let province = ''
+      if (this.selectedAreaNode?.level === 1) {
+        city = ''
+        province = this.selectedArea
+      }
+      else if (this.selectedAreaNode?.level === 2) {
+        city = this.selectedArea
+        province = this.selectedAreaNode.parent.data.label
+      }
+      const river = this.river === '全部' ? '' : this.river
+      eventBus.emit('filterparam', {
+        river,
+        city,
+        province,
+        timeSlot: {
+          start: this.timeSlot[0],
+          startYear: this.timeSlot[0].getFullYear().toString(),
+          startMon: (this.timeSlot[0].getMonth() + 1).toString().padStart(2, 0),
+          end: this.timeSlot[1],
+          endYear: this.timeSlot[1].getFullYear().toString(),
+          endMon: (this.timeSlot[1].getMonth() + 1).toString().padStart(2, 0),
+        },
+      })
+    },
+    disabledDate(time) {
+      return time.getTime() > Date.now()
+    },
+
+    handleAreasClick(node, curentNode) {
+      this.selectedAreaNode = curentNode
+      // console.log('handleAreasClick', node, curentNode)
+      this.river = '全部'
+      const code = node.code.replace(/0+$/, '')
+      this.calcRivers(code)
+    },
   },
 }
 </script>
@@ -276,18 +322,25 @@ export default {
 <template>
   <div class="work-zone">
     <div class="filters">
-      <el-tree-select v-model="selectedArea" :data="areas" :render-after-expand="false" node-key="label" check-strictly size="large" @change="filterRiverSections()" />
+      <el-tree-select
+        v-model="selectedArea" :data="areas" :render-after-expand="false" node-key="label"
+        check-strictly size="large" @node-click="handleAreasClick" @change="filterRiverSections"
+      />
 
-      <el-select v-model="river" filterable placeholder="请选择水体" size="large" @change="filterRiverSections()">
+      <el-select v-model="river" filterable placeholder="请选择断面" size="large" @change="filterRiverSections">
         <el-option v-for="(item, index) in rivers" :key="index" :label="item" :value="item" />
       </el-select>
       <el-date-picker
         v-model="timeSlot"
+        size="large"
         type="monthrange"
         range-separator="-"
         start-placeholder="开始月份"
         end-placeholder="结束月份"
+        unlink-panels
         :shortcuts="shortcuts"
+        :disabled-date="disabledDate"
+        @change="selectedTimeSlot()"
       />
       <el-switch v-model="estuary" active-text="入海口" @change="filterRiverSections()" />
       <el-switch v-model="showList" active-text="显示列表" />
@@ -340,8 +393,20 @@ export default {
   color: white;
 }
 
+.el-date-picker {
+  :deep .el-input__inner {
+    background-color: transparent !important;
+    border-color: #80ffff;
+    box-shadow: 1px 1px 5px 1px  rgb(128 255 255 / 80%) inset;
+  }
+}
+
 .work-zone {
   display: flex;
+
+  .filters {
+    pointer-events: all;
+  }
 
   .river-section-list {
     position: absolute;

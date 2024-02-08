@@ -2,6 +2,7 @@
 import ZFrame from '../ZFrame.vue'
 import Echart from '@/lib/echart/index.vue'
 import apiData from '@/api/modules/data'
+import eventBus from '@/utils/eventBus'
 
 const data = [
   {
@@ -42,7 +43,9 @@ export default {
   data() {
     return {
       visible: false,
-      flag: false,
+      param: {
+        flag: false,
+      },
       options: {
         legend: {
           orient: 'vertical',
@@ -95,12 +98,22 @@ export default {
   },
   mounted() {
     this.visible = true
-    this.getData(this.flag)
+    // this.getData(this.param)
+
+    eventBus.on('filterparam', (param) => {
+      // console.log('quality:filterparam:', param)
+      param.flag = this.param.flag
+      this.param = param
+      this.getData(this.param)
+    })
+    onBeforeUnmount(() => {
+      eventBus.off('filterparam')
+    })
   },
   methods: {
-    async getData(flag) {
-      const result1 = await apiData.getRiverSectionAreaRatio({ flag })
-      if (result1.code === 1000 && result1.data) {
+    async getData(param) {
+      const result1 = await apiData.getRiverSectionAreaRatio(param)
+      if (result1 && result1.code === 1000 && result1.data) {
         const opt = {
           legend: {
             orient: 'vertical',
@@ -154,8 +167,8 @@ export default {
       }
     },
     handleClick() {
-      this.flag = !this.flag
-      this.getData(this.flag)
+      this.param.flag = !this.param.flag
+      this.getData(this.param)
     },
   },
 
