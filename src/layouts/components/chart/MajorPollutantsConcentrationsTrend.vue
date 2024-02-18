@@ -1,7 +1,5 @@
 <script>
-import ZFrame from '../ZFrame.vue'
-import Echart from '@/lib/echart/index.vue'
-import ApiData from '@/api/modules/data'
+import eventBus from '@/utils/eventBus'
 
 const types = {
   oils: '石油类(mg/L)',
@@ -12,12 +10,13 @@ const types = {
   ph: 'ph值',
 }
 export default {
-  components: { ZFrame, Echart },
+  // components: { ZFrame, Echart },
   data() {
     return {
       type: 'do',
       types,
       visible: false,
+      layerVisible: false,
       options: {
         grid: {
           left: '10px',
@@ -177,12 +176,12 @@ export default {
     },
   },
   async mounted() {
-    const res = await ApiData.getPollutionConcentrationTrend()
+    // const res = await ApiData.getPollutionConcentrationTrend()
     // console.log('getPollutionConcentrationTrend', res)
-    if (res && res.code === 1000) {
-      this.options.xAxis[0].data = res.data.map(e => e.WQ_INF_MONTH)
-      this.options.series[0].data = res.data.map(e => Math.round(e.value))
-    }
+    // if (res && res.code === 1000) {
+    //   this.options.xAxis[0].data = res.data.map(e => e.WQ_INF_MONTH)
+    //   this.options.series[0].data = res.data.map(e => Math.round(e.value))
+    // }
 
     // this.options.xAxis[0].data = [
     //   '202101',
@@ -197,13 +196,40 @@ export default {
     //   data.push(round(random(1.1, 6.9), 1))
     // }
     // this.options.series[0].data = data
-    this.visible = true
+    // this.visible = true
+  },
+  methods: {
+    toggleView() {
+      eventBus.emit('showtrend')
+    },
   },
 }
 </script>
 
 <template>
-  <ZFrame :height="220" :title="combinedTitle">
-    <Echart v-if="visible" :options="options" height="190px" width="375px" />
-  </ZFrame>
+  <div class="zong-button">
+    <el-button type="primary" class="positioned" @click="toggleView">
+      浓度趋势图
+    </el-button>
+  </div>
+  <!-- <div v-if="layerVisible" class="layer" :title="combinedTitle">
+    <ZFrame width="100%" height="100%">
+      <Echart v-if="visible" :options="options" height="190px" width="375px" />
+    </ZFrame>
+  </div> -->
 </template>
+
+<style lang='scss'>
+.zong-button {
+  position: relative;
+  height: 100px;
+  width: 375px;
+}
+
+.positioned {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+}
+</style>

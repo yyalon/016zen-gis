@@ -2,6 +2,7 @@
 import DrawerRiverSection from '../drawer/RiverSection.vue'
 import PopupRiverSection from '../popup/RiverSection.vue'
 import ZFrame from '../ZFrame.vue'
+import LayerMajorPollutantsConcentrationsTrend from '../chart/LayerMajorPollutantsConcentrationsTrend.vue'
 import eventBus from '@/utils/eventBus'
 import apiData from '@/api/modules/data'
 import areas from '@/utils/area.json'
@@ -76,7 +77,7 @@ const columns = [
 ]
 
 export default {
-  components: { DrawerRiverSection, ZFrame },
+  components: { DrawerRiverSection, ZFrame, LayerMajorPollutantsConcentrationsTrend },
   emits: ['filterparam'],
   data() {
     return {
@@ -120,11 +121,18 @@ export default {
           },
         },
       ],
-
+      trendVisible: false,
     }
   },
   watch: {},
   async mounted() {
+    eventBus.on('showtrend', () => {
+      this.trendVisible = !this.trendVisible
+    })
+    onBeforeUnmount(() => {
+      eventBus.off('showtrend')
+    })
+
     await this.showLayer()
   },
   unmounted() {
@@ -291,7 +299,7 @@ export default {
       }
       const river = this.river === '全部' ? '' : this.river
       eventBus.emit('filterparam', {
-        river,
+        dm_name: river,
         city,
         province,
         timeSlot: {
@@ -314,6 +322,9 @@ export default {
       this.river = '全部'
       const code = node.code.replace(/0+$/, '')
       this.calcRivers(code)
+    },
+    closeLayerTrend() {
+      this.trendVisible = false
     },
   },
 }
@@ -363,6 +374,7 @@ export default {
       </ZFrame>
     </div>
     <DrawerRiverSection :drawer-data="drawerData" :visible="drawerVisible" @close="drawerVisible = false" />
+    <LayerMajorPollutantsConcentrationsTrend v-if="trendVisible" class="layer-trend" @close="closeLayerTrend" />
   </div>
 </template>
 
@@ -416,6 +428,17 @@ export default {
     height: 800px;
     overflow-y: auto;
     overflow-x: hidden;
+    pointer-events: all;
+  }
+
+  .layer-trend {
+    position: absolute;
+    background: #d7f2f2;
+    z-index: 10000;
+    right: 100px;
+    bottom: 0;
+    width: 800px;
+    height: 300px;
     pointer-events: all;
   }
 }
