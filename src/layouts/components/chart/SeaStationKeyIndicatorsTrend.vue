@@ -21,7 +21,10 @@ export default {
   components: { Echart },
   props: {
     chartData: {
-      type: Object, default() { return {} },
+      type: Object,
+      default() {
+        return {}
+      },
     },
   },
   data() {
@@ -134,14 +137,18 @@ export default {
     this.update()
   },
   methods: {
-    selectType() { this.update() },
+    selectType() {
+      this.update()
+    },
     update() {
       if (this.chartData.items && this.chartData.items.length > 0) {
         this.options.xAxis[0].data = []
         this.options.series[0].data = []
         this.chartData.items.forEach((item) => {
-          this.options.xAxis[0].data.push(`${dayjs(item.minitor_month).format('YYYY')}\n${seasons[item.season]}`)
-          this.options.series[0].data.push(item[this.type])
+          if (item[this.type]) {
+            this.options.xAxis[0].data.push(`${dayjs(item.minitor_month).format('YYYY')}\n${seasons[item.season]}`)
+            this.options.series[0].data.push(item[this.type])
+          }
         })
         this.visible = true
       }
@@ -155,7 +162,7 @@ export default {
     <h5 class="chart-title">
       海水水质关键指标变化趋势
       <el-select v-model="type" class="select-type" size="small" @change="selectType()">
-        <el-option v-for=" item, key in types" :key="key" :label="item" :value="key" />
+        <el-option v-for="(item, key) in types" :key="key" :label="item" :value="key" />
       </el-select>
     </h5>
     <Echart v-if="visible" :options="options" height="220px" width="375px" />

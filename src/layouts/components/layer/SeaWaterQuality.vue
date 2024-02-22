@@ -99,47 +99,78 @@ const columns = [
     prop: 'pH',
     title: 'PH',
     width: 120,
+    align: 'center',
+    cellRenderer: (scope) => {
+      const { rowData, cellData } = scope
+      return rowData.pH || '-'
+    },
   },
   {
     key: 6,
     dataKey: 'rjy',
     prop: 'rjy',
     title: '溶解氧',
+    align: 'center',
     width: 120,
+    cellRenderer: (scope) => {
+      const { rowData, cellData } = scope
+      return rowData.rjy || '-'
+    },
   },
   {
     key: 7,
     dataKey: 'hxxyl',
     prop: 'hxxyl',
     title: '化学需氧量',
+    align: 'center',
     width: 120,
+    cellRenderer: (scope) => {
+      const { rowData, cellData } = scope
+      return rowData.hxxyl || '-'
+    },
   },
   {
     key: 8,
     dataKey: 'wjd',
     prop: 'wjd',
     title: '无机氮',
+    align: 'center',
     width: 120,
+    cellRenderer: (scope) => {
+      const { rowData, cellData } = scope
+      return rowData.wjd || '-'
+    },
   },
   {
     key: 9,
     dataKey: 'hxlxy',
     prop: 'hxlxy',
     title: '活性磷酸盐',
+    align: 'center',
     width: 120,
+    cellRenderer: (scope) => {
+      const { rowData, cellData } = scope
+      return rowData.hxlxy || '-'
+    },
   },
   {
     key: 10,
     dataKey: 'syl',
     prop: 'syl',
     title: '石油类',
+    align: 'center',
     width: 120,
+    cellRenderer: (scope) => {
+      const { rowData, cellData } = scope
+      return rowData.syl || '-'
+    },
   },
   {
     key: 11,
     dataKey: 'szlb',
     prop: 'szlb',
     title: '水质类别',
+    align: 'center',
     width: 120,
     cellRenderer: (scope) => {
       const { rowData, cellData } = scope
@@ -150,7 +181,7 @@ const columns = [
           effect: 'dark',
           color: legendWQ[rowData.wqLevel].color,
         },
-        { default: () => cellData },
+        { default: () => cellData }
       )
     },
   },
@@ -159,10 +190,11 @@ const columns = [
     dataKey: 'eIndex',
     prop: 'eIndex',
     title: '富营养化',
+    align: 'center',
     width: 120,
     cellRenderer: (scope) => {
       const { rowData, cellData } = scope
-      return legendE[rowData.eLevel].label
+      return legendE[rowData.eLevel]?.label || '-'
     },
   },
 ]
@@ -216,20 +248,17 @@ export default {
         this.setOpacity(shanghai, 0)
         this.setOpacity(jiangsu, 0)
         this.setOpacity(zhejiang, 0)
-      }
-      else if (this.sea === 'shanghai') {
+      } else if (this.sea === 'shanghai') {
         window.$zMap.fitBounds(shanghai.getBounds(), { padding: [40, 40], duration: 5 })
         this.setOpacity(shanghai, 0.01)
         this.setOpacity(jiangsu, 0.8)
         this.setOpacity(zhejiang, 0.8)
-      }
-      else if (this.sea === 'zhejiang') {
+      } else if (this.sea === 'zhejiang') {
         window.$zMap.fitBounds(zhejiang.getBounds(), { padding: [40, 40], duration: 5 })
         this.setOpacity(zhejiang, 0.01)
         this.setOpacity(shanghai, 0.8)
         this.setOpacity(jiangsu, 0.8)
-      }
-      else if (this.sea === 'jiangsu') {
+      } else if (this.sea === 'jiangsu') {
         window.$zMap.fitBounds(jiangsu.getBounds(), { padding: [40, 40], duration: 5 })
         this.setOpacity(jiangsu, 0.01)
         this.setOpacity(shanghai, 0.8)
@@ -245,7 +274,7 @@ export default {
     zhejiang = window.$zMap.getLayerById(2002)
     this.sea = 'all'
     this.showLayer()
-    this.getSeaWaterQuality()
+    // this.getSeaWaterQuality()
     this.showStationLayer()
   },
   unmounted() {
@@ -282,6 +311,7 @@ export default {
         query.province = province
       }
       const { code, data } = await apiData.getSeaWaterQuality(query)
+      console.log(data)
       this.loadingSeaWaterQualites = false
       if (code === 1000) {
         this.seaWaterQualites = data.map((item) => {
@@ -292,8 +322,7 @@ export default {
           this.seaWaterQualites.forEach((item) => {
             if (objSeaWaterQualites[item.site]) {
               objSeaWaterQualites[item.site].push(item)
-            }
-            else {
+            } else {
               objSeaWaterQualites[item.site] = [item]
             }
           })
@@ -346,9 +375,8 @@ export default {
 
             this.filteredSeaWaterQualites.push(objYearQualites)
           }
-        }
-        else {
-          this.filteredSeaWaterQualites = this.seaWaterQualites.filter(item => item.year === this.year && item.season === this.season)
+        } else {
+          this.filteredSeaWaterQualites = this.seaWaterQualites.filter((item) => item.year === this.year && item.season === this.season)
         }
       }
     },
@@ -362,8 +390,7 @@ export default {
       if (stationlayer) {
         stationlayer.show = true
         loading.close()
-      }
-      else {
+      } else {
         stationlayer = new window.$ZMap.layer.ClusterLayer({
           show: false,
           maxClusterRadius: 70,
@@ -425,8 +452,7 @@ export default {
         let fillColor = ''
         if (this.type === 'wq') {
           fillColor = legendWQ[value]?.checked ? legendWQ[value].color : '#00000000'
-        }
-        else {
+        } else {
           fillColor = legendE[value]?.checked ? legendE[value].color : '#00000000'
         }
         graphic.setStyle({ fillColor })
@@ -441,8 +467,7 @@ export default {
       })
       if (this.type === 'wq') {
         this.legendWQ[value].checked = !this.legendWQ[value].checked
-      }
-      else {
+      } else {
         this.legendE[value].checked = !this.legendE[value].checked
       }
       this.resetLayerStyle()
@@ -463,6 +488,7 @@ export default {
     updateChartData(type) {
       const name = `${type}${this.year}${this.season}`
       const graphics = layers[name].getGraphics()
+      console.log(graphics)
       const areas = {}
       graphics.forEach((graphic) => {
         if (graphic.area && graphic.attr && graphic.attr.Value) {
@@ -483,6 +509,7 @@ export default {
         province,
         areas: Object.entries(areas).map(([key, value]) => ({ label: objLegend[key].label, value })),
       }
+      console.log(chartData)
       this.$emit(eventName, chartData)
     },
     createNewGeoLayer(name) {
@@ -505,8 +532,7 @@ export default {
             let fillColor = ''
             if (this.type === 'wq') {
               fillColor = legendWQ[attr.Value]?.checked ? legendWQ[attr.Value].color : '#00000000'
-            }
-            else {
+            } else {
               fillColor = legendE[attr.Value]?.checked ? legendE[attr.Value].color : '#00000000'
             }
             return {
@@ -525,19 +551,15 @@ export default {
       }
 
       for (const key in layers) {
-        // console.log('隐藏图层', key)
         layers[key].show = false
       }
-      // this.sea = 'all'
       const name = `${this.type}${this.year}${this.season}`
-      // console.log('显示图层', name)
       if (layers[name]) {
         this.resetLayerStyle()
         layers[name].show = true
         this.updateChartData('wq')
         this.updateChartData('e')
-      }
-      else {
+      } else {
         const loading = this.$loading({
           lock: true,
           text: '正在加载地图数据...',
