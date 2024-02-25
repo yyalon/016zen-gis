@@ -24,6 +24,8 @@ import settings from '@/settings.default'
 import { toAdmin } from '@/utils/index'
 import 'dayjs/locale/zh-cn'
 
+import geoApi from '@/api/modules/layers'
+
 export default {
   components: {
     GraphSwitcher,
@@ -165,8 +167,9 @@ export default {
     //   spinner: 'el-icon-loading',
     //   background: '#100d17e3',
     // })
-    // const { data } = await geoApi.getGeoSerevrLayers()
-    // const layers = data.layers.layer
+    const { data } = await geoApi.getGeoSerevrLayers()
+    const layers = data.layers.layer
+    console.log(layers)
     // layers.forEach((layer: any) => {
     //   const tileLayer = new window.$ZMap.layer.WmsLayer({
     //     name: layer.name,
@@ -231,8 +234,7 @@ export default {
             })
           }
         })
-      }
-      else {
+      } else {
         this.riverLevel = null
         this.visibilities.layerRiver = false
         this.buttons.forEach((button) => {
@@ -427,7 +429,7 @@ export default {
   .layout-mask {
     z-index: 1000;
     pointer-events: none;
-    background-image: url("@/assets/images/mask.png");
+    background-image: url('@/assets/images/mask.png');
     background-repeat: no-repeat;
     background-size: 100% 100%;
   }
