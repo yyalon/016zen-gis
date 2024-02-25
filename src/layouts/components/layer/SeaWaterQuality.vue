@@ -1,5 +1,7 @@
 <script>
 import dayjs from 'dayjs'
+import { ElMessage } from 'element-plus'
+import { area, intersect } from '@turf/turf'
 import DrawerSeaWaterStation from '../drawer/SeaWaterStation.vue'
 import PopupSeaWaterStation from '../popup/SeaWaterStation.vue'
 import ZFrame from '../ZFrame.vue'
@@ -32,6 +34,19 @@ const legendWQ = {
   5: { color: '#7a624a', label: '劣四类', checked: true, show: true },
 }
 
+const legendOther = {
+  1: {
+    color: '#73b2ff',
+    label: '一类',
+    checked: true,
+    show: true,
+  },
+  2: { color: '#b2ddf7', label: '二类', checked: true, show: true },
+  3: { color: '#beb1a1', label: '三类', checked: true, show: true },
+  4: { color: '#9b856e', label: '四类', checked: true, show: true },
+  5: { color: '#7a624a', label: '五类', checked: true, show: true },
+}
+
 const legendE = {
   1: { color: '#ffff0000', label: '正常', checked: true, show: false },
   2: { color: '#ffff00', label: '轻度', checked: true, show: true },
@@ -46,6 +61,7 @@ const years = [
   { value: 2020, label: 2020 },
   { value: 2021, label: 2021 },
   { value: 2022, label: 2022 },
+  { value: 2023, label: 2023 },
 ]
 
 const seasons = [
@@ -59,6 +75,17 @@ const objSeasons = {
   spring: '春季',
   summer: '夏季',
   autumn: '秋季',
+  average: '年平均',
+}
+
+const objTypes = {
+  wq: '水质评价',
+  e: '富营养化',
+  hxxyl: '化学需氧量',
+  hxlsy: '活性磷酸盐',
+  rjy: '溶解氧',
+  syl: '石油类',
+  wjd: '无机氮',
 }
 
 const types = [
@@ -210,11 +237,13 @@ export default {
   data() {
     return {
       seas,
+      legendOther,
       legendWQ,
       legendE,
       years,
       seasons,
       objSeasons,
+      objTypes,
       types,
       year: 2022,
       season: 'spring',
@@ -240,9 +269,16 @@ export default {
       this.getSeaWaterQuality()
     },
     type() {
+      for (const key in this.legendOther) {
+        this.legendOther[key].checked = true
+      }
+      for (const key in this.legendWQ) {
+        this.legendWQ[key].checked = true
+      }
       this.showLayer()
     },
     sea() {
+      this.showLayer()
       if (this.sea === 'all') {
         window.$zMap.flyHome()
         this.setOpacity(shanghai, 0)
@@ -273,8 +309,6 @@ export default {
     jiangsu = window.$zMap.getLayerById(2001)
     zhejiang = window.$zMap.getLayerById(2002)
     this.sea = 'all'
-    this.showLayer()
-    // this.getSeaWaterQuality()
     this.showStationLayer()
   },
   unmounted() {
@@ -311,7 +345,6 @@ export default {
         query.province = province
       }
       const { code, data } = await apiData.getSeaWaterQuality(query)
-      console.log(data)
       this.loadingSeaWaterQualites = false
       if (code === 1000) {
         this.seaWaterQualites = data.map((item) => {
@@ -445,17 +478,21 @@ export default {
     resetLayerStyle() {
       const name = this.type + this.year + this.season
       const graphics = layers[name].getGraphics()
-      for (let i = 0; i < graphics.length; i++) {
-        const graphic = graphics[i]
-        const value = graphic.attr.Value
+      if (layers[name]) {
+        for (let i = 0; i < graphics.length; i++) {
+          const graphic = graphics[i]
+          const value = graphic.attr.Value
 
-        let fillColor = ''
-        if (this.type === 'wq') {
-          fillColor = legendWQ[value]?.checked ? legendWQ[value].color : '#00000000'
-        } else {
-          fillColor = legendE[value]?.checked ? legendE[value].color : '#00000000'
+          let fillColor = ''
+          if (this.type === 'wq') {
+            fillColor = legendWQ[value]?.checked ? legendWQ[value].color : '#00000000'
+          } else if (this.type === 'e') {
+            fillColor = legendE[value]?.checked ? legendE[value].color : '#00000000'
+          } else {
+            fillColor = legendOther[value]?.checked ? legendOther[value].color : '#00000000'
+          }
+          graphic.setStyle({ fillColor })
         }
-        graphic.setStyle({ fillColor })
       }
     },
     checkLegendItem(value) {
@@ -467,8 +504,10 @@ export default {
       })
       if (this.type === 'wq') {
         this.legendWQ[value].checked = !this.legendWQ[value].checked
-      } else {
+      } else if (this.type === 'e') {
         this.legendE[value].checked = !this.legendE[value].checked
+      } else {
+        this.legendOther[value].checked = !this.legendOther[value].checked
       }
       this.resetLayerStyle()
       loading.close()
@@ -488,11 +527,39 @@ export default {
     updateChartData(type) {
       const name = `${type}${this.year}${this.season}`
       const graphics = layers[name].getGraphics()
-      console.log(graphics)
       const areas = {}
+      let theSea = null
+      let areaSum = 0
+      let featureSea = null
+      if (this.sea !== 'all') {
+        if (this.sea === 'shanghai') {
+          theSea = shanghai
+        }
+        if (this.sea === 'jiangsu') {
+          theSea = jiangsu
+        }
+        if (this.sea === 'zhejiang') {
+          theSea = zhejiang
+        }
+        const geojsonSea = theSea.toGeoJSON()
+        geojsonSea.features.forEach((feature) => {
+          if (feature.geometry.type === 'Polygon') {
+            featureSea = feature
+          }
+        })
+      }
+
       graphics.forEach((graphic) => {
         if (graphic.area && graphic.attr && graphic.attr.Value) {
-          areas[graphic.attr.Value] = areas[graphic.attr.Value] ? areas[graphic.attr.Value] + graphic.area : graphic.area
+          if (this.sea === 'all') {
+            areas[graphic.attr.Value] = areas[graphic.attr.Value] ? areas[graphic.attr.Value] + graphic.area : graphic.area
+          } else {
+            const result = intersect(featureSea, graphic.toGeoJSON())
+            if (result) {
+              areaSum += area(result)
+              areas[graphic.attr.Value] = areas[graphic.attr.Value] ? areas[graphic.attr.Value] + area(result) : area(result)
+            }
+          }
         }
       })
       let province = ''
@@ -509,7 +576,6 @@ export default {
         province,
         areas: Object.entries(areas).map(([key, value]) => ({ label: objLegend[key].label, value })),
       }
-      console.log(chartData)
       this.$emit(eventName, chartData)
     },
     createNewGeoLayer(name) {
@@ -532,8 +598,10 @@ export default {
             let fillColor = ''
             if (this.type === 'wq') {
               fillColor = legendWQ[attr.Value]?.checked ? legendWQ[attr.Value].color : '#00000000'
-            } else {
+            } else if (this.type === 'e') {
               fillColor = legendE[attr.Value]?.checked ? legendE[attr.Value].color : '#00000000'
+            } else {
+              fillColor = legendOther[attr.Value]?.checked ? legendOther[attr.Value].color : '#00000000'
             }
             return {
               fillColor,
@@ -549,7 +617,6 @@ export default {
       for (const key in this.legendWQ) {
         this.legendWQ[key].checked = true
       }
-
       for (const key in layers) {
         layers[key].show = false
       }
@@ -557,6 +624,7 @@ export default {
       if (layers[name]) {
         this.resetLayerStyle()
         layers[name].show = true
+        layers[name].bringToBack()
         this.updateChartData('wq')
         this.updateChartData('e')
       } else {
@@ -566,9 +634,36 @@ export default {
           spinner: 'el-icon-loading',
           background: '#100d17e3',
         })
+        let queryMapServer = null
+        if (this.type !== 'e' && this.type !== 'wq') {
+          queryMapServer = new window.$ZMap.query.QueryGeoServer({
+            url: 'http://10.103.10.80:8078/geoserver/sea/ows',
+            layer: `sea:${name}`,
+          })
+          queryMapServer.query({
+            success: (result) => {
+              const { count, geojson } = result
+              if (count > 0) {
+                layers[name] = this.createNewGeoLayer(name)
+                window.$zMap.addLayer(layers[name])
+                layers[name].load({ data: geojson })
+                layers[name].show = true
+              } else {
+                ElMessage({
+                  message: `没有${this.year}${this.objSeasons[this.season]} ${this.objTypes[this.type]}的数据`,
+                })
+              }
+              loading.close()
+            },
+            error: (error, msg) => {
+              loading.close()
+            },
+          })
+        }
+
         const wqName = `wq${this.year}${this.season}`
-        let queryMapServer = new window.$ZMap.query.QueryGeoServer({
-          url: 'http://139.9.41.23:8078/geoserver/sea/ows',
+        queryMapServer = new window.$ZMap.query.QueryGeoServer({
+          url: 'http://10.103.10.80:8078/geoserver/sea/ows',
           layer: `sea:${wqName}`,
         })
 
@@ -583,14 +678,21 @@ export default {
                 layers[wqName].show = true
               }
               this.updateChartData('wq')
-              loading.close()
+            } else {
+              ElMessage({
+                message: `没有${this.year}${this.objSeasons[this.season]} ${this.objTypes.wq}的数据`,
+              })
             }
+            loading.close()
+          },
+          error: (error, msg) => {
+            loading.close()
           },
         })
 
         const eName = `e${this.year}${this.season}`
         queryMapServer = new window.$ZMap.query.QueryGeoServer({
-          url: 'http://139.9.41.23:8078/geoserver/sea/ows',
+          url: 'http://10.103.10.80:8078/geoserver/sea/ows',
           layer: `sea:${eName}`,
         })
 
@@ -606,8 +708,15 @@ export default {
               }
 
               this.updateChartData('e')
-              loading.close()
+            } else {
+              ElMessage({
+                message: `没有${this.year}${this.objSeasons[this.season]} ${this.objTypes.e}的数据`,
+              })
             }
+            loading.close()
+          },
+          error: (error, msg) => {
+            loading.close()
           },
         })
       }
@@ -636,7 +745,7 @@ export default {
           </div>
         </template>
       </div>
-      <div v-if="type === 'e'" class="legend-e">
+      <div v-else-if="type === 'e'" class="legend-e">
         <template v-for="(item, key) in legendE" :key="item.color">
           <div v-if="item.show" class="legend-item" :style="{ background: item.color, display: key === 1 ? 'none' : 'flex' }" @click="checkLegendItem(key)">
             <div class="icon">
@@ -648,6 +757,23 @@ export default {
               </el-icon>
             </div>
             {{ item.label }}富营养化
+          </div>
+        </template>
+      </div>
+      <div v-else class="legend-wq">
+        <template v-for="(item, key) in legendOther" :key="item.color">
+          <div v-if="item.show" class="legend-item" :style="{ background: item.color }" @click="checkLegendItem(key)">
+            <div class="icon">
+              <el-icon v-if="item.checked">
+                <svg-icon name="ep:circle-check-filled" />
+              </el-icon>
+              <el-icon v-if="!item.checked">
+                <svg-icon name="ep:circle-check" />
+              </el-icon>
+            </div>
+            <div class="name">
+              {{ item.label }}
+            </div>
           </div>
         </template>
       </div>

@@ -30,7 +30,7 @@ export default {
           orient: 'vertical',
           top: 'center',
           right: '10%',
-          data: data.map(it => it.label),
+          data: data.map((it) => it.label),
           textStyle: {
             color: '#fff',
             fontSize: 12,
