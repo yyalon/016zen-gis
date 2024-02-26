@@ -2,6 +2,7 @@
 import ChartSeaWaterQualityProportion from '../chart/SeaWaterQualityProportion.vue'
 import ChartSeaEutrophicationProportion from '../chart/SeaEutrophicationProportion.vue'
 import ChartSeaWaterQualityColumn from '../chart/SeaWaterQualityColumn.vue'
+import ChartSeaWaterGoodQualityProvinceColumn from '../chart/SeaWaterGoodQualityProvinceColumn.vue'
 
 import LayerSeaWaterQuality from '../layer/SeaWaterQuality.vue'
 import RightDrawer from '../RightDrawer.vue'
@@ -13,6 +14,7 @@ export default {
     ChartSeaWaterQualityProportion,
     ChartSeaEutrophicationProportion,
     ChartSeaWaterQualityColumn,
+    ChartSeaWaterGoodQualityProvinceColumn,
   },
   props: {
     visible: {
@@ -39,7 +41,8 @@ export default {
     <RightDrawer :drawer-visible="visible">
       <ChartSeaWaterQualityProportion v-if="visible" :chart-data="chartData" /> <br />
       <ChartSeaEutrophicationProportion v-if="visible" :chart-data="chartData" /><br />
-      <ChartSeaWaterQualityColumn v-if="visible" :chart-data="chartData" />
+      <!-- <ChartSeaWaterQualityColumn v-if="visible" :chart-data="chartData" /><br />
+      <ChartSeaWaterGoodQualityProvinceColumn v-if="visible" :chart-data="chartData" /> -->
     </RightDrawer>
   </div>
 </template>
