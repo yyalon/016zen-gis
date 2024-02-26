@@ -1,6 +1,12 @@
 import api from '../index'
 
 export default {
+  // 获取并计算生成海水水质等级面积数据
+  getSeaWaterQualityAreas: () => api.post('/app/data/sea-water-quality-area/list'),
+
+  // 获取并计算生成海水水质等级面积数据
+  initSeaWaterQualityAreas: (data: any) => api.post('/app/data/sea-water-quality-area/init', data),
+
   // 获取河流断面
   getRiverSections: () => api.post('/app/data/river-section/list'),
 

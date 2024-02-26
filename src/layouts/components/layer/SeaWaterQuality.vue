@@ -1,7 +1,6 @@
 <script>
 import dayjs from 'dayjs'
 import { ElMessage } from 'element-plus'
-import { area, intersect } from '@turf/turf'
 import DrawerSeaWaterStation from '../drawer/SeaWaterStation.vue'
 import PopupSeaWaterStation from '../popup/SeaWaterStation.vue'
 import ZFrame from '../ZFrame.vue'
@@ -233,7 +232,7 @@ const columns = [
 </el-table-column>  */
 export default {
   components: { DrawerSeaWaterStation, ZFrame },
-  emits: ['refreshSeaWaterQualityProportion', 'refreshSeaEutrophicationProportion'],
+  emits: ['refreshSeaWaterQualityChart'],
   data() {
     return {
       seas,
@@ -248,9 +247,10 @@ export default {
       year: 2022,
       season: 'spring',
       type: 'wq',
-      sea: '',
+      sea: 'all',
       seaWaterStations: [],
       seaWaterQualites: [],
+      seaWaterQualityAreas: null,
       filteredSeaWaterQualites: [],
       drawerVisible: false,
       loadingSeaWaterQualites: false,
@@ -263,10 +263,12 @@ export default {
     year() {
       this.showLayer()
       this.getSeaWaterQuality()
+      this.updateChartData()
     },
     season() {
       this.showLayer()
       this.getSeaWaterQuality()
+      this.updateChartData()
     },
     type() {
       for (const key in this.legendOther) {
@@ -276,6 +278,7 @@ export default {
         this.legendWQ[key].checked = true
       }
       this.showLayer()
+      this.updateChartData()
     },
     sea() {
       this.showLayer()
@@ -300,7 +303,7 @@ export default {
         this.setOpacity(shanghai, 0.8)
         this.setOpacity(zhejiang, 0.8)
       }
-      // this.showLayer()
+      this.updateChartData()
       this.getSeaWaterQuality()
     },
   },
@@ -325,6 +328,40 @@ export default {
       const { code, data } = await apiData.getSeaWaterStation()
       if (code === 1000) {
         this.seaWaterStations = data
+      }
+    },
+    async getSeaWaterQualityAreas() {
+      const { code, data } = await apiData.getSeaWaterQualityAreas()
+      if (code === 1000) {
+        const areas = {}
+        data.forEach((item) => {
+          const name = `${item.t}-${item.y}-${item.s}`
+          if (areas[name]) {
+            if (areas[name][item.p]) {
+              areas[name][item.p].push({
+                value: item.l,
+                area: parseFloat(item.a),
+              })
+            } else {
+              areas[name][item.p] = [
+                {
+                  value: item.l,
+                  area: parseFloat(item.a),
+                },
+              ]
+            }
+          } else {
+            areas[name] = {}
+            areas[name][item.p] = [
+              {
+                value: item.l,
+                area: parseFloat(item.a),
+              },
+            ]
+          }
+        })
+        this.seaWaterQualityAreas = areas
+        this.updateChartData()
       }
     },
     async getSeaWaterQuality() {
@@ -434,6 +471,7 @@ export default {
         window.$zMap.addLayer(stationlayer)
 
         await this.getData()
+        await this.getSeaWaterQualityAreas()
 
         for (let i = 0, len = this.seaWaterStations.length; i < len; i++) {
           const item = this.seaWaterStations[i]
@@ -524,59 +562,15 @@ export default {
         })
       }
     },
-    updateChartData(type) {
-      const name = `${type}${this.year}${this.season}`
-      const graphics = layers[name].getGraphics()
-      const areas = {}
-      let theSea = null
-      let areaSum = 0
-      let featureSea = null
-      if (this.sea !== 'all') {
-        if (this.sea === 'shanghai') {
-          theSea = shanghai
-        }
-        if (this.sea === 'jiangsu') {
-          theSea = jiangsu
-        }
-        if (this.sea === 'zhejiang') {
-          theSea = zhejiang
-        }
-        const geojsonSea = theSea.toGeoJSON()
-        geojsonSea.features.forEach((feature) => {
-          if (feature.geometry.type === 'Polygon') {
-            featureSea = feature
-          }
-        })
-      }
-
-      graphics.forEach((graphic) => {
-        if (graphic.area && graphic.attr && graphic.attr.Value) {
-          if (this.sea === 'all') {
-            areas[graphic.attr.Value] = areas[graphic.attr.Value] ? areas[graphic.attr.Value] + graphic.area : graphic.area
-          } else {
-            const result = intersect(featureSea, graphic.toGeoJSON())
-            if (result) {
-              areaSum += area(result)
-              areas[graphic.attr.Value] = areas[graphic.attr.Value] ? areas[graphic.attr.Value] + area(result) : area(result)
-            }
-          }
-        }
-      })
-      let province = ''
-      seas.forEach((sea) => {
-        if (sea.value === this.sea) {
-          province = sea.name
-        }
-      })
-      const objLegend = type === 'wq' ? legendWQ : legendE
-      const eventName = type === 'wq' ? 'refreshSeaWaterQualityProportion' : 'refreshSeaEutrophicationProportion'
+    updateChartData() {
       const chartData = {
+        type: this.type,
         year: this.year,
         season: this.season,
-        province,
-        areas: Object.entries(areas).map(([key, value]) => ({ label: objLegend[key].label, value })),
+        province: this.sea,
+        areas: this.seaWaterQualityAreas,
       }
-      this.$emit(eventName, chartData)
+      this.$emit('refreshSeaWaterQualityChart', chartData)
     },
     createNewGeoLayer(name) {
       return new window.$ZMap.layer.GeoJsonLayer({
@@ -625,8 +619,6 @@ export default {
         this.resetLayerStyle()
         layers[name].show = true
         layers[name].bringToBack()
-        this.updateChartData('wq')
-        this.updateChartData('e')
       } else {
         const loading = this.$loading({
           lock: true,
@@ -635,82 +627,21 @@ export default {
           background: '#100d17e3',
         })
         let queryMapServer = null
-        if (this.type !== 'e' && this.type !== 'wq') {
-          queryMapServer = new window.$ZMap.query.QueryGeoServer({
-            url: 'http://10.103.10.80:8078/geoserver/sea/ows',
-            layer: `sea:${name}`,
-          })
-          queryMapServer.query({
-            success: (result) => {
-              const { count, geojson } = result
-              if (count > 0) {
-                layers[name] = this.createNewGeoLayer(name)
-                window.$zMap.addLayer(layers[name])
-                layers[name].load({ data: geojson })
-                layers[name].show = true
-              } else {
-                ElMessage({
-                  message: `没有${this.year}${this.objSeasons[this.season]} ${this.objTypes[this.type]}的数据`,
-                })
-              }
-              loading.close()
-            },
-            error: (error, msg) => {
-              loading.close()
-            },
-          })
-        }
-
-        const wqName = `wq${this.year}${this.season}`
         queryMapServer = new window.$ZMap.query.QueryGeoServer({
           url: 'http://10.103.10.80:8078/geoserver/sea/ows',
-          layer: `sea:${wqName}`,
+          layer: `sea:${name}`,
         })
-
         queryMapServer.query({
           success: (result) => {
             const { count, geojson } = result
             if (count > 0) {
-              layers[wqName] = this.createNewGeoLayer(wqName)
-              window.$zMap.addLayer(layers[wqName])
-              layers[wqName].load({ data: geojson })
-              if (name === wqName) {
-                layers[wqName].show = true
-              }
-              this.updateChartData('wq')
+              layers[name] = this.createNewGeoLayer(name)
+              window.$zMap.addLayer(layers[name])
+              layers[name].load({ data: geojson })
+              layers[name].show = true
             } else {
               ElMessage({
-                message: `没有${this.year}${this.objSeasons[this.season]} ${this.objTypes.wq}的数据`,
-              })
-            }
-            loading.close()
-          },
-          error: (error, msg) => {
-            loading.close()
-          },
-        })
-
-        const eName = `e${this.year}${this.season}`
-        queryMapServer = new window.$ZMap.query.QueryGeoServer({
-          url: 'http://10.103.10.80:8078/geoserver/sea/ows',
-          layer: `sea:${eName}`,
-        })
-
-        queryMapServer.query({
-          success: (result) => {
-            const { count, geojson } = result
-            if (count > 0) {
-              layers[eName] = this.createNewGeoLayer(eName)
-              window.$zMap.addLayer(layers[eName])
-              layers[eName].load({ data: geojson })
-              if (name === eName) {
-                layers[eName].show = true
-              }
-
-              this.updateChartData('e')
-            } else {
-              ElMessage({
-                message: `没有${this.year}${this.objSeasons[this.season]} ${this.objTypes.e}的数据`,
+                message: `没有${this.year}${this.objSeasons[this.season]} ${this.objTypes[this.type]}的数据`,
               })
             }
             loading.close()

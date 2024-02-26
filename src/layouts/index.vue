@@ -1,6 +1,8 @@
 <script lang="ts" name="Layout">
 import autofit from 'autofit.js'
 import dayjs from 'dayjs'
+import { area, intersect } from '@turf/turf'
+
 import LayerRivers from './components/layer/Rivers.vue'
 import LayerSeaShanghai from './components/layer/SeaShanghai.vue'
 import LayerSeaJiangsu from './components/layer/SeaJiangsu.vue'
@@ -25,6 +27,7 @@ import { toAdmin } from '@/utils/index'
 import 'dayjs/locale/zh-cn'
 
 import geoApi from '@/api/modules/layers'
+import apiData from '@/api/modules/data'
 
 export default {
   components: {
@@ -167,9 +170,6 @@ export default {
     //   spinner: 'el-icon-loading',
     //   background: '#100d17e3',
     // })
-    const { data } = await geoApi.getGeoSerevrLayers()
-    const layers = data.layers.layer
-    console.log(layers)
     // layers.forEach((layer: any) => {
     //   const tileLayer = new window.$ZMap.layer.WmsLayer({
     //     name: layer.name,
@@ -195,6 +195,10 @@ export default {
     // })
 
     this.activeGraph = 'river'
+
+    // setTimeout(async () => {
+    //   await this.initSeaWaterQualityAreas()
+    // }, 3000)
   },
   unmounted() {},
   methods: {
@@ -253,6 +257,105 @@ export default {
       this.buttons.forEach((button) => {
         if (button.value === name) {
           button.visibility = !button.visibility
+        }
+      })
+    },
+    async initSeaWaterQualityAreas() {
+      const provinces: any = {
+        shanghai: window.$zMap.getLayerById(2000),
+        jiangsu: window.$zMap.getLayerById(2001),
+        zhejiang: window.$zMap.getLayerById(2002),
+      }
+
+      const { data } = await geoApi.getGeoSerevrLayers()
+      const layers = data.layers.layer
+      const objLayers: any = {}
+      const objAreas: any = {}
+
+      const aryFinal: any = []
+
+      layers.forEach((layer: any) => {
+        if (layer.name.includes('summer') || layer.name.includes('spring') || layer.name.includes('autumn') || layer.name.includes('average')) {
+          // if (layer.name.includes('hxlsy') && (layer.name.includes('2018') || layer.name.includes('2017'))) {
+          objLayers[layer.name] = null
+        }
+      })
+
+      layers.forEach((layer: any) => {
+        if (layer.name.includes('summer') || layer.name.includes('spring') || layer.name.includes('autumn') || layer.name.includes('average')) {
+          // if (layer.name.includes('hxlsy') && (layer.name.includes('2018') || layer.name.includes('2017'))) {
+          const objResult: any = {
+            shanghai: [],
+            jiangsu: [],
+            zhejiang: [],
+          }
+          const queryMapServer = new window.$ZMap.query.QueryGeoServer({
+            url: 'http://10.103.10.80:8078/geoserver/sea/ows',
+            layer: `sea:${layer.name}`,
+          })
+
+          queryMapServer.query({
+            success: async (result: any) => {
+              const { count, geojson } = result
+              if (count > 0) {
+                geojson.features.forEach((feature: any) => {
+                  for (const key in provinces) {
+                    let featureSea = null
+                    const geojsonSea = provinces[key].toGeoJSON()
+                    geojsonSea.features.forEach((feature: any) => {
+                      if (feature.geometry.type === 'Polygon') {
+                        featureSea = feature
+                        objAreas[key] = window.$ZMap.MeasureUtil.formatArea(area(featureSea))
+                      }
+                    })
+                    if (featureSea) {
+                      const result = intersect(featureSea, feature)
+                      if (result) {
+                        objResult[key].push({ area: area(result), value: feature.properties.Value })
+                      }
+                    }
+                  }
+                })
+                objLayers[layer.name] = objResult
+                console.log(layer.name, 'ok')
+                let ok = true
+                for (const key in objLayers) {
+                  if (!objLayers[key]) {
+                    ok = false
+                  }
+                }
+                if (ok) {
+                  // console.log('shanghai', objAreas.shanghai, 'zhejiang', objAreas.zhejiang, 'jiangsu', objAreas.jiangsu)
+
+                  for (const layerName in objLayers) {
+                    let type = ''
+                    let year = ''
+                    let season = ''
+                    if (layerName.includes('average')) {
+                      season = 'average'
+                      year = layerName.slice(-11, -7)
+                      type = layerName.slice(0, -11)
+                    } else {
+                      season = layerName.slice(-6)
+                      year = layerName.slice(-10, -6)
+                      type = layerName.slice(0, -10)
+                    }
+                    for (const province in objLayers[layerName]) {
+                      // let area1 = 0
+                      objLayers[layerName][province].forEach((item: any) => {
+                        // area1 += item.area
+                        aryFinal.push({ type, year, season, province, area: item.area.toFixed(2), level: item.value })
+                      })
+                    }
+                  }
+
+                  console.log(aryFinal)
+
+                  await apiData.initSeaWaterQualityAreas(aryFinal)
+                }
+              }
+            },
+          })
         }
       })
     },
