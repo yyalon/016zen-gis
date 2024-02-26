@@ -169,7 +169,7 @@ export default {
     // })
     const { data } = await geoApi.getGeoSerevrLayers()
     const layers = data.layers.layer
-    console.log(layers)
+    // console.log(layers)
     // layers.forEach((layer: any) => {
     //   const tileLayer = new window.$ZMap.layer.WmsLayer({
     //     name: layer.name,
@@ -234,7 +234,8 @@ export default {
             })
           }
         })
-      } else {
+      }
+      else {
         this.riverLevel = null
         this.visibilities.layerRiver = false
         this.buttons.forEach((button) => {
@@ -429,7 +430,7 @@ export default {
   .layout-mask {
     z-index: 1000;
     pointer-events: none;
-    background-image: url('@/assets/images/mask.png');
+    background-image: url("@/assets/images/mask.png");
     background-repeat: no-repeat;
     background-size: 100% 100%;
   }

@@ -433,7 +433,7 @@ export default {
 
   .layer-trend {
     position: absolute;
-    background: #d7f2f2;
+    // background: #d7f2f2;
     z-index: 10000;
     right: 100px;
     bottom: 0;
