@@ -31,8 +31,8 @@ export default {
       allYears: [2021, 2022, 2023, 2024].map((i) => { return { value: i, label: i } }),
       allMonths: Array.from({ length: 12 }, (_, index) => index + 1).map((i) => { return { value: i, label: i } }),
       year: 2022,
-      selYears: [],
-      selProvince: ['上海市', '浙江省', '江苏省', '福建省'],
+      selYears: [2021, 2022],
+      selProvince: ['上海市', '浙江省', '江苏省'],
       selMons: [],
     }
   },
@@ -42,7 +42,7 @@ export default {
     },
   },
   mounted() {
-
+    this.getData()
   },
   unmounted() {
     this.handleClose()
@@ -83,24 +83,31 @@ export default {
 
       const allYears = Array.from(new Set(data.map(i => i.WQ_INF_YEAR)))
       return {
-        tooltip: {
-          trigger: 'axis',
+        trigger: 'axis',
+        axisPointer: {
+          type: 'shadow',
         },
         legend: {
           data: allYears,
         },
         grid: {
-          left: '10px',
-          right: '10px',
-          bottom: '10px',
-          top: '10px',
+          left: '3%',
+          right: '4%',
+          bottom: '3%',
           containLabel: true,
         },
-        toolbox: {
-          feature: {
-            saveAsImage: {},
-          },
-        },
+        // grid: {
+        //   left: '10px',
+        //   right: '10px',
+        //   bottom: '10px',
+        //   top: '10px',
+        //   containLabel: true,
+        // },
+        // toolbox: {
+        //   feature: {
+        //     saveAsImage: {},
+        //   },
+        // },
 
         xAxis: {
           type: 'category',
@@ -108,8 +115,8 @@ export default {
           data: allPro,
           axisLabel: {
           // 坐标轴刻度标签的相关设置。
-            interval: 0, // 设置为 1，表示『隔一个标签显示一个标签』
-            margin: 15,
+            interval: 1, // 设置为 1，表示『隔一个标签显示一个标签』
+            // margin: 15,
             color: '#078ceb',
             fontStyle: 'normal',
             fontFamily: '微软雅黑',
@@ -137,8 +144,12 @@ export default {
           return {
             name: year,
             type: 'bar',
+            barGap: 0,
+            barWidth: '10px',
+            // barCategoryGap: '2px', // 设置同一个类目下柱子之间的间距为类目宽度的20%
+            // barGap: '10px', // 设置不同系列之间柱子之间的间距为类目宽度的30%
             // stack: 'stack1',
-            symbolSize: 6, // 空心标记的大小
+            // symbolSize: 6, // 空心标记的大小
             data: allPro.map((pro) => {
               const arr = data.filter(i => i.WQ_INF_YEAR === year && i.PROVINCE_NAME === pro)
               const firstObj = arr[0]
@@ -176,7 +187,7 @@ export default {
 </script>
 
 <template>
-  <div :title="combinedTitle">
+  <div>
     <el-button class="close-button" type="primary" circle size="default" @click="handleClose">
       <el-icon>
         <svg-icon name="ep:close" />
@@ -231,7 +242,7 @@ export default {
     </el-select>
 
     <ZFrame width="100%" height="90%">
-      <Echart v-if="visible" :options="options" height="270px" width="475px" />
+      <Echart v-if="visible" :options="options" height="270px" width="80%" class="layer-echart" />
     </ZFrame>
   </div>
 </template>
@@ -241,5 +252,9 @@ export default {
   position: absolute;
   top: 10px;
   right: 10px;
+}
+
+.layer-echart {
+  margin-left: 50px;
 }
 </style>
