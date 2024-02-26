@@ -41,8 +41,8 @@ export default {
     <RightDrawer :drawer-visible="visible">
       <ChartSeaWaterQualityProportion v-if="visible" :chart-data="chartData" /> <br />
       <ChartSeaEutrophicationProportion v-if="visible" :chart-data="chartData" /><br />
-      <!-- <ChartSeaWaterQualityColumn v-if="visible" :chart-data="chartData" /><br />
-      <ChartSeaWaterGoodQualityProvinceColumn v-if="visible" :chart-data="chartData" /> -->
+      <!-- <ChartSeaWaterQualityColumn v-if="visible" :chart-data="chartData" /><br /> -->
+      <ChartSeaWaterGoodQualityProvinceColumn v-if="visible" :chart-data="chartData" />
     </RightDrawer>
   </div>
 </template>

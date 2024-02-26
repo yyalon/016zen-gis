@@ -53,8 +53,6 @@ const series = ['Direct', 'Mail Ad', 'Affiliate Ad', 'Video Ad', 'Search Engine'
   }
 })
 
-console.log(series)
-
 export default {
   components: { ZFrame, Echart },
   props: {

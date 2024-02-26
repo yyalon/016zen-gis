@@ -57,7 +57,7 @@ export default {
         tooltip: {
           trigger: 'item',
           formatter(param) {
-            return `${param.name} (${param.percent * 2}%)<br>${window.$ZMap.MeasureUtil.formatArea(param.value)}`
+            return `${param.name} (${param.percent}%)<br>${window.$ZMap.MeasureUtil.formatArea(param.value)}`
           },
           textStyle: {
             fontSize: 16,

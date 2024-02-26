@@ -23,37 +23,8 @@ const legend = {
   4: { color: '#ff0000', label: '重度' },
 }
 
-const rawData = [
-  [11100, 302, 301, 334],
-  [1320, 132, 101, 134],
-  [220, 182, 191, 234],
-  [150, 212, 201, 154],
-  [820, 832, 901, 934],
-]
-const totalData = []
-for (let i = 0; i < rawData[0].length; ++i) {
-  let sum = 0
-  for (let j = 0; j < rawData.length; ++j) {
-    sum += rawData[j][i]
-  }
-  totalData.push(sum)
-}
-
-const series = ['Direct', 'Mail Ad', 'Affiliate Ad', 'Video Ad', 'Search Engine'].map((name, sid) => {
-  return {
-    name,
-    type: 'bar',
-    stack: 'total',
-    barWidth: '60%',
-    label: {
-      show: true,
-      formatter: (params) => `${Math.round(params.value * 1000) / 10}%`,
-    },
-    data: rawData[sid].map((d, did) => (totalData[did] <= 0 ? 0 : d / totalData[did])),
-  }
-})
-
-console.log(series)
+const arySeas = ['shanghai', 'jiangsu', 'zhejiang', 'all']
+const years = [2020, 2021, 2022, 2023]
 
 export default {
   components: { ZFrame, Echart },
@@ -72,20 +43,43 @@ export default {
       seasons,
       visible: false,
       options: {
-        yAxis: {
-          type: 'value',
+        tooltip: {
+          trigger: 'item',
+          formatter(param) {
+            return `${param.name} ${param.seriesName} 占比 ${param.value}% `
+          },
+          axisPointer: {
+            type: 'shadow',
+          },
         },
-        xAxis: {
-          type: 'category',
-          data: ['江苏省', '上海市', '浙江省', '整体'],
+        legend: {},
+        grid: {
+          left: '5%',
+          right: '5%',
+          bottom: '5%',
+          top: '15%',
+          containLabel: true,
         },
-        series,
+        xAxis: [
+          {
+            type: 'category',
+            data: arySeas.map((key) => {
+              return seas[key].name
+            }),
+          },
+        ],
+        yAxis: [
+          {
+            type: 'value',
+          },
+        ],
+        series: [],
       },
     }
   },
   watch: {
     chartData() {
-      // this.update()
+      this.update()
     },
   },
   mounted() {
@@ -93,47 +87,44 @@ export default {
   },
   methods: {
     update() {
-      if (this.chartData.year && this.chartData.season && this.chartData.areas) {
-        const name = `e-${this.chartData.year}-${this.chartData.season}`
-        const areas = this.chartData.areas[name]
-        if (areas) {
-          const proportion = {}
-          if (this.chartData.province === 'all') {
-            for (const key in areas) {
-              areas[key].forEach((item) => {
-                if (item.value !== 1) {
-                  if (proportion[item.value]) {
-                    proportion[item.value] += item.area
-                  } else {
-                    proportion[item.value] = item.area
+      if (this.chartData.areas) {
+        this.options.series = years.map((year) => {
+          const name = `wq-${year}-average`
+          const sums = {}
+          let sumAllGood = 0 // 所有海域良好水质面积
+          let sumAllWhold = 0 // 所有海域整体面积
+          for (const key in seas) {
+            if (key !== 'all') {
+              let sumGood = 0 // 单个省份海域的良好水质面积
+              let sumWhole = 0 // 单个省份海域的总面积
+              if (this.chartData.areas[name]) {
+                const areas = this.chartData.areas[name][key] || []
+                areas.forEach((item) => {
+                  if (item.value === 1 || item.value === 2) {
+                    sumGood += item.area
+                    sumAllGood += item.area
                   }
-                }
-              })
-            }
-          } else {
-            areas[this.chartData.province].forEach((item) => {
-              if (item.value !== 1) {
-                if (proportion[item.value]) {
-                  proportion[item.value] += item.area
-                } else {
-                  proportion[item.value] = item.area
-                }
+                  sumWhole += item.area
+                  sumAllWhold += item.area
+                })
               }
-            })
+              sums[key] = ((sumGood / sumWhole) * 100).toFixed(1)
+            }
           }
-          this.options.series[0].data = []
-          for (const key in proportion) {
-            this.options.series[0].data.push({
-              value: proportion[key],
-              name: this.legend[key].label,
-              itemStyle: {
-                color: `${this.legend[key].color}`,
-              },
-            })
+          sums.all = ((sumAllGood / sumAllWhold) * 100).toFixed(1)
+
+          return {
+            name: year,
+            type: 'bar',
+            emphasis: {
+              focus: 'series',
+            },
+            data: arySeas.map((key) => {
+              return sums[key]
+            }),
           }
-        } else {
-          this.options.series[0].data = []
-        }
+        })
+        console.log(this.options.series)
       }
     },
   },
