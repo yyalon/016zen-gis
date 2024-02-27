@@ -332,6 +332,12 @@ export default {
       }
     },
     async getSeaWaterQualityAreas() {
+      const loading = this.$loading({
+        lock: true,
+        text: '正在加载地图数据...',
+        spinner: 'el-icon-loading',
+        background: '#100d17e3',
+      })
       const { code, data } = await apiData.getSeaWaterQualityAreas()
       if (code === 1000) {
         const areas = {}
@@ -364,6 +370,7 @@ export default {
         this.seaWaterQualityAreas = areas
         this.updateChartData()
       }
+      loading.close()
     },
     async getSeaWaterQuality() {
       this.loadingSeaWaterQualites = true
