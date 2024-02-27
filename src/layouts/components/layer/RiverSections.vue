@@ -172,7 +172,7 @@ export default {
         const graphic = new window.$ZMap.graphic.Marker({
           latlng: [riverSection.latitude, riverSection.longitude],
           style: {
-            image: '/img/marker/river.png',
+            image: 'img/marker/river.png',
             horizontalOrigin: window.$ZMap.HorizontalOrigin.CENTER,
             verticalOrigin: window.$ZMap.VerticalOrigin.BOTTOM,
           },
@@ -208,7 +208,7 @@ export default {
           const graphic = new window.$ZMap.graphic.Marker({
             latlng: [riverSection.latitude, riverSection.longitude],
             style: {
-              image: '/img/marker/river.png',
+              image: 'img/marker/river.png',
               horizontalOrigin: window.$ZMap.HorizontalOrigin.CENTER,
               verticalOrigin: window.$ZMap.VerticalOrigin.BOTTOM,
             },

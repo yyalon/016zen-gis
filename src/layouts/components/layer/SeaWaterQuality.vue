@@ -313,6 +313,7 @@ export default {
     zhejiang = window.$zMap.getLayerById(2002)
     this.sea = 'all'
     this.showStationLayer()
+    this.showLayer()
   },
   unmounted() {
     for (const key in layers) {
@@ -480,7 +481,7 @@ export default {
             style: {
               width: 24,
               height: 24,
-              image: '/img/marker/river.png',
+              image: 'img/marker/river.png',
               horizontalOrigin: window.$ZMap.HorizontalOrigin.CENTER,
               verticalOrigin: window.$ZMap.VerticalOrigin.BOTTOM,
             },
