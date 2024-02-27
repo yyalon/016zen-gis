@@ -69,9 +69,6 @@ export default {
       this.param = param
       this.getData(param)
     })
-    onBeforeUnmount(() => {
-      eventBus.off('filterparam')
-    })
 
     // this.options.xAxis[0].data = [
     //   '2016',
@@ -92,6 +89,9 @@ export default {
 
     // }
   },
+  beforeUnmount() {
+    eventBus.off('filterparam')
+  },
   methods: {
     async getData(param) {
       const res = await ApiData.getRiverSectionTotalDan(param)
@@ -99,11 +99,11 @@ export default {
       if (res && res.code === 1000) {
         const data = res.data
 
-        if (param.dm_name === '') { // 断面选择了全部, 使用饼图
+        if (param.dm_name === '') {
+          // 断面选择了全部, 使用饼图
           this.options = this.generyBingtu(data)
           this.visible = true
-        }
-        else {
+        } else {
           this.options = this.generyLine(data)
           // console.log('this.options:', this.options)
           this.visible = true
@@ -112,18 +112,14 @@ export default {
     },
 
     generyBingtu(data) {
-      const colors = [
-        '#3D26A8',
-        '#F9FA14',
-        '#18BFB5',
-      ]
+      const colors = ['#3D26A8', '#F9FA14', '#18BFB5']
 
       return {
         legend: {
           orient: 'vertical',
           top: 'top',
           right: '5%',
-          data: data.map(it => it.label),
+          data: data.map((it) => it.label),
           textStyle: {
             color: '#fff',
             fontSize: 12,
@@ -184,9 +180,9 @@ export default {
       }
     },
     generyLine(data) {
-      let allMonth = data.filter(item => item.WQ_INF_YEAR === data[0].WQ_INF_YEAR).map(i => i.WQ_INF_MONTH)
+      let allMonth = data.filter((item) => item.WQ_INF_YEAR === data[0].WQ_INF_YEAR).map((i) => i.WQ_INF_MONTH)
       allMonth = Array.from(new Set(allMonth))
-      const allYear = Array.from(new Set(data.map(i => i.WQ_INF_YEAR)))
+      const allYear = Array.from(new Set(data.map((i) => i.WQ_INF_YEAR)))
       return {
         tooltip: {
           trigger: 'axis',
@@ -245,7 +241,7 @@ export default {
             stack: 'stack1',
             symbolSize: 6, // 空心标记的大小
             data: allMonth.map((mon) => {
-              const arr = data.filter(i => i.WQ_INF_YEAR === year && i.WQ_INF_MONTH === mon)
+              const arr = data.filter((i) => i.WQ_INF_YEAR === year && i.WQ_INF_MONTH === mon)
               const firstObj = arr[0]
               const n2023 = firstObj && firstObj.N2023
               return n2023

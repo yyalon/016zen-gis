@@ -42,7 +42,6 @@ export default {
       seas,
       seasons,
       legend,
-      visible: false,
       options: {
         legend: {
           orient: 'vertical',
@@ -96,9 +95,6 @@ export default {
       this.update()
     },
   },
-  mounted() {
-    this.visible = true
-  },
   methods: {
     update() {
       if (this.chartData.year && this.chartData.season && this.chartData.areas) {
@@ -146,6 +142,6 @@ export default {
 
 <template>
   <ZFrame :height="220" :title="`${seas[chartData?.province]?.label || ''}${chartData?.year || ''}年${seasons[chartData?.season] || ''}海水水质类别面积占比`">
-    <Echart v-if="visible" :options="options" height="190px" width="375px" />
+    <Echart :options="options" height="190px" width="375px" />
   </ZFrame>
 </template>

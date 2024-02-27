@@ -82,7 +82,7 @@ export default {
   data() {
     return {
       loadingRiverSections: false,
-      areas: areas.filter(zone => ['全部', '上海市', '浙江省', '江苏省'].includes(zone.label)),
+      areas: areas.filter((zone) => ['全部', '上海市', '浙江省', '江苏省'].includes(zone.label)),
       estuary: false,
       selectedArea: '',
       selectedAreaNode: null,
@@ -129,9 +129,6 @@ export default {
     eventBus.on('showtrend', () => {
       this.trendVisible = !this.trendVisible
     })
-    onBeforeUnmount(() => {
-      eventBus.off('showtrend')
-    })
 
     await this.showLayer()
   },
@@ -139,6 +136,9 @@ export default {
     _layer.clear()
     window.$zMap.removeLayer(_layer)
     _layer = null
+  },
+  beforeUnmount() {
+    eventBus.off('filterparam')
   },
   methods: {
     filterRiverSections(value) {
@@ -292,8 +292,7 @@ export default {
       if (this.selectedAreaNode?.level === 1) {
         city = ''
         province = this.selectedArea
-      }
-      else if (this.selectedAreaNode?.level === 2) {
+      } else if (this.selectedAreaNode?.level === 2) {
         city = this.selectedArea
         province = this.selectedAreaNode.parent.data.label
       }
@@ -334,8 +333,14 @@ export default {
   <div class="work-zone">
     <div class="filters">
       <el-tree-select
-        v-model="selectedArea" :data="areas" :render-after-expand="false" node-key="label"
-        check-strictly size="large" @node-click="handleAreasClick" @change="filterRiverSections"
+        v-model="selectedArea"
+        :data="areas"
+        :render-after-expand="false"
+        node-key="label"
+        check-strictly
+        size="large"
+        @node-click="handleAreasClick"
+        @change="filterRiverSections"
       />
 
       <el-select v-model="river" filterable placeholder="请选择断面" size="large" @change="filterRiverSections">
@@ -409,7 +414,7 @@ export default {
   :deep .el-input__inner {
     background-color: transparent !important;
     border-color: #80ffff;
-    box-shadow: 1px 1px 5px 1px  rgb(128 255 255 / 80%) inset;
+    box-shadow: 1px 1px 5px 1px rgb(128 255 255 / 80%) inset;
   }
 }
 

@@ -24,6 +24,7 @@ export default {
   },
   data() {
     return {
+      showChart: false,
       chartData: {},
     }
   },
@@ -38,11 +39,11 @@ export default {
 <template>
   <div>
     <LayerSeaWaterQuality v-if="visible" @refresh-sea-water-quality-chart="refreshSeaWaterQualityChart" />
-    <RightDrawer :drawer-visible="visible">
-      <ChartSeaWaterQualityProportion v-if="visible" :chart-data="chartData" /> <br />
-      <ChartSeaEutrophicationProportion v-if="visible" :chart-data="chartData" /><br />
-      <!-- <ChartSeaWaterQualityColumn v-if="visible" :chart-data="chartData" /><br /> -->
-      <ChartSeaWaterGoodQualityProvinceColumn v-if="visible" :chart-data="chartData" />
+    <RightDrawer :drawer-visible="visible" @open="showChart = true">
+      <ChartSeaWaterQualityProportion v-if="showChart" :chart-data="chartData" /> <br />
+      <ChartSeaEutrophicationProportion v-if="showChart" :chart-data="chartData" /><br />
+      <!-- <ChartSeaWaterQualityColumn :chart-data="chartData" /><br /> -->
+      <ChartSeaWaterGoodQualityProvinceColumn v-if="showChart" :chart-data="chartData" />
     </RightDrawer>
   </div>
 </template>

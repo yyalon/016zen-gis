@@ -68,7 +68,6 @@ export default {
       legend,
       seas,
       seasons,
-      visible: false,
       options: {
         yAxis: {
           type: 'value',
@@ -86,9 +85,7 @@ export default {
       // this.update()
     },
   },
-  mounted() {
-    this.visible = true
-  },
+  mounted() {},
   methods: {
     update() {
       if (this.chartData.year && this.chartData.season && this.chartData.areas) {
@@ -140,6 +137,6 @@ export default {
 
 <template>
   <ZFrame :height="220" title="近岸海域各类海水比例">
-    <Echart v-if="visible" :options="options" height="190px" width="375px" />
+    <Echart :options="options" height="190px" width="375px" />
   </ZFrame>
 </template>

@@ -41,7 +41,6 @@ export default {
       legend,
       seas,
       seasons,
-      visible: false,
       options: {
         tooltip: {
           trigger: 'axis',
@@ -97,9 +96,6 @@ export default {
       this.update()
     },
   },
-  mounted() {
-    this.visible = true
-  },
   methods: {
     update() {
       if (this.chartData.areas) {
@@ -147,6 +143,6 @@ export default {
 
 <template>
   <ZFrame :height="220" title="优良水质面积比例">
-    <Echart v-if="visible" :options="options" height="190px" width="375px" />
+    <Echart :options="options" height="190px" width="375px" />
   </ZFrame>
 </template>

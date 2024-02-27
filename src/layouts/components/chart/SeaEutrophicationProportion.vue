@@ -38,7 +38,6 @@ export default {
       legend,
       seas,
       seasons,
-      visible: false,
       options: {
         legend: {
           orient: 'vertical',
@@ -92,9 +91,6 @@ export default {
       this.update()
     },
   },
-  mounted() {
-    this.visible = true
-  },
   methods: {
     update() {
       if (this.chartData.year && this.chartData.season && this.chartData.areas) {
@@ -108,18 +104,21 @@ export default {
                 if (item.value !== 1) {
                   if (proportion[item.value]) {
                     proportion[item.value] += item.area
-                  } else {
+                  }
+                  else {
                     proportion[item.value] = item.area
                   }
                 }
               })
             }
-          } else {
+          }
+          else {
             areas[this.chartData.province].forEach((item) => {
               if (item.value !== 1) {
                 if (proportion[item.value]) {
                   proportion[item.value] += item.area
-                } else {
+                }
+                else {
                   proportion[item.value] = item.area
                 }
               }
@@ -135,7 +134,8 @@ export default {
               },
             })
           }
-        } else {
+        }
+        else {
           this.options.series[0].data = []
         }
       }
@@ -146,6 +146,6 @@ export default {
 
 <template>
   <ZFrame :height="220" :title="`${seas[chartData.province]?.label || ''}${chartData.year || ''}年${seasons[chartData.season] || ''}富营养化面积占比`">
-    <Echart v-if="visible" :options="options" height="190px" width="375px" />
+    <Echart :options="options" height="190px" width="375px" />
   </ZFrame>
 </template>

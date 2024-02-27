@@ -64,8 +64,8 @@ export default {
       //   data.push(round(random(3, 8), 0))
       //   data1.push(9 - data[i])
       // }
-      this.options.series[0].data = data.map(e => e.value)
-      this.options.xAxis[0].data = data.map(e => e.WQ_INF_YEAR)
+      this.options.series[0].data = data.map((e) => e.value)
+      this.options.xAxis[0].data = data.map((e) => e.WQ_INF_YEAR)
       // this.options.series[1].data = data1
       this.visible = true
     }
@@ -74,9 +74,9 @@ export default {
     eventBus.on('filterparam', (param) => {
       // console.log('water:filterparam:', param)
     })
-    onBeforeUnmount(() => {
-      eventBus.off('filterparam')
-    })
+  },
+  beforeUnmount() {
+    eventBus.off('filterparam')
   },
   methods: {
     delay(ms) {
@@ -88,7 +88,6 @@ export default {
       // console.log('handleSearch')
     },
   },
-
 }
 </script>
 

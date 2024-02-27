@@ -30,14 +30,7 @@ const data = [
     value: 240,
   },
 ]
-const colors = [
-  '#4a90e2',
-  '#6ea2cf',
-  '#81adc6',
-  '#b5cda7',
-  '#e1e787',
-  '#fffb6e',
-]
+const colors = ['#4a90e2', '#6ea2cf', '#81adc6', '#b5cda7', '#e1e787', '#fffb6e']
 export default {
   components: { ZFrame, Echart },
   data() {
@@ -51,7 +44,7 @@ export default {
           orient: 'vertical',
           top: 'center',
           right: '10%',
-          data: data.map(it => it.label),
+          data: data.map((it) => it.label),
           textStyle: {
             color: '#fff',
             fontSize: 12,
@@ -106,9 +99,9 @@ export default {
       this.param = param
       this.getData(this.param)
     })
-    onBeforeUnmount(() => {
-      eventBus.off('filterparam')
-    })
+  },
+  beforeUnmount() {
+    eventBus.off('filterparam')
   },
   methods: {
     async getData(param) {
@@ -119,7 +112,7 @@ export default {
             orient: 'vertical',
             top: 'center',
             right: '10%',
-            data: result1.data.map(it => `${it.label}类`),
+            data: result1.data.map((it) => `${it.label}类`),
             textStyle: {
               color: '#fff',
               fontSize: 12,
@@ -171,7 +164,6 @@ export default {
       this.getData(this.param)
     },
   },
-
 }
 </script>
 
