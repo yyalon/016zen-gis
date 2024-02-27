@@ -1,6 +1,7 @@
 import path from 'path-browserify'
 
 export function toAdmin(currentPath: string) {
+  console.log(currentPath)
   window.location.href = `${import.meta.env.VITE_APP_ADMIN_URL}/#${currentPath || '/'}`
 }
 
