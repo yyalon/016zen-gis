@@ -24,7 +24,7 @@ const legend = {
 }
 
 const arySeas = ['shanghai', 'jiangsu', 'zhejiang', 'all']
-const years = [2020, 2021, 2022, 2023]
+const years = [2019, 2020, 2021, 2022, 2023]
 
 export default {
   components: { ZFrame, Echart },
@@ -44,9 +44,13 @@ export default {
       visible: false,
       options: {
         tooltip: {
-          trigger: 'item',
+          trigger: 'axis',
           formatter(param) {
-            return `${param.name} ${param.seriesName} 占比 ${param.value}% `
+            let label = `<b style="font-size:16px">${param[0].name}</b><br>`
+            param.forEach((item) => {
+              label += `${item.seriesName} 占比${parseFloat(item.value) || '-'}%<br>`
+            })
+            return label
           },
           axisPointer: {
             type: 'shadow',
@@ -73,7 +77,18 @@ export default {
             type: 'value',
           },
         ],
-        series: [],
+        series: years.map((year) => {
+          return {
+            name: year,
+            type: 'bar',
+            emphasis: {
+              focus: 'series',
+            },
+            data: arySeas.map((key) => {
+              return 0
+            }),
+          }
+        }),
       },
     }
   },

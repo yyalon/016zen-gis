@@ -1,5 +1,8 @@
 <script>
-import tdTheme from './theme.json' // 引入默认主题
+import { markRaw } from 'vue' // 引入默认主题
+import tdTheme from './theme.json'
+
+const chart = null
 
 export default {
   name: 'Echart',
@@ -50,7 +53,7 @@ export default {
   methods: {
     initChart() {
       // 初始化echart
-      this.chart = window.$echarts.init(this.$el, 'tdTheme')
+      this.chart = markRaw(window.$echarts.init(this.$el, 'tdTheme'))
       this.chart.setOption(this.options, true)
     },
   },
@@ -58,5 +61,5 @@ export default {
 </script>
 
 <template>
-  <div :id="id" :class="className" style="height: 100%;width: 100%;" :style="{ height, width }" />
+  <div :id="id" :class="className" style="height: 100%; width: 100%" :style="{ height, width }" />
 </template>
