@@ -34,8 +34,7 @@ export default {
       })
       if (_layer) {
         _layer.show = true
-      }
-      else {
+      } else {
         _layer = new window.$ZMap.layer.ClusterLayer({
           show: false,
           chunkedLoading: true, // 间隔添加数据，以便页面不冻结。
@@ -53,7 +52,7 @@ export default {
             const graphic = new window.$ZMap.graphic.Marker({
               latlng: [item.latitude, item.longitude],
               style: {
-                image: '/img/marker/sewage_outfall.png',
+                image: 'img/marker/sewage_outfall.png',
                 horizontalOrigin: window.$ZMap.HorizontalOrigin.CENTER,
                 verticalOrigin: window.$ZMap.VerticalOrigin.BOTTOM,
               },

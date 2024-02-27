@@ -32,16 +32,16 @@ export default ({ mode, command }) => {
         '/proxy': {
           target: env.VITE_APP_API_BASEURL,
           changeOrigin: command === 'serve' && env.VITE_OPEN_PROXY === 'true',
-          rewrite: path => path.replace(/\/proxy/, ''),
+          rewrite: (path) => path.replace(/\/proxy/, ''),
         },
-        '/arcmap': {
-          target: 'https://services.arcgisonline.com',
-          changeOrigin: command === 'serve' && env.VITE_OPEN_PROXY === 'true',
-          rewrite: path => path.replace(/\/arcmap/, ''),
-        },
+        // '/arcmap': {
+        //   target: 'https://services.arcgisonline.com',
+        //   changeOrigin: command === 'serve' && env.VITE_OPEN_PROXY === 'true',
+        //   rewrite: path => path.replace(/\/arcmap/, ''),
+        // },
         '/file': {
           target: env.VITE_APP_STATIC_PATH,
-          rewrite: path => path.replace(/\/file/, ''),
+          rewrite: (path) => path.replace(/\/file/, ''),
         },
       },
     },

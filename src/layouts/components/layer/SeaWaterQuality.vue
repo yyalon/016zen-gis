@@ -313,6 +313,7 @@ export default {
     zhejiang = window.$zMap.getLayerById(2002)
     this.sea = 'all'
     this.showStationLayer()
+    this.showLayer()
   },
   unmounted() {
     for (const key in layers) {
@@ -331,6 +332,12 @@ export default {
       }
     },
     async getSeaWaterQualityAreas() {
+      const loading = this.$loading({
+        lock: true,
+        text: '正在加载地图数据...',
+        spinner: 'el-icon-loading',
+        background: '#100d17e3',
+      })
       const { code, data } = await apiData.getSeaWaterQualityAreas()
       if (code === 1000) {
         const areas = {}
@@ -363,6 +370,7 @@ export default {
         this.seaWaterQualityAreas = areas
         this.updateChartData()
       }
+      loading.close()
     },
     async getSeaWaterQuality() {
       this.loadingSeaWaterQualites = true
@@ -480,7 +488,7 @@ export default {
             style: {
               width: 24,
               height: 24,
-              image: '/img/marker/river.png',
+              image: 'img/marker/river.png',
               horizontalOrigin: window.$ZMap.HorizontalOrigin.CENTER,
               verticalOrigin: window.$ZMap.VerticalOrigin.BOTTOM,
             },
@@ -628,7 +636,7 @@ export default {
         })
         let queryMapServer = null
         queryMapServer = new window.$ZMap.query.QueryGeoServer({
-          url: 'http://10.103.10.80:8078/geoserver/sea/ows',
+          url: 'http://10.103.10.80/geoserver/sea/ows',
           layer: `sea:${name}`,
         })
         queryMapServer.query({
