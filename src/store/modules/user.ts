@@ -11,12 +11,9 @@ const useUserStore = defineStore(
     const account = ref(localStorage.account ?? '')
     const token = ref(localStorage['zen-token'] ?? '')
     const tokenExpiration = ref(localStorage['token-expiration'] ?? '')
-    console.log(2)
     const isLogin = computed(() => {
-      console.log(3)
       let retn = false
       if (token.value) {
-        console.log(tokenExpiration.value)
         if (new Date().getTime() < parseInt(tokenExpiration.value) * 1000) {
           retn = true
         }

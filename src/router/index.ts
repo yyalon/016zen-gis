@@ -19,8 +19,6 @@ const router = createRouter({
 
 router.beforeEach(async (to, from, next) => {
   const query: any = to.query
-  console.log(1)
-  console.log(query)
   if (query.t && query.rt && query.te && query.rte) {
     localStorage.setItem('zen-token', query.t)
     localStorage.setItem('zen-refresh-token', query.rt)
