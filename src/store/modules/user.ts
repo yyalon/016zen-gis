@@ -1,6 +1,5 @@
 import useRouteStore from './route'
 import useMenuStore from './menu'
-import apiUser from '@/api/modules/user'
 
 const useUserStore = defineStore(
   // 唯一ID
@@ -10,70 +9,49 @@ const useUserStore = defineStore(
     const menuStore = useMenuStore()
 
     const account = ref(localStorage.account ?? '')
-    const token = ref(localStorage.token ?? '')
-    const failure_time = ref(localStorage.failure_time ?? '')
-    const permissions = ref<string[]>([])
+    const token = ref(localStorage['zen-token'] ?? '')
+    const tokenExpiration = ref(localStorage['token-expiration'] ?? '')
+    console.log(2)
     const isLogin = computed(() => {
+      console.log(3)
       let retn = false
       if (token.value) {
-        if (new Date().getTime() < parseInt(failure_time.value) * 1000) {
+        console.log(tokenExpiration.value)
+        if (new Date().getTime() < parseInt(tokenExpiration.value) * 1000) {
           retn = true
         }
       }
       return retn
     })
 
-    // 登录
-    async function login(data: {
-      account: string
-      password: string
-    }) {
-      // 通过 mock 进行登录
-      const res = await apiUser.login(data)
-      localStorage.setItem('account', res.data.account)
-      localStorage.setItem('token', res.data.token)
-      localStorage.setItem('failure_time', res.data.failure_time)
-      account.value = res.data.account
-      token.value = res.data.token
-      failure_time.value = res.data.failure_time
+    // 登出
+    async function setToken(tokenData: any) {
+      token.value = tokenData.token
+      tokenExpiration.value = tokenData.tokenExpiration
     }
+
     // 登出
     async function logout() {
       localStorage.removeItem('account')
-      localStorage.removeItem('token')
-      localStorage.removeItem('failure_time')
+      localStorage.removeItem('zen-token')
+      localStorage.removeItem('zen-refresh-token')
+      localStorage.removeItem('token-expiration')
+      localStorage.removeItem('refresh-token-expiration')
       account.value = ''
       token.value = ''
-      failure_time.value = ''
+      tokenExpiration.value = ''
       routeStore.removeRoutes()
       menuStore.setActived(0)
-    }
-    // 获取我的权限
-    async function getPermissions() {
-      // 通过 mock 获取权限
-      const res = await apiUser.permission()
-      permissions.value = res.data.permissions
-      return permissions.value
-    }
-    // 修改密码
-    async function editPassword(data: {
-      password: string
-      newpassword: string
-    }) {
-      await apiUser.passwordEdit(data)
     }
 
     return {
       account,
       token,
-      permissions,
       isLogin,
-      login,
+      setToken,
       logout,
-      getPermissions,
-      editPassword,
     }
-  },
+  }
 )
 
 export default useUserStore

@@ -8,21 +8,30 @@ import { asyncRoutesByFilesystem, constantRoutes, constantRoutesByFilesystem } f
 import pinia from '@/store'
 import useSettingsStore from '@/store/modules/settings'
 import useRouteStore from '@/store/modules/route'
+import useUserStore from '@/store/modules/user'
 
 const { isLoading } = useNProgress()
 
 const router = createRouter({
   history: createWebHashHistory(),
-  routes: useSettingsStore(pinia).settings.app.routeBaseOn === 'filesystem' ? constantRoutesByFilesystem : constantRoutes as RouteRecordRaw[],
+  routes: useSettingsStore(pinia).settings.app.routeBaseOn === 'filesystem' ? constantRoutesByFilesystem : (constantRoutes as RouteRecordRaw[]),
 })
 
 router.beforeEach(async (to, from, next) => {
   const query: any = to.query
+  console.log(1)
+  console.log(query)
   if (query.t && query.rt && query.te && query.rte) {
-    localStorage.setItem('mgp-token', query.t)
-    localStorage.setItem('mgp-refresh-token', query.rt)
+    localStorage.setItem('zen-token', query.t)
+    localStorage.setItem('zen-refresh-token', query.rt)
     localStorage.setItem('token-expiration', query.te)
     localStorage.setItem('refresh-token-expiration', query.rte)
+
+    const userStore = useUserStore()
+    userStore.setToken({
+      token: query.t,
+      tokenExpiration: query.te,
+    })
     router.push({ query: {} })
   }
   const settingsStore = useSettingsStore()
@@ -31,12 +40,10 @@ router.beforeEach(async (to, from, next) => {
   if (routeStore.isGenerate) {
     if (to.name === 'callback') {
       next({ name: 'home' })
-    }
-    else {
+    } else {
       next()
     }
-  }
-  else {
+  } else {
     await routeStore.generateRoutesAtFilesystem(asyncRoutesByFilesystem)
 
     // 注册并记录路由数据

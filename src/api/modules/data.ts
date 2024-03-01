@@ -8,7 +8,7 @@ export default {
   initSeaWaterQualityAreas: (data: any) => api.post('/app/data/sea-water-quality-area/init', data),
 
   // 获取河流断面
-  getRiverSections: () => api.post('/app/data/river-section/list'),
+  getRiverSections: () => api.post('/admin/data/river-section/list'),
 
   // 获取河流断面详细信息
   getRiverSectionInfo: (params: any) => api.get('/app/data/river-section/info', { params }),
