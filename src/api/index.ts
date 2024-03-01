@@ -28,7 +28,6 @@ api.interceptors.request.use((request) => {
   /**
    * 全局拦截请求发送前提交的参数
    */
-  v
   if (request.headers) {
     request.headers.Token = userStore.token
 
