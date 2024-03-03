@@ -1,12 +1,10 @@
 import useRouteStore from './route'
-import useMenuStore from './menu'
 
 const useUserStore = defineStore(
   // 唯一ID
   'user',
   () => {
     const routeStore = useRouteStore()
-    const menuStore = useMenuStore()
 
     const account = ref(localStorage.account ?? '')
     const token = ref(localStorage['zen-token'] ?? '')
@@ -38,7 +36,6 @@ const useUserStore = defineStore(
       token.value = ''
       tokenExpiration.value = ''
       routeStore.removeRoutes()
-      menuStore.setActived(0)
     }
 
     return {

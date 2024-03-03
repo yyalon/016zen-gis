@@ -9,8 +9,6 @@ export {}
 
 declare module '@vue/runtime-core' {
   export interface GlobalComponents {
-    Auth: typeof import('./../components/Auth/index.vue')['default']
-    AuthAll: typeof import('./../components/AuthAll/index.vue')['default']
     Copyright: typeof import('./../components/Copyright/index.vue')['default']
     FileUpload: typeof import('./../components/FileUpload/index.vue')['default']
     FixedActionBar: typeof import('./../components/FixedActionBar/index.vue')['default']

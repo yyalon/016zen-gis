@@ -7,7 +7,6 @@ import eventBus from './utils/eventBus'
 import useSettingsStore from '@/store/modules/settings'
 
 const settingsStore = useSettingsStore()
-const { auth } = useAuth()
 
 const buttonConfig = ref({
   autoInsertSpace: true,
@@ -31,20 +30,20 @@ const subSidebarActualWidth = computed(() => {
   return `${actualWidth}px`
 })
 
-watch([
-  () => settingsStore.settings.app.enableDynamicTitle,
-  () => settingsStore.title,
-], () => {
-  if (settingsStore.settings.app.enableDynamicTitle && settingsStore.title) {
-    const title = typeof settingsStore.title === 'function' ? settingsStore.title() : settingsStore.title
-    document.title = `${title} - ${import.meta.env.VITE_APP_TITLE}`
+watch(
+  [() => settingsStore.settings.app.enableDynamicTitle, () => settingsStore.title],
+  () => {
+    if (settingsStore.settings.app.enableDynamicTitle && settingsStore.title) {
+      const title = typeof settingsStore.title === 'function' ? settingsStore.title() : settingsStore.title
+      document.title = `${title} - ${import.meta.env.VITE_APP_TITLE}`
+    } else {
+      document.title = import.meta.env.VITE_APP_TITLE
+    }
+  },
+  {
+    immediate: true,
   }
-  else {
-    document.title = import.meta.env.VITE_APP_TITLE
-  }
-}, {
-  immediate: true,
-})
+)
 
 onMounted(() => {
   settingsStore.setMode(document.documentElement.clientWidth)
@@ -63,14 +62,13 @@ import.meta.env.VITE_APP_DEBUG_TOOL === 'vconsole' && new VConsole()
 <template>
   <el-config-provider :locale="zhCn" :size="settingsStore.settings.app.elementSize" :button="buttonConfig">
     <RouterView
-      v-slot="{ Component, route }"
+      v-slot="{ Component }"
       :style="{
         '--g-main-sidebar-actual-width': mainSidebarActualWidth,
         '--g-sub-sidebar-actual-width': subSidebarActualWidth,
       }"
     >
-      <component :is="Component" v-if="auth(route.meta.auth ?? '')" />
-      <not-allowed v-else />
+      <component :is="Component" />
     </RouterView>
     <system-info />
   </el-config-provider>

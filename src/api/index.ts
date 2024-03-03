@@ -70,7 +70,7 @@ api.interceptors.response.use(
     })
     setTimeout(() => {
       if (error.response) {
-        const { status, config: c } = error.response
+        const { status } = error.response
         if (status === 401) {
           userStore.logout()
           toAdmin('/logout')
