@@ -153,10 +153,11 @@ export default {
   async mounted() {
     autofit.init({
       el: '.layout',
-      dw: 1440,
-      dh: 1050,
+      dw: 1920,
+      dh: 1080,
       resize: true,
-      ignore: ['.leaflet-container'],
+      // ignore: ['.leaflet-container'],
+      ignore: [],
       transition: 0,
       delay: 0,
     })
