@@ -23,13 +23,15 @@ export default {
       types,
       visible: false,
       layerVisible: true,
-      options: {
-
-      },
+      options: {},
 
       allProvince,
-      allYears: [2021, 2022, 2023, 2024].map((i) => { return { value: i, label: i } }),
-      allMonths: Array.from({ length: 12 }, (_, index) => index + 1).map((i) => { return { value: i, label: i } }),
+      allYears: [2021, 2022, 2023, 2024].map((i) => {
+        return { value: i, label: i }
+      }),
+      allMonths: Array.from({ length: 12 }, (_, index) => index + 1).map((i) => {
+        return { value: i, label: i }
+      }),
       year: 2022,
       selYears: [2021, 2022],
       selProvince: ['上海市', '浙江省', '江苏省'],
@@ -83,95 +85,49 @@ export default {
 
       const allYears = Array.from(new Set(data.map(i => i.WQ_INF_YEAR)))
       return {
-        trigger: 'axis',
-        axisPointer: {
-          type: 'shadow',
+        tooltip: {
+          trigger: 'axis',
+          axisPointer: {
+            type: 'shadow',
+          },
         },
         legend: {
+          top: '5%',
           data: allYears,
         },
         grid: {
-          left: '3%',
-          right: '4%',
-          bottom: '3%',
+          left: '5%',
+          right: '5%',
+          bottom: '5%',
+          top: '15%',
           containLabel: true,
         },
-        // grid: {
-        //   left: '10px',
-        //   right: '10px',
-        //   bottom: '10px',
-        //   top: '10px',
-        //   containLabel: true,
-        // },
-        // toolbox: {
-        //   feature: {
-        //     saveAsImage: {},
-        //   },
-        // },
 
-        xAxis: {
-          type: 'category',
-          boundaryGap: false,
-          data: allPro,
-          axisLabel: {
-          // 坐标轴刻度标签的相关设置。
-            interval: 1, // 设置为 1，表示『隔一个标签显示一个标签』
-            // margin: 15,
-            color: '#078ceb',
-            fontStyle: 'normal',
-            fontFamily: '微软雅黑',
-            fontSize: 12,
+        xAxis: [
+          {
+            type: 'category',
+            data: allPro,
           },
-          axisTick: {
-          // 坐标轴刻度相关设置。
-            show: false,
+        ],
+        yAxis: [
+          {
+            type: 'value',
           },
-          axisLine: {
-          // 坐标轴轴线相关设置
-            lineStyle: {
-              color: '#fff',
-              opacity: 0.2,
-            },
-          },
-          splitLine: {
-            show: false,
-          },
-        },
-        yAxis: {
-          type: 'value',
-        },
+        ],
         series: allYears.map((year) => {
           return {
             name: year,
             type: 'bar',
-            barGap: 0,
-            barWidth: '10px',
-            // barCategoryGap: '2px', // 设置同一个类目下柱子之间的间距为类目宽度的20%
-            // barGap: '10px', // 设置不同系列之间柱子之间的间距为类目宽度的30%
-            // stack: 'stack1',
-            // symbolSize: 6, // 空心标记的大小
+            barWidth: '20px',
+            emphasis: {
+              focus: 'series',
+            },
             data: allPro.map((pro) => {
               const arr = data.filter(i => i.WQ_INF_YEAR === year && i.PROVINCE_NAME === pro)
               const firstObj = arr[0]
-              const value = firstObj && firstObj.value
+              const value = firstObj && firstObj.value.toFixed(1)
               return value
             }),
-            // lineStyle: {
-            //   width: 1,
-            //   color: '#2d8cf0',
-            // },
-            // itemStyle: {
-            //   color: '#2d8cf033',
-            //   borderWidth: 1,
-            // },
-            // label: {
-            //   show: true,
-            //   position: 'top',
-            //   color: '#a8aab0',
-            //   fontStyle: 'normal',
-            //   fontFamily: '微软雅黑',
-            //   fontSize: 12,
-            // },
           }
         }),
       }
@@ -193,61 +149,25 @@ export default {
         <svg-icon name="ep:close" />
       </el-icon>
     </el-button>
-    <el-select
-      v-model="selProvince"
-      multiple
-      collapse-tags
-      collapse-tags-tooltip
-      placeholder="请选择"
-      @blur="getData"
-    >
-      <el-option
-        v-for="item in allProvince"
-        :key="item.value"
-        :label="item.label"
-        :value="item.value"
-      />
+    <el-select v-model="selProvince" multiple collapse-tags collapse-tags-tooltip placeholder="请选择" @change="getData">
+      <el-option v-for="item in allProvince" :key="item.value" :label="item.label" :value="item.value" />
     </el-select>
 
-    <el-select
-      v-model="selYears"
-      multiple
-      collapse-tags
-      collapse-tags-tooltip
-      placeholder="请选择"
-      @blur="getData"
-    >
-      <el-option
-        v-for="item in allYears"
-        :key="item.value"
-        :label="item.label"
-        :value="item.value"
-      />
+    <el-select v-model="selYears" multiple collapse-tags collapse-tags-tooltip placeholder="请选择" @change="getData">
+      <el-option v-for="item in allYears" :key="item.value" :label="item.label" :value="item.value" />
     </el-select>
 
-    <el-select
-      v-model="selMons"
-      multiple
-      collapse-tags
-      collapse-tags-tooltip
-      placeholder="请选择"
-      @blur="getData"
-    >
-      <el-option
-        v-for="item in allMonths"
-        :key="item.value"
-        :label="item.label"
-        :value="item.value"
-      />
+    <el-select v-model="selMons" multiple collapse-tags collapse-tags-tooltip placeholder="请选择" @change="getData">
+      <el-option v-for="item in allMonths" :key="item.value" :label="item.label" :value="item.value" />
     </el-select>
 
-    <ZFrame width="100%" height="90%">
+    <ZFrame title="总氮浓度趋势图" width="100%" height="90%">
       <Echart v-if="visible" :options="options" height="270px" width="80%" class="layer-echart" />
     </ZFrame>
   </div>
 </template>
 
-<style lang='scss'>
+<style lang="scss">
 .close-button {
   position: absolute;
   top: 10px;
