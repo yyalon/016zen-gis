@@ -207,7 +207,7 @@ const columns = [
           effect: 'dark',
           color: legendWQ[rowData.wqLevel].color,
         },
-        { default: () => cellData }
+        { default: () => cellData },
       )
     },
   },
@@ -291,17 +291,20 @@ export default {
         this.setOpacity(shanghai, 0)
         this.setOpacity(jiangsu, 0)
         this.setOpacity(zhejiang, 0)
-      } else if (this.sea === 'shanghai') {
+      }
+      else if (this.sea === 'shanghai') {
         window.$zMap.fitBounds(shanghai.getBounds(), { padding: [40, 40], duration: 5 })
         this.setOpacity(shanghai, 0.01)
         this.setOpacity(jiangsu, 0.8)
         this.setOpacity(zhejiang, 0.8)
-      } else if (this.sea === 'zhejiang') {
+      }
+      else if (this.sea === 'zhejiang') {
         window.$zMap.fitBounds(zhejiang.getBounds(), { padding: [40, 40], duration: 5 })
         this.setOpacity(zhejiang, 0.01)
         this.setOpacity(shanghai, 0.8)
         this.setOpacity(jiangsu, 0.8)
-      } else if (this.sea === 'jiangsu') {
+      }
+      else if (this.sea === 'jiangsu') {
         window.$zMap.fitBounds(jiangsu.getBounds(), { padding: [40, 40], duration: 5 })
         this.setOpacity(jiangsu, 0.01)
         this.setOpacity(shanghai, 0.8)
@@ -353,7 +356,8 @@ export default {
                 value: item.l,
                 area: parseFloat(item.a),
               })
-            } else {
+            }
+            else {
               areas[name][item.p] = [
                 {
                   value: item.l,
@@ -361,7 +365,8 @@ export default {
                 },
               ]
             }
-          } else {
+          }
+          else {
             areas[name] = {}
             areas[name][item.p] = [
               {
@@ -404,7 +409,8 @@ export default {
           this.seaWaterQualites.forEach((item) => {
             if (objSeaWaterQualites[item.site]) {
               objSeaWaterQualites[item.site].push(item)
-            } else {
+            }
+            else {
               objSeaWaterQualites[item.site] = [item]
             }
           })
@@ -457,8 +463,9 @@ export default {
 
             this.filteredSeaWaterQualites.push(objYearQualites)
           }
-        } else {
-          this.filteredSeaWaterQualites = this.seaWaterQualites.filter((item) => item.year === this.year && item.season === this.season)
+        }
+        else {
+          this.filteredSeaWaterQualites = this.seaWaterQualites.filter(item => item.year === this.year && item.season === this.season)
         }
       }
     },
@@ -472,7 +479,8 @@ export default {
       if (stationlayer) {
         stationlayer.show = this.showStations
         loading.close()
-      } else {
+      }
+      else {
         stationlayer = new window.$ZMap.layer.ClusterLayer({
           show: false,
           maxClusterRadius: 70,
@@ -536,9 +544,11 @@ export default {
           let fillColor = ''
           if (this.type === 'wq') {
             fillColor = legendWQ[value]?.checked ? legendWQ[value].color : '#00000000'
-          } else if (this.type === 'e') {
+          }
+          else if (this.type === 'e') {
             fillColor = legendE[value]?.checked ? legendE[value].color : '#00000000'
-          } else {
+          }
+          else {
             fillColor = legendOther[value]?.checked ? legendOther[value].color : '#00000000'
           }
           graphic.setStyle({ fillColor })
@@ -554,9 +564,11 @@ export default {
       })
       if (this.type === 'wq') {
         this.legendWQ[value].checked = !this.legendWQ[value].checked
-      } else if (this.type === 'e') {
+      }
+      else if (this.type === 'e') {
         this.legendE[value].checked = !this.legendE[value].checked
-      } else {
+      }
+      else {
         this.legendOther[value].checked = !this.legendOther[value].checked
       }
       this.resetLayerStyle()
@@ -604,9 +616,11 @@ export default {
             let fillColor = ''
             if (this.type === 'wq') {
               fillColor = legendWQ[attr.Value]?.checked ? legendWQ[attr.Value].color : '#00000000'
-            } else if (this.type === 'e') {
+            }
+            else if (this.type === 'e') {
               fillColor = legendE[attr.Value]?.checked ? legendE[attr.Value].color : '#00000000'
-            } else {
+            }
+            else {
               fillColor = legendOther[attr.Value]?.checked ? legendOther[attr.Value].color : '#00000000'
             }
             return {
@@ -631,7 +645,8 @@ export default {
         this.resetLayerStyle()
         layers[name].show = true
         layers[name].bringToBack()
-      } else {
+      }
+      else {
         const loading = this.$loading({
           lock: true,
           text: '正在加载地图数据...',
@@ -651,14 +666,15 @@ export default {
               window.$zMap.addLayer(layers[name])
               layers[name].load({ data: geojson })
               layers[name].show = true
-            } else {
+            }
+            else {
               ElMessage({
                 message: `没有${this.year}${this.objSeasons[this.season]} ${this.objTypes[this.type]}的数据`,
               })
             }
             loading.close()
           },
-          error: (error, msg) => {
+          error: () => {
             loading.close()
           },
         })
@@ -735,7 +751,7 @@ export default {
         <el-option v-for="item in types" :key="item.value" :label="item.label" :value="item.value" />
       </el-select>
 
-      <el-switch v-model="showList" active-text="显示列表" style="margin-right: 10px" />
+      <el-switch v-model="showList" active-text="显示列表" style="margin-right: 10px;" />
 
       <el-switch v-model="showStations" active-text="显示点位" />
     </div>
