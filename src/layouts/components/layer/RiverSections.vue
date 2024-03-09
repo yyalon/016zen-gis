@@ -82,7 +82,7 @@ export default {
   data() {
     return {
       loadingRiverSections: false,
-      areas: areas.filter((zone) => ['全部', '上海市', '浙江省', '江苏省'].includes(zone.label)),
+      areas: areas.filter(zone => ['全部', '上海市', '浙江省', '江苏省'].includes(zone.label)),
       estuary: false,
       selectedArea: '',
       selectedAreaNode: null,
@@ -129,11 +129,11 @@ export default {
     eventBus.on('showtrend', () => {
       this.trendVisible = !this.trendVisible
     })
-
+    // await this.getWaterQuality()
     await this.showLayer()
   },
   unmounted() {
-    _layer.clear()
+    _layer?.clear()
     window.$zMap.removeLayer(_layer)
     _layer = null
   },
@@ -169,10 +169,13 @@ export default {
     refreshLayer() {
       _layer.clear()
       this.filteredRiverSections.forEach((riverSection) => {
+        const arr = ['I', 'Ⅱ', 'Ⅲ']
+        const compliant = arr.includes(riverSection?.level2018)
+        // const compliant = this.dictWaterQuality[riverSection.code]?.compliant
         const graphic = new window.$ZMap.graphic.Marker({
           latlng: [riverSection.latitude, riverSection.longitude],
           style: {
-            image: 'img/marker/river.png',
+            image: compliant ? 'img/marker/river.png' : 'img/marker/river-red.png',
             horizontalOrigin: window.$ZMap.HorizontalOrigin.CENTER,
             verticalOrigin: window.$ZMap.VerticalOrigin.BOTTOM,
           },
@@ -205,10 +208,13 @@ export default {
       _layer.clear()
       this.riverSections.forEach((riverSection) => {
         if (!this.watershed || riverSection.watershed === this.watershed) {
+          const arr = ['I', 'Ⅱ', 'Ⅲ']
+          const compliant = arr.includes(riverSection?.level2018)
+
           const graphic = new window.$ZMap.graphic.Marker({
             latlng: [riverSection.latitude, riverSection.longitude],
             style: {
-              image: 'img/marker/river.png',
+              image: compliant ? 'img/marker/river.png' : 'img/marker/river_red.png',
               horizontalOrigin: window.$ZMap.HorizontalOrigin.CENTER,
               verticalOrigin: window.$ZMap.VerticalOrigin.BOTTOM,
             },
@@ -292,7 +298,8 @@ export default {
       if (this.selectedAreaNode?.level === 1) {
         city = ''
         province = this.selectedArea
-      } else if (this.selectedAreaNode?.level === 2) {
+      }
+      else if (this.selectedAreaNode?.level === 2) {
         city = this.selectedArea
         province = this.selectedAreaNode.parent.data.label
       }
@@ -324,6 +331,37 @@ export default {
     },
     closeLayerTrend() {
       this.trendVisible = false
+    },
+    async getWaterQuality() {
+      // const res = await apiData.getWaterQuality()
+      // if (res && res.code === 1000) {
+      //   // console.log('getWaterQuality', res.data)
+      //   const dictWaterQuality = {}
+      //   const arr = ['I', 'Ⅱ', 'Ⅲ']
+      //   res.data.forEach((e) => {
+      //     let noDabiao = false
+      //     //   {
+      //     //     "PROVINCE_NAME": "浙江省",
+      //     //     "AREA_NAME": "绍兴市",
+      //     //     "WQ_INF_YEAR": "2023",
+      //     //     "WQ_INF_MONTH": "07",
+      //     //     "WQ_PI_CODE": "330600_0001",
+      //     //     "WQ_PI_NAME": "曹娥江大闸闸前",
+      //     //     "W2023": "Ⅲ",
+      //     //     "N2023": 1.99,
+      //     //     "W2025": "Ⅲ",
+      //     //     "N2025": "2.14"
+      //     // }
+      //     e.N2025 = parseFloat(e.N2025)
+      //     if (e.N2023 >= e.N2025 || !arr.includes(e.W2023)) {
+      //       // 不达标
+      //       noDabiao = true
+      //     }
+      //     e.compliant = !noDabiao
+      //     return dictWaterQuality[e.WQ_PI_CODE] = e
+      //   })
+      //   this.dictWaterQuality = dictWaterQuality
+      // }
     },
   },
 }

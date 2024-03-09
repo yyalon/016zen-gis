@@ -674,7 +674,7 @@ export default {
             }
             loading.close()
           },
-          error: (_error, msg) => {
+          error: () => {
             loading.close()
           },
         })
@@ -751,7 +751,7 @@ export default {
         <el-option v-for="item in types" :key="item.value" :label="item.label" :value="item.value" />
       </el-select>
 
-      <el-switch v-model="showList" active-text="显示列表" style="margin-right: 10px" />
+      <el-switch v-model="showList" active-text="显示列表" style="margin-right: 10px;" />
 
       <el-switch v-model="showStations" active-text="显示点位" />
     </div>
