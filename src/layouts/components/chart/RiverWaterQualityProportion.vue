@@ -44,7 +44,7 @@ export default {
           orient: 'vertical',
           top: 'center',
           right: '10%',
-          data: data.map((it) => it.label),
+          data: data.map(it => it.label),
           textStyle: {
             color: '#fff',
             fontSize: 12,
@@ -112,7 +112,7 @@ export default {
             orient: 'vertical',
             top: 'center',
             right: '10%',
-            data: result1.data.map((it) => `${it.label}类`),
+            data: result1.data.map(it => `${it.label}类`),
             textStyle: {
               color: '#fff',
               fontSize: 12,
@@ -123,6 +123,15 @@ export default {
             formatter: '{a} <br/>{b} : {c} ({d}%)',
             textStyle: {
               fontSize: 16,
+            },
+          },
+          toolbox: {
+            show: true,
+            orient: 'vertical',
+            left: 'right',
+            top: 'center',
+            feature: {
+              saveAsImage: { show: true },
             },
           },
           series: [

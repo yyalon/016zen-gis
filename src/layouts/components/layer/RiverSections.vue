@@ -175,7 +175,7 @@ export default {
         const graphic = new window.$ZMap.graphic.Marker({
           latlng: [riverSection.latitude, riverSection.longitude],
           style: {
-            image: compliant ? 'img/marker/river.png' : 'img/marker/river-red.png',
+            image: compliant ? 'img/marker/river.png' : 'img/marker/river_red.png',
             horizontalOrigin: window.$ZMap.HorizontalOrigin.CENTER,
             verticalOrigin: window.$ZMap.VerticalOrigin.BOTTOM,
           },

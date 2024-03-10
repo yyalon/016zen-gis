@@ -102,7 +102,15 @@ export default {
           top: '15%',
           containLabel: true,
         },
-
+        toolbox: {
+          show: true,
+          orient: 'vertical',
+          left: 'right',
+          top: '10%',
+          feature: {
+            saveAsImage: { show: true },
+          },
+        },
         xAxis: [
           {
             type: 'category',
@@ -161,7 +169,7 @@ export default {
       <el-option v-for="item in allMonths" :key="item.value" :label="item.label" :value="item.value" />
     </el-select>
 
-    <ZFrame title="总氮浓度趋势图" width="100%" height="90%">
+    <ZFrame title="主要污染物浓度趋势图" width="100%" height="90%">
       <Echart v-if="visible" :options="options" height="270px" width="80%" class="layer-echart" />
     </ZFrame>
   </div>
