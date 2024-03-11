@@ -80,10 +80,10 @@ export default {
       // this.options.series[0].data = data
     },
     generyLine(data) {
-      let allPro = data.map((i) => i.PROVINCE_NAME)
+      let allPro = data.map(i => i.PROVINCE_NAME)
       allPro = Array.from(new Set(allPro))
 
-      const allYears = Array.from(new Set(data.map((i) => i.WQ_INF_YEAR)))
+      const allYears = Array.from(new Set(data.map(i => i.WQ_INF_YEAR)))
       return {
         tooltip: {
           trigger: 'axis',
@@ -123,7 +123,7 @@ export default {
               focus: 'series',
             },
             data: allPro.map((pro) => {
-              const arr = data.filter((i) => i.WQ_INF_YEAR === year && i.PROVINCE_NAME === pro)
+              const arr = data.filter(i => i.WQ_INF_YEAR === year && i.PROVINCE_NAME === pro)
               const firstObj = arr[0]
               const value = firstObj && firstObj.value.toFixed(1)
               return value
@@ -144,22 +144,24 @@ export default {
 
 <template>
   <div>
-    <el-button class="close-button" type="primary" circle size="default" @click="handleClose">
-      <el-icon>
-        <svg-icon name="ep:close" />
-      </el-icon>
-    </el-button>
-    <el-select v-model="selProvince" multiple collapse-tags collapse-tags-tooltip placeholder="请选择" @change="getData">
-      <el-option v-for="item in allProvince" :key="item.value" :label="item.label" :value="item.value" />
-    </el-select>
+    <div style="background-color: black; height: auto">
+      <el-button class="close-button" type="primary" circle size="small" @click="handleClose">
+        <el-icon>
+          <svg-icon name="ep:close" />
+        </el-icon>
+      </el-button>
+      <el-select v-model="selProvince" multiple collapse-tags collapse-tags-tooltip placeholder="请选择" @change="getData">
+        <el-option v-for="item in allProvince" :key="item.value" :label="item.label" :value="item.value" />
+      </el-select>
 
-    <el-select v-model="selYears" multiple collapse-tags collapse-tags-tooltip placeholder="请选择" @change="getData">
-      <el-option v-for="item in allYears" :key="item.value" :label="item.label" :value="item.value" />
-    </el-select>
+      <el-select v-model="selYears" multiple collapse-tags collapse-tags-tooltip placeholder="请选择" @change="getData">
+        <el-option v-for="item in allYears" :key="item.value" :label="item.label" :value="item.value" />
+      </el-select>
 
-    <el-select v-model="selMons" multiple collapse-tags collapse-tags-tooltip placeholder="请选择" @change="getData">
-      <el-option v-for="item in allMonths" :key="item.value" :label="item.label" :value="item.value" />
-    </el-select>
+      <el-select v-model="selMons" multiple collapse-tags collapse-tags-tooltip placeholder="请选择" @change="getData">
+        <el-option v-for="item in allMonths" :key="item.value" :label="item.label" :value="item.value" />
+      </el-select>
+    </div>
 
     <ZFrame title="总氮浓度趋势图" width="100%" height="90%">
       <Echart v-if="visible" :options="options" height="270px" width="80%" class="layer-echart" />
@@ -170,7 +172,7 @@ export default {
 <style lang="scss" scoped>
 .close-button {
   position: absolute;
-  top: 10px;
+  top: 5px;
   right: 10px;
 }
 

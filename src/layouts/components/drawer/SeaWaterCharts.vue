@@ -29,7 +29,6 @@ export default {
   },
   watch: {
     async visible() {
-      console.log(this.drawerData)
       this.drawerVisible = this.visible
     },
   },
@@ -66,7 +65,7 @@ export default {
             </el-icon>
           </el-button>
         </div>
-        <br />
+        <br>
         <div class="drawer-body">
           <div class="chart-container">
             <ChartSeaWaterQualityProportion :chart-data="drawerData" />
@@ -95,6 +94,7 @@ export default {
 <style lang="scss" scoped>
 .drawer-container {
   width: 500px;
+
   .el-drawer__body {
     padding: 0;
   }
@@ -110,6 +110,7 @@ export default {
     align-content: flex-start;
     justify-content: space-between;
     gap: 20px;
+
     .chart-container {
       height: 226px;
       width: 375px;
