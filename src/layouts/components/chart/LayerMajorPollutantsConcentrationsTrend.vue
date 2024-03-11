@@ -80,10 +80,10 @@ export default {
       // this.options.series[0].data = data
     },
     generyLine(data) {
-      let allPro = data.map(i => i.PROVINCE_NAME)
+      let allPro = data.map((i) => i.PROVINCE_NAME)
       allPro = Array.from(new Set(allPro))
 
-      const allYears = Array.from(new Set(data.map(i => i.WQ_INF_YEAR)))
+      const allYears = Array.from(new Set(data.map((i) => i.WQ_INF_YEAR)))
       return {
         tooltip: {
           trigger: 'axis',
@@ -123,7 +123,7 @@ export default {
               focus: 'series',
             },
             data: allPro.map((pro) => {
-              const arr = data.filter(i => i.WQ_INF_YEAR === year && i.PROVINCE_NAME === pro)
+              const arr = data.filter((i) => i.WQ_INF_YEAR === year && i.PROVINCE_NAME === pro)
               const firstObj = arr[0]
               const value = firstObj && firstObj.value.toFixed(1)
               return value
@@ -167,7 +167,7 @@ export default {
   </div>
 </template>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .close-button {
   position: absolute;
   top: 10px;

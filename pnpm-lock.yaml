@@ -105,7 +105,7 @@ devDependencies:
     version: 3.0.1(vite@4.3.1)(vue@3.2.47)
   autoprefixer:
     specifier: ^10.4.14
-    version: 10.4.14(postcss@8.4.29)
+    version: 10.4.14(postcss@8.4.35)
   bumpp:
     specifier: ^9.1.0
     version: 9.1.0
@@ -150,7 +150,7 @@ devDependencies:
     version: 33.0.0(stylelint@15.5.0)
   stylelint-config-standard-scss:
     specifier: ^8.0.0
-    version: 8.0.0(postcss@8.4.29)(stylelint@15.5.0)
+    version: 8.0.0(postcss@8.4.35)(stylelint@15.5.0)
   stylelint-config-standard-vue:
     specifier: ^1.0.0
     version: 1.0.0(postcss-html@1.5.0)(stylelint@15.5.0)
@@ -2935,7 +2935,7 @@ packages:
     resolution: {integrity: sha512-4enCcYI9uGHtX/mVdTPeJp11+NkXbJc9zUy/IVYAcG8Eud428m+AB82savT1Zdb1SDRG2HEl0hpQV2bwPJjWiw==}
     dev: false
 
-  /autoprefixer@10.4.14(postcss@8.4.29):
+  /autoprefixer@10.4.14(postcss@8.4.35):
     resolution: {integrity: sha512-FQzyfOsTlwVzjHxKEqRIAdJx9niO6VCBCoEwax/VLSoQF29ggECcPuBqUMZ+u8jCZOPSy8b8/8KnuFbp0SaFZQ==}
     engines: {node: ^10 || ^12 || >=14}
     hasBin: true
@@ -2943,11 +2943,11 @@ packages:
       postcss: ^8.1.0
     dependencies:
       browserslist: 4.21.5
-      caniuse-lite: 1.0.30001532
+      caniuse-lite: 1.0.30001597
       fraction.js: 4.2.0
       normalize-range: 0.1.2
       picocolors: 1.0.0
-      postcss: 8.4.29
+      postcss: 8.4.35
       postcss-value-parser: 4.2.0
     dev: true
 
@@ -3091,7 +3091,7 @@ packages:
     engines: {node: ^6 || ^7 || ^8 || ^9 || ^10 || ^11 || ^12 || >=13.7}
     hasBin: true
     dependencies:
-      caniuse-lite: 1.0.30001532
+      caniuse-lite: 1.0.30001597
       electron-to-chromium: 1.4.327
       node-releases: 2.0.10
       update-browserslist-db: 1.0.10(browserslist@4.21.5)
@@ -3217,8 +3217,8 @@ packages:
     engines: {node: '>=10'}
     dev: true
 
-  /caniuse-lite@1.0.30001532:
-    resolution: {integrity: sha512-FbDFnNat3nMnrROzqrsg314zhqN5LGQ1kyyMk2opcrwGbVGpHRhgCWtAgD5YJUqNAiQ+dklreil/c3Qf1dfCTw==}
+  /caniuse-lite@1.0.30001597:
+    resolution: {integrity: sha512-7LjJvmQU6Sj7bL0j5b5WY/3n7utXUJvAe1lxhsHDbLmwX9mdL86Yjtr+5SRCyf8qME4M7pU2hswj0FpyBVCv9w==}
     dev: true
 
   /capital-case@1.0.4:
@@ -7205,6 +7205,12 @@ packages:
     hasBin: true
     dev: true
 
+  /nanoid@3.3.7:
+    resolution: {integrity: sha512-eSRppjcPIatRIMC1U6UngP8XFcz8MQWGQdt1MTBQ7NaAmvXDfvNxbvWV3x2y6CdEUciCSsDHDQZbhYaB8QEo2g==}
+    engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
+    hasBin: true
+    dev: true
+
   /nanomatch@1.2.13:
     resolution: {integrity: sha512-fpoe2T0RbHwBTBUOftAfBPaDEi06ufaUai0mE6Yn1kacc3SnTErfb/h+X94VXzI64rKFHYImXSvdwGGCmwOqCA==}
     engines: {node: '>=0.10.0'}
@@ -7903,13 +7909,13 @@ packages:
       postcss: 8.4.23
     dev: true
 
-  /postcss-scss@4.0.6(postcss@8.4.29):
+  /postcss-scss@4.0.6(postcss@8.4.35):
     resolution: {integrity: sha512-rLDPhJY4z/i4nVFZ27j9GqLxj1pwxE80eAzUNRMXtcpipFYIeowerzBgG3yJhMtObGEXidtIgbUpQ3eLDsf5OQ==}
     engines: {node: '>=12.0'}
     peerDependencies:
       postcss: ^8.4.19
     dependencies:
-      postcss: 8.4.29
+      postcss: 8.4.35
     dev: true
 
   /postcss-selector-parser@6.0.11:
@@ -7960,11 +7966,11 @@ packages:
       source-map-js: 1.0.2
     dev: true
 
-  /postcss@8.4.29:
-    resolution: {integrity: sha512-cbI+jaqIeu/VGqXEarWkRCCffhjgXc0qjBtXpqJhTBohMUjUQnbBr0xqX3vEKudc4iviTewcJo5ajcec5+wdJw==}
+  /postcss@8.4.35:
+    resolution: {integrity: sha512-u5U8qYpBCpN13BsiEB0CbR1Hhh4Gc0zLFuedrHJKMctHCHAGrMdG0PRM/KErzAL3CU6/eckEtmHNB3x6e3c0vA==}
     engines: {node: ^10 || ^12 || >=14}
     dependencies:
-      nanoid: 3.3.6
+      nanoid: 3.3.7
       picocolors: 1.0.0
       source-map-js: 1.0.2
     dev: true
@@ -8943,7 +8949,7 @@ packages:
       stylelint: 15.5.0
     dev: true
 
-  /stylelint-config-recommended-scss@10.0.0(postcss@8.4.29)(stylelint@15.5.0):
+  /stylelint-config-recommended-scss@10.0.0(postcss@8.4.35)(stylelint@15.5.0):
     resolution: {integrity: sha512-+YvPgUHi0W5mCJCKdupBCIsWPYNbWuJcRmFtSYujwNg+41ljFknhO9bpY6C+oahv659zW7W1AT7i6DQvJYYr1A==}
     peerDependencies:
       postcss: ^8.3.3
@@ -8952,8 +8958,8 @@ packages:
       postcss:
         optional: true
     dependencies:
-      postcss: 8.4.29
-      postcss-scss: 4.0.6(postcss@8.4.29)
+      postcss: 8.4.35
+      postcss-scss: 4.0.6(postcss@8.4.35)
       stylelint: 15.5.0
       stylelint-config-recommended: 11.0.0(stylelint@15.5.0)
       stylelint-scss: 4.6.0(stylelint@15.5.0)
@@ -8989,7 +8995,7 @@ packages:
       stylelint: 15.5.0
     dev: true
 
-  /stylelint-config-standard-scss@8.0.0(postcss@8.4.29)(stylelint@15.5.0):
+  /stylelint-config-standard-scss@8.0.0(postcss@8.4.35)(stylelint@15.5.0):
     resolution: {integrity: sha512-TDT/gJD/0LUDoUgkjF1uoI/4DfczXHxg7gJVcWT4/JbE6k5hszVuI14reNX+tEwSyMNhcK2BA7izrK+uVAz7XA==}
     peerDependencies:
       postcss: ^8.3.3
@@ -8998,9 +9004,9 @@ packages:
       postcss:
         optional: true
     dependencies:
-      postcss: 8.4.29
+      postcss: 8.4.35
       stylelint: 15.5.0
-      stylelint-config-recommended-scss: 10.0.0(postcss@8.4.29)(stylelint@15.5.0)
+      stylelint-config-recommended-scss: 10.0.0(postcss@8.4.35)(stylelint@15.5.0)
       stylelint-config-standard: 32.0.0(stylelint@15.5.0)
     dev: true
 
