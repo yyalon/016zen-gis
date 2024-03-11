@@ -169,7 +169,7 @@ export default {
     refreshLayer() {
       _layer.clear()
       this.filteredRiverSections.forEach((riverSection) => {
-        const arr = ['I', 'Ⅱ', 'Ⅲ']
+        const arr = ['Ⅰ', 'Ⅱ', 'Ⅲ']
         const compliant = arr.includes(riverSection?.level2018)
         // const compliant = this.dictWaterQuality[riverSection.code]?.compliant
         const graphic = new window.$ZMap.graphic.Marker({
@@ -208,7 +208,7 @@ export default {
       _layer.clear()
       this.riverSections.forEach((riverSection) => {
         if (!this.watershed || riverSection.watershed === this.watershed) {
-          const arr = ['I', 'Ⅱ', 'Ⅲ']
+          const arr = ['Ⅰ', 'Ⅱ', 'Ⅲ']
           const compliant = arr.includes(riverSection?.level2018)
 
           const graphic = new window.$ZMap.graphic.Marker({
@@ -478,9 +478,10 @@ export default {
     position: absolute;
     // background: #d7f2f2;
     z-index: 10000;
-    right: 100px;
-    bottom: 0;
-    width: 800px;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 50px;
+    width: 700px;
     height: 300px;
     pointer-events: all;
   }

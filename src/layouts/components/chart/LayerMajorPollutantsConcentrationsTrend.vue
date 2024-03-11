@@ -152,22 +152,24 @@ export default {
 
 <template>
   <div>
-    <el-button class="close-button" type="primary" circle size="default" @click="handleClose">
-      <el-icon>
-        <svg-icon name="ep:close" />
-      </el-icon>
-    </el-button>
-    <el-select v-model="selProvince" multiple collapse-tags collapse-tags-tooltip placeholder="请选择" @change="getData">
-      <el-option v-for="item in allProvince" :key="item.value" :label="item.label" :value="item.value" />
-    </el-select>
+    <div style="background-color: black; height: auto;">
+      <el-button class="close-button" type="primary" circle size="small" @click="handleClose">
+        <el-icon>
+          <svg-icon name="ep:close" />
+        </el-icon>
+      </el-button>
+      <el-select v-model="selProvince" multiple collapse-tags collapse-tags-tooltip placeholder="请选择" @change="getData">
+        <el-option v-for="item in allProvince" :key="item.value" :label="item.label" :value="item.value" />
+      </el-select>
 
-    <el-select v-model="selYears" multiple collapse-tags collapse-tags-tooltip placeholder="请选择" @change="getData">
-      <el-option v-for="item in allYears" :key="item.value" :label="item.label" :value="item.value" />
-    </el-select>
+      <el-select v-model="selYears" multiple collapse-tags collapse-tags-tooltip placeholder="请选择" @change="getData">
+        <el-option v-for="item in allYears" :key="item.value" :label="item.label" :value="item.value" />
+      </el-select>
 
-    <el-select v-model="selMons" multiple collapse-tags collapse-tags-tooltip placeholder="请选择" @change="getData">
-      <el-option v-for="item in allMonths" :key="item.value" :label="item.label" :value="item.value" />
-    </el-select>
+      <el-select v-model="selMons" multiple collapse-tags collapse-tags-tooltip placeholder="请选择" @change="getData">
+        <el-option v-for="item in allMonths" :key="item.value" :label="item.label" :value="item.value" />
+      </el-select>
+    </div>
 
     <ZFrame title="主要污染物浓度趋势图" width="100%" height="90%">
       <Echart v-if="visible" :options="options" height="270px" width="80%" class="layer-echart" />
@@ -175,10 +177,10 @@ export default {
   </div>
 </template>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .close-button {
   position: absolute;
-  top: 10px;
+  top: 5px;
   right: 10px;
 }
 

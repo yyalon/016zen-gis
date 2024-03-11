@@ -62,7 +62,7 @@ export default {
             top: '10%',
             name: '水质类别',
             type: 'pie',
-            left: '0',
+            // left: '0',
             radius: ['30%', '70%'],
             center: ['40%', '50%'],
             roseType: 'radius',
@@ -91,7 +91,7 @@ export default {
   },
   mounted() {
     this.visible = true
-    // this.getData(this.param)
+    this.getData(this.param)
 
     eventBus.on('filterparam', (param) => {
       // console.log('quality:filterparam:', param)
@@ -108,19 +108,22 @@ export default {
       const result1 = await apiData.getRiverSectionAreaRatio(param)
       if (result1 && result1.code === 1000 && result1.data) {
         const opt = {
-          legend: {
-            orient: 'vertical',
-            top: 'center',
-            right: '10%',
-            data: result1.data.map(it => `${it.label}类`),
-            textStyle: {
-              color: '#fff',
-              fontSize: 12,
-            },
-          },
+          // legend: {
+          //   orient: 'vertical',
+          //   top: 'center',
+          //   right: '10%',
+          //   data: result1.data.map((it) => `${it.label}`),
+          //   textStyle: {
+          //     color: '#fff',
+          //     fontSize: 12,
+          //   },
+          // },
           tooltip: {
             trigger: 'item',
-            formatter: '{a} <br/>{b} : {c} ({d}%)',
+            formatter(param) {
+              return `${param.name} (${param.percent}%)<br>`
+            },
+            // formatter: '{a} <br/>{b} : {c} ({d}%)',
             textStyle: {
               fontSize: 16,
             },
@@ -139,7 +142,7 @@ export default {
               top: '10%',
               name: '水质类别',
               type: 'pie',
-              left: '0',
+              // left: '0',
               radius: ['30%', '70%'],
               center: ['40%', '50%'],
               roseType: 'radius',
@@ -147,6 +150,9 @@ export default {
                 show: true,
                 position: 'outside',
                 fontSize: 16,
+                formatter(param) {
+                  return `${param.name} (${parseInt(param.percent)}%)`
+                },
               },
               labelLine: {
                 length: 2,
@@ -155,7 +161,7 @@ export default {
               data: result1.data.map((it, i) => {
                 return {
                   value: it.value,
-                  name: `${it.label}类`,
+                  name: `${it.label}`,
                   itemStyle: {
                     color: `${colors[i]}`,
                   },
