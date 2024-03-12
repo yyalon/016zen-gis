@@ -48,7 +48,8 @@ export default {
   <div v-loading="loading">
     <el-drawer
       v-model="drawerVisible"
-      class="drawer-container"
+      class="drawer-sea-water-charts-container"
+      size="810px"
       :append-to-body="true"
       direction="rtl"
       :close-on-press-escape="false"
@@ -65,7 +66,7 @@ export default {
             </el-icon>
           </el-button>
         </div>
-        <br>
+        <br />
         <div class="drawer-body">
           <div class="chart-container">
             <ChartSeaWaterQualityProportion :chart-data="drawerData" />
@@ -86,15 +87,13 @@ export default {
 </template>
 
 <style lang="scss">
-.drawer-container {
+.drawer-sea-water-charts-container {
   overflow: hidden;
 }
 </style>
 
 <style lang="scss" scoped>
-.drawer-container {
-  width: 500px;
-
+.drawer-sea-water-charts-container {
   .el-drawer__body {
     padding: 0;
   }
