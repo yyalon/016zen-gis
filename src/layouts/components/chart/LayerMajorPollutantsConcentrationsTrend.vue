@@ -152,13 +152,15 @@ export default {
 
 <template>
   <div>
-    <div style="background-color: black; height: auto;">
+    <div style="background-color: black; height: auto;" class="filters">
       <el-button class="close-button" type="primary" circle size="small" @click="handleClose">
         <el-icon>
           <svg-icon name="ep:close" />
         </el-icon>
       </el-button>
-      <el-select v-model="selProvince" multiple collapse-tags collapse-tags-tooltip placeholder="请选择" @change="getData">
+      <el-select
+        v-model="selProvince" multiple collapse-tags collapse-tags-tooltip placeholder="请选择" @change="getData"
+      >
         <el-option v-for="item in allProvince" :key="item.value" :label="item.label" :value="item.value" />
       </el-select>
 

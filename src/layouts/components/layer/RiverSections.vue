@@ -386,6 +386,7 @@ export default {
       </el-select>
       <el-date-picker
         v-model="timeSlot"
+        style="background-color: #070e14;border: 1px solid #64b4ff;color: #64b4ff;box-shadow: none;"
         size="large"
         type="monthrange"
         range-separator="-"
@@ -396,7 +397,7 @@ export default {
         :disabled-date="disabledDate"
         @change="selectedTimeSlot()"
       />
-      <el-switch v-model="estuary" active-text="入海口" @change="filterRiverSections()" />
+      <el-switch v-model="estuary" style="margin-left: 10px;" active-text="入海口" @change="filterRiverSections()" />
       <el-switch v-model="showList" active-text="显示列表" />
     </div>
     <div v-if="showList" class="river-section-list">
@@ -418,6 +419,9 @@ export default {
     </div>
     <DrawerRiverSection :drawer-data="drawerData" :visible="drawerVisible" @close="drawerVisible = false" />
     <LayerMajorPollutantsConcentrationsTrend v-if="trendVisible" class="layer-trend" @close="closeLayerTrend" />
+    <el-button type="primary" class="positioned" @click="toggleView">
+      浓度趋势图
+    </el-button>
   </div>
 </template>
 

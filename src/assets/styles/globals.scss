@@ -140,8 +140,6 @@ textarea {
         border: 1px solid #72b3f0;
       }
 
-
-
       .el-picker-panel__icon-btn {
         color: #fff;
       }
@@ -177,4 +175,12 @@ textarea {
 .el-table-v2__row:hover {
   background-color: #fffb75;
   color: black;
+}
+
+.el-tag {
+  background-color: transparent;
+}
+
+.el-select__tags .el-tag--info {
+  background-color: transparent;
 }
