@@ -39,6 +39,7 @@ export default {
   },
   data() {
     return {
+      loading: false,
       seas,
       seasons,
       legend,
@@ -101,6 +102,7 @@ export default {
   },
   methods: {
     update() {
+      this.loading = true
       if (this.chartData.year && this.chartData.season && this.chartData.areas) {
         const name = `wq-${this.chartData.year}-${this.chartData.season}`
         const areas = this.chartData.areas[name]
@@ -145,7 +147,7 @@ export default {
 </script>
 
 <template>
-  <ZFrame :height="220" :title="`${seas[chartData?.province]?.label || ''}${chartData?.year || ''}年${seasons[chartData?.season] || ''}海水水质类别面积占比`">
-    <Echart :options="options" height="190px" width="375px" />
+  <ZFrame :height="220" :title="`${seas[chartData?.province]?.label || ''}${chartData?.year || ''}年${seasons[chartData?.season] || ''}海水水质类别面积占比`" :loading="loading">
+    <Echart :options="options" height="190px" width="375px" @on-finished="loading = flase" />
   </ZFrame>
 </template>

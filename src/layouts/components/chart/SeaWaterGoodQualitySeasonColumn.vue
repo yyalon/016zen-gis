@@ -39,6 +39,7 @@ export default {
   },
   data() {
     return {
+      loading: false,
       legend,
       seas,
       seasons,
@@ -103,6 +104,7 @@ export default {
   },
   methods: {
     update() {
+      this.loading = true
       if (this.chartData.areas) {
         this.options.series = aryYears.map((year) => {
           const sums = {}
@@ -142,7 +144,7 @@ export default {
 </script>
 
 <template>
-  <ZFrame :height="220" title="优良水质面积比例（季度）">
-    <Echart :options="options" height="190px" width="375px" />
+  <ZFrame :height="220" title="优良水质面积比例（季度）" :loading="loading">
+    <Echart :options="options" height="190px" width="375px" @on-finished="loading = flase" />
   </ZFrame>
 </template>
