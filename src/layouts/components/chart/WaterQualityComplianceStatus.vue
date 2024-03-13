@@ -37,42 +37,30 @@ export default {
         ],
         series: [
           {
-            name: '总体水质达标断面数',
+            name: '达标断面数',
             type: 'bar',
             barWidth: '8px',
             data: [],
           },
           {
-            name: '总体水质不达标断面数',
+            name: '不达标断面数',
             type: 'bar',
             barWidth: '8px',
             data: [],
           },
         ],
       },
+      param: {},
     }
   },
   async mounted() {
     await this.delay(1000)
-    const res = await ApiData.getRiverSectionOverall()
-    // console.log('getRiverSectionOverall:', res)
-    if (res && res.code === 1000) {
-      const data = res.data
-
-      const data1 = []
-      // for (let i = 0; i < 6; i++) {
-      //   data.push(round(random(3, 8), 0))
-      //   data1.push(9 - data[i])
-      // }
-      this.options.series[0].data = data.map((e) => e.value)
-      this.options.xAxis[0].data = data.map((e) => e.WQ_INF_YEAR)
-      // this.options.series[1].data = data1
-      this.visible = true
-    }
-    this.visible = true
+    await this.getData()
 
     eventBus.on('filterparam', (param) => {
       // console.log('water:filterparam:', param)
+      this.param = param
+      this.getData(param)
     })
   },
   beforeUnmount() {
@@ -86,6 +74,21 @@ export default {
     },
     handleSearch(data) {
       // console.log('handleSearch')
+    },
+    async getData(param) {
+      const res = await ApiData.getRiverSectionOverall(param)
+      // console.log('getRiverSectionOverall:', res)
+      if (res && res.code === 1000) {
+        const data = res.data.filter(e => e.result === '达标')
+
+        const data1 = res.data.filter(e => e.result === '不达标')
+        this.options.series[0].data = data.map(e => e.value)
+        this.options.xAxis[0].data = data.map(e => e.WQ_INF_YEAR)
+        this.options.series[1].data = data1.map(e => e.value)
+        // this.options.xAxis[1].data = data1.map((e) => e.WQ_INF_YEAR)
+        this.visible = true
+      }
+      this.visible = true
     },
   },
 }

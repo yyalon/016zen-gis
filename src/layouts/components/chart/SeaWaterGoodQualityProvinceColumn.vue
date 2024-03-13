@@ -92,8 +92,12 @@ export default {
     }
   },
   watch: {
-    chartData() {
-      this.update()
+    chartData: {
+      deep: true,
+      immediate: true,
+      handler() {
+        this.update()
+      },
     },
   },
   methods: {

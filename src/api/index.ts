@@ -1,3 +1,4 @@
+/* eslint-disable no-mixed-operators */
 import type { AxiosResponse } from 'axios'
 import axios from 'axios'
 
@@ -43,7 +44,8 @@ api.interceptors.response.use(
   (response: AxiosResponse) => {
     if (response.data.code === 1000) {
       return Promise.resolve(response.data)
-    } else {
+    }
+    else {
       ElMessage({
         message: response.data.message,
         type: 'error',
@@ -58,9 +60,14 @@ api.interceptors.response.use(
     let message = error.message
     if (message === 'Network Error') {
       message = '后端网络故障'
-    } else if (message.includes('timeout')) {
+    }
+    else if (message.includes('timeout')) {
       message = '接口请求超时'
-    } else if (message.includes('Request failed with status code')) {
+    }
+    else if (error?.response?.status === 401) {
+      message = '请重新登录'
+    }
+    else if (message.includes('Request failed with status code')) {
       message = `接口${message.substr(message.length - 3)}异常`
     }
 
@@ -78,7 +85,7 @@ api.interceptors.response.use(
       }
     }, 3000)
     return Promise.reject(error)
-  }
+  },
 )
 
 export default api

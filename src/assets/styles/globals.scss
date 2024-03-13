@@ -112,21 +112,47 @@ textarea {
     }
   }
 
-  .elDatePicker.el-picker-panel {
-    color: #fff;
-    background: #002450;
-    border: 1px solid #1384b4;
-
-    .el-picker-panel__icon-btn {
-      color: #fff;
+  .el-date-editor {
+    .el-input__wrapper {
+      border: 1px solid #64b4ff;
+      background: #070e14;
+      color: #64b4ff;
+      box-shadow: none;
     }
 
-    .el-date-picker__header-label {
-      color: #fff;
+    .el-input {
+      background: black;
     }
 
-    .el-date-table th {
+    .el-range-input {
+      cursor: pointer;
+      color: #64b4ff;
+    }
+    // #app > div.layout > div.layout-container > div.layout-body > div:nth-child(1) > div.work-zone > div.filters > div.el-date-editor.el-date-editor--monthrange.el-input__wrapper.is-active.el-range-editor.el-range-editor--large.el-tooltip__trigger.el-tooltip__trigger
+
+    .el-picker-panel {
       color: #fff;
+      background: #070e14;
+      border: 1px solid #1384b4;
+
+      &:hover .el-input__wrapper {
+        box-shadow: none;
+        border: 1px solid #72b3f0;
+      }
+
+
+
+      .el-picker-panel__icon-btn {
+        color: #fff;
+      }
+
+      .el-date-picker__header-label {
+        color: #fff;
+      }
+
+      .el-date-table th {
+        color: #fff;
+      }
     }
   }
 

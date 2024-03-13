@@ -103,7 +103,8 @@ export default {
           // 断面选择了全部, 使用饼图
           this.options = this.generyBingtu(data)
           this.visible = true
-        } else {
+        }
+        else {
           this.options = this.generyLine(data)
           // console.log('this.options:', this.options)
           this.visible = true
@@ -117,9 +118,9 @@ export default {
       return {
         legend: {
           orient: 'vertical',
-          top: 'top',
-          right: '5%',
-          data: data.map((it) => it.label),
+          top: 'center',
+          right: '10%',
+          data: [],
           textStyle: {
             color: '#fff',
             fontSize: 12,
@@ -127,26 +128,29 @@ export default {
         },
         tooltip: {
           trigger: 'item',
-          formatter: '{a} <br/>{b} : {c} ({d}%)',
+          formatter(param) {
+            return `${param.name} (${param.percent}%)<br> ${param.value}`
+          },
+          // formatter: '{a} <br/>{b} : {c} ({d}%)',
           textStyle: {
             fontSize: 16,
           },
         },
         series: [
           {
-            top: '10%',
+            top: '0%',
             name: '断面达标比例',
             type: 'pie',
             left: '0',
-            radius: ['40%', '60%'],
-            // center: ['40%', '50%'],
+            radius: ['30%', '70%'],
+            center: ['50%', '50%'],
             roseType: 'radius',
             label: {
               show: true,
               position: 'outside',
               fontSize: 16,
               formatter(param) {
-                return `${param.percent}%`
+                return `${param.name} (${parseInt(param.percent)}%)`
               },
             },
             labelLine: {
@@ -180,12 +184,15 @@ export default {
       }
     },
     generyLine(data) {
-      let allMonth = data.filter((item) => item.WQ_INF_YEAR === data[0].WQ_INF_YEAR).map((i) => i.WQ_INF_MONTH)
+      let allMonth = data.filter(item => item.WQ_INF_YEAR === data[0].WQ_INF_YEAR).map(i => i.WQ_INF_MONTH)
       allMonth = Array.from(new Set(allMonth))
-      const allYear = Array.from(new Set(data.map((i) => i.WQ_INF_YEAR)))
+      const allYear = Array.from(new Set(data.map(i => i.WQ_INF_YEAR)))
       return {
         tooltip: {
           trigger: 'axis',
+          formatter(param) {
+            return `${param.name} (${param.percent}%)<br>`
+          },
         },
         legend: {
           data: allYear,
@@ -241,7 +248,7 @@ export default {
             stack: 'stack1',
             symbolSize: 6, // 空心标记的大小
             data: allMonth.map((mon) => {
-              const arr = data.filter((i) => i.WQ_INF_YEAR === year && i.WQ_INF_MONTH === mon)
+              const arr = data.filter(i => i.WQ_INF_YEAR === year && i.WQ_INF_MONTH === mon)
               const firstObj = arr[0]
               const n2023 = firstObj && firstObj.N2023
               return n2023
