@@ -15,10 +15,10 @@ export default {
   </ZDrawer>
 </template>
 
-<style lang='scss'>
+<style lang="scss">
 .z-drawer {
   bottom: 0 !important;
-  top: 80px !important;
+  top: 100px !important;
   height: fit-content !important;
 
   .el-drawer__body {

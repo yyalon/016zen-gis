@@ -379,21 +379,32 @@ export default {
     <Toolbar :buttons="buttons" @excute-command="excuteCommand" />
     <!-- <LayerAllBorderMask /> -->
     <div class="layout-container">
-      <div class="layout-header">
-        <div class="title" @click="toAdminIndex()">
-          {{ settings.app.abbreviation }}
+      <div class="header">
+        <div class="left">
+          <div class="time" @click="toLogin()">
+            {{ moment(null, 'HH:mm') }}
+          </div>
+          <div class="date">
+            {{ moment(null, 'YYYY-MM-DD') }}
+          </div>
+          <div class="weekday">
+            {{ moment(null, 'dddd') }}
+          </div>
         </div>
-        <div class="title-en">
-          {{ settings.app.titleEn }}
+        <div class="center">
+          <div class="title">
+            {{ settings.app.abbreviation }}
+          </div>
+          <div class="title-en">
+            {{ settings.app.titleEn }}
+          </div>
         </div>
-        <div class="time" @click="toLogin()">
-          {{ moment(null, 'HH:mm') }}
-        </div>
-        <div class="date">
-          {{ moment(null, 'YYYY-MM-DD') }}
-        </div>
-        <div class="weekday">
-          {{ moment(null, 'dddd') }}
+        <div class="right">
+          <div class="setting" @click="toAdminIndex()">
+            <el-icon>
+              <svg-icon name="ep:setting" />
+            </el-icon>
+          </div>
         </div>
       </div>
       <div class="layout-body">
@@ -444,81 +455,97 @@ export default {
   &-container {
     z-index: 2000;
 
-    .layout-header {
-      width: 1920px;
+    .header {
+      width: 100%;
       height: 100px;
       pointer-events: all;
+      display: flex;
 
-      .title {
-        position: absolute;
-        top: 10px;
-        left: 0;
-        right: 0;
-        margin: 0 auto;
-        z-index: 2000;
-        font-family: SourceHanSansCN-Regular;
-        font-weight: bold;
-        font-size: 36px;
-        text-align: center;
-        text-shadow: rgb(11 113 230 / 0%) 1px 1px 1px;
-        user-select: none;
+      .left {
+        width: 200px;
+
+        .time {
+          position: absolute;
+          top: 18px;
+          left: 120px;
+          z-index: 2000;
+          width: 64px;
+          height: 22px;
+          font-size: 30px;
+          font-family: DINPro-Regular;
+          line-height: 26px;
+          user-select: none;
+        }
+
+        .date {
+          position: absolute;
+          top: 12px;
+          left: 10px;
+          z-index: 2000;
+          width: 120px;
+          height: 11px;
+          font-family: DINPro-Regular;
+          font-size: 16px;
+          line-height: 14px;
+          user-select: none;
+        }
+
+        .weekday {
+          position: absolute;
+          top: 36px;
+          left: 55px;
+          z-index: 2000;
+          width: 120px;
+          height: 12px;
+          font-size: 16px;
+          font-family: DINPro-Regular;
+          line-height: 14px;
+          user-select: none;
+        }
       }
 
-      .title-en {
-        position: absolute;
-        left: 0;
-        right: 0;
-        margin: 0 auto;
-        top: 60px;
-        z-index: 2000;
-        height: 26px;
-        clip-path: inset(1px 0);
-        font-family: SourceHanSansCN-Regular;
-        font-size: 20px;
-        color: transparent;
-        text-align: center;
-        user-select: none;
-        background: linear-gradient(360deg, rgb(155 155 155) 0%, rgb(255 255 255) 100%);
-        background-clip: text !important;
+      .center {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+
+        .title {
+          font-family: SourceHanSansCN-Regular;
+          font-weight: bold;
+          font-size: 36px;
+          text-align: center;
+          text-shadow: rgb(11 113 230 / 0%) 1px 1px 1px;
+          user-select: none;
+        }
+
+        .title-en {
+          height: 26px;
+          clip-path: inset(1px 0);
+          font-family: SourceHanSansCN-Regular;
+          font-size: 20px;
+          color: transparent;
+          text-align: center;
+          user-select: none;
+          background: linear-gradient(360deg, rgb(155 155 155) 0%, rgb(255 255 255) 100%);
+          background-clip: text !important;
+        }
       }
 
-      .time {
-        position: absolute;
-        top: 18px;
-        left: 120px;
-        z-index: 2000;
-        width: 64px;
-        height: 22px;
-        font-size: 30px;
-        font-family: DINPro-Regular;
-        line-height: 26px;
-        user-select: none;
-      }
+      .right {
+        width: 200px;
 
-      .date {
-        position: absolute;
-        top: 12px;
-        left: 10px;
-        z-index: 2000;
-        width: 120px;
-        height: 11px;
-        font-family: DINPro-Regular;
-        font-size: 16px;
-        line-height: 14px;
-        user-select: none;
-      }
+        .setting {
+          padding: 20px;
+          font-size: 26px;
+          text-align: right;
+          cursor: pointer;
 
-      .weekday {
-        position: absolute;
-        top: 36px;
-        left: 55px;
-        z-index: 2000;
-        width: 120px;
-        height: 12px;
-        font-size: 16px;
-        font-family: DINPro-Regular;
-        line-height: 14px;
-        user-select: none;
+          :hover {
+            color: silver;
+          }
+        }
       }
     }
 
