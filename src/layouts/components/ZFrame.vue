@@ -3,6 +3,10 @@ export default {
   name: 'ZFrame',
   components: {},
   props: {
+    loading: {
+      type: Boolean,
+      default: false,
+    },
     title: {
       type: String,
       default: '',
@@ -17,24 +21,20 @@ export default {
     },
   },
   data() {
-    return {
-    }
+    return {}
   },
   computed: {},
-  mounted() { },
+  mounted() {},
   methods: {},
 }
 </script>
 
 <template>
-  <div
-    class="z-frame"
-    :style="{ width: typeof width === 'Number' ? `${width}px` : width, height: typeof height === 'Number' ? `${height}px` : height }"
-  >
+  <div class="z-frame" :style="{ width: typeof width === 'Number' ? `${width}px` : width, height: typeof height === 'Number' ? `${height}px` : height }">
     <div v-if="title" class="z-frame-title">
       {{ title }}
     </div>
-    <div class="z-frame-content">
+    <div v-loading="loading" class="z-frame-content">
       <slot />
     </div>
   </div>
@@ -48,7 +48,7 @@ export default {
   border-radius: 5px;
 
   &::after {
-    content: " ";
+    content: ' ';
     backdrop-filter: blur(3px);
     position: absolute;
     width: 100%;
@@ -79,13 +79,17 @@ export default {
     align-content: center;
     justify-content: flex-start;
     align-items: center;
-    background-image: url("@/assets/images/frame_title_bg.png");
+    background-image: url('@/assets/images/frame_title_bg.png');
     background-repeat: no-repeat;
     background-size: 370px 36px;
   }
 
   .z-frame-content {
     flex: 1;
+  }
+
+  ::v-deep .el-loading-mask {
+    background-color: #1d1d1df7 !important;
   }
 }
 </style>

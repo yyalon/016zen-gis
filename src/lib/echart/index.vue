@@ -28,6 +28,7 @@ export default {
       default: () => ({}),
     },
   },
+  emits: ['onFinished'],
   data() {
     return {
       chart: null,
@@ -57,6 +58,10 @@ export default {
       // 初始化echart
       this.chart = markRaw(window.$echarts.init(this.$el, 'tdTheme'))
       this.chart.setOption(this.options, true)
+      // 渲染后
+      this.chart.on('finished', (_) => {
+        this.$emit('onFinished')
+      })
     },
   },
 }
