@@ -182,7 +182,6 @@ export default {
     //   this.options.xAxis[0].data = res.data.map(e => e.WQ_INF_MONTH)
     //   this.options.series[0].data = res.data.map(e => Math.round(e.value))
     // }
-
     // this.options.xAxis[0].data = [
     //   '202101',
     //   '202102',
@@ -208,9 +207,9 @@ export default {
 
 <template>
   <div class="zong-button">
-    <el-button type="primary" class="positioned" @click="toggleView">
+    <!-- <el-button type="primary" class="positioned" @click="toggleView">
       浓度趋势图
-    </el-button>
+    </el-button> -->
   </div>
   <!-- <div v-if="layerVisible" class="layer" :title="combinedTitle">
     <ZFrame width="100%" height="100%">
@@ -219,7 +218,7 @@ export default {
   </div> -->
 </template>
 
-<style lang='scss'>
+<style lang="scss">
 .zong-button {
   position: relative;
   height: 100px;

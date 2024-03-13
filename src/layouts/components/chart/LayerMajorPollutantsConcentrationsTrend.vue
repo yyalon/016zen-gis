@@ -80,10 +80,10 @@ export default {
       // this.options.series[0].data = data
     },
     generyLine(data) {
-      let allPro = data.map(i => i.PROVINCE_NAME)
+      let allPro = data.map((i) => i.PROVINCE_NAME)
       allPro = Array.from(new Set(allPro))
 
-      const allYears = Array.from(new Set(data.map(i => i.WQ_INF_YEAR)))
+      const allYears = Array.from(new Set(data.map((i) => i.WQ_INF_YEAR)))
       return {
         tooltip: {
           trigger: 'axis',
@@ -131,7 +131,7 @@ export default {
               focus: 'series',
             },
             data: allPro.map((pro) => {
-              const arr = data.filter(i => i.WQ_INF_YEAR === year && i.PROVINCE_NAME === pro)
+              const arr = data.filter((i) => i.WQ_INF_YEAR === year && i.PROVINCE_NAME === pro)
               const firstObj = arr[0]
               const value = firstObj && firstObj.value.toFixed(1)
               return value
@@ -158,9 +158,7 @@ export default {
           <svg-icon name="ep:close" />
         </el-icon>
       </el-button>
-      <el-select
-        v-model="selProvince" multiple collapse-tags collapse-tags-tooltip placeholder="请选择" @change="getData"
-      >
+      <el-select v-model="selProvince" multiple collapse-tags collapse-tags-tooltip placeholder="请选择" @change="getData">
         <el-option v-for="item in allProvince" :key="item.value" :label="item.label" :value="item.value" />
       </el-select>
 
@@ -174,7 +172,7 @@ export default {
     </div>
 
     <ZFrame title="主要污染物浓度趋势图" width="100%" height="90%">
-      <Echart v-if="visible" :options="options" height="270px" width="80%" class="layer-echart" />
+      <Echart v-if="visible" :options="options" height="270px" width="90%" class="layer-echart" />
     </ZFrame>
   </div>
 </template>
@@ -182,7 +180,7 @@ export default {
 <style lang="scss" scoped>
 .close-button {
   position: absolute;
-  top: 5px;
+  top: 15px;
   right: 10px;
 }
 
