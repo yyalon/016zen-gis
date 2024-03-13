@@ -1,4 +1,5 @@
 <script>
+import { distance, point } from '@turf/turf'
 import apiData from '@/api/modules/data'
 
 export default {
@@ -23,6 +24,9 @@ export default {
       tableHeight: '600',
       riverSectionInfo: [],
       waterQualityData: [],
+      reservoirs: [],
+      riverChannels: [],
+      meteorologyStations: [],
       loading: false,
     }
   },
@@ -31,6 +35,9 @@ export default {
       this.drawerVisible = this.visible
       if (this.drawerVisible) {
         await this.getData()
+        this.getReservoirs()
+        this.getRiverChannels()
+        this.getMeteorologyStations()
       }
     },
   },
@@ -48,6 +55,56 @@ export default {
         this.riverSectionInfo = result2.data
       }
       this.loading = false
+    },
+    async getReservoirs() {
+      const { code, data } = await apiData.getReservoirs()
+
+      if (code === 1000 && data) {
+        data.forEach((item) => {
+          if (item.JD && item.WD) {
+            const point1 = point([this.riverSectionInfo.longitude, this.riverSectionInfo.latitude]) // 第一个点的经纬度坐标
+            const point2 = point([item.JD, item.WD]) // 第二个点的经纬度坐标
+
+            const _distance = distance(point1, point2) // 计算两点之间的距离
+            item.distance = _distance.toFixed(2)
+            if (_distance < 100) {
+              this.reservoirs.push(item)
+            }
+          }
+        })
+      }
+    },
+    async getRiverChannels() {
+      const { code, data } = await apiData.getRiverChannels()
+      if (code === 1000 && data) {
+        data.forEach((item) => {
+          if (item.JD && item.WD) {
+            const point1 = point([this.riverSectionInfo.longitude, this.riverSectionInfo.latitude]) // 第一个点的经纬度坐标
+            const point2 = point([item.JD, item.WD]) // 第二个点的经纬度坐标
+            const _distance = distance(point1, point2) // 计算两点之间的距离
+            item.distance = _distance.toFixed(2)
+            if (_distance < 100) {
+              this.riverChannels.push(item)
+            }
+          }
+        })
+      }
+    },
+    async getMeteorologyStations() {
+      const { code, data } = await apiData.getMeteorologyStations()
+      if (code === 1000 && data) {
+        data.forEach((item) => {
+          if (item.LON && item.LAT) {
+            const point1 = point([this.riverSectionInfo.longitude, this.riverSectionInfo.latitude]) // 第一个点的经纬度坐标
+            const point2 = point([item.LON, item.LAT]) // 第二个点的经纬度坐标
+            const _distance = distance(point1, point2) // 计算两点之间的距离
+            item.distance = _distance.toFixed(2)
+            if (_distance < 100) {
+              this.meteorologyStations.push(item)
+            }
+          }
+        })
+      }
     },
     handleClose() {
       this.$emit('close')
@@ -117,14 +174,12 @@ export default {
               </el-descriptions-item>
             </el-descriptions>
           </div>
-          <br>
+          <br />
           <el-tabs v-model="activeName" class="demo-tabs">
             <el-tab-pane label="水质数据" name="waterQuality">
               <el-table :data="waterQualityData" :height="tableHeight" size="small">
                 <el-table-column label="监测时间" fixed>
-                  <template #default="scope">
-                    {{ scope.row.WQ_INF_YEAR }}-{{ scope.row.WQ_INF_MONTH }}
-                  </template>
+                  <template #default="scope"> {{ scope.row.WQ_INF_YEAR }}-{{ scope.row.WQ_INF_MONTH }} </template>
                 </el-table-column>
                 <el-table-column label="水质类别" fixed>
                   <template #default="scope">
@@ -328,9 +383,195 @@ export default {
                 </el-table-column>
               </el-table>
             </el-tab-pane>
-            <el-tab-pane label="附近水库站" name="reservoir" />
-            <el-tab-pane label="附近河道站" name="riverChannel" />
-            <el-tab-pane label="附近气象站" name="meteorologyStation" />
+            <el-tab-pane label="附近水库站" name="reservoir">
+              <el-table :data="reservoirs" :height="tableHeight" size="small">
+                <!-- "STNM": "横山水库",
+                "WEBSTLC": "苏-宜兴",
+                "RVNM": "厔溪",
+                "POINTCODE": "63101901",
+                "POINTTYPE": "RR",
+                "POINTTYPE_NAME": "水库水文站",
+                "PROVINCE": "江苏省",
+                "CITY": "无锡市", -->
+                <el-table-column label="测站编码" fixed>
+                  <template #default="scope">
+                    {{ scope.row.POINTCODE }}
+                  </template>
+                </el-table-column>
+                <el-table-column label="站名" fixed>
+                  <template #default="scope">
+                    {{ scope.row.STNM }}
+                  </template>
+                </el-table-column>
+                <el-table-column label="站址">
+                  <template #default="scope">
+                    {{ scope.row.WEBSTLC }}
+                  </template>
+                </el-table-column>
+                <el-table-column label="河名">
+                  <template #default="scope">
+                    {{ scope.row.RVNM }}
+                  </template>
+                </el-table-column>
+                <el-table-column label="测点类型名称">
+                  <template #default="scope">
+                    {{ scope.row.POINTTYPE_NAME }}
+                  </template>
+                </el-table-column>
+                <el-table-column label="省">
+                  <template #default="scope">
+                    {{ scope.row.PROVINCE }}
+                  </template>
+                </el-table-column>
+                <el-table-column label="地市">
+                  <template #default="scope">
+                    {{ scope.row.CITY }}
+                  </template>
+                </el-table-column>
+                <el-table-column label="直线距离">
+                  <template #default="scope"> {{ scope.row.distance }}公里 </template>
+                </el-table-column>
+              </el-table>
+            </el-tab-pane>
+            <el-tab-pane label="附近河道站" name="riverChannel">
+              <el-table :data="riverChannels" :height="tableHeight" size="small">
+                <!-- "STNM": "夹浦",
+                "WEBSTLC": "夹浦镇",
+                "RVNM": "夹浦港",
+                "WRZ": 3.701,
+                "POINTCODE": "63201900",
+                "POINTTYPE": "ZZ",
+                "POINTTYPE_NAME": "河道水位站",
+                "PROVINCE": "浙江省",
+                "CITY": "湖州市",
+                "distance": "60.38"  -->
+                <el-table-column label="测站编码" fixed>
+                  <template #default="scope">
+                    {{ scope.row.POINTCODE }}
+                  </template>
+                </el-table-column>
+                <el-table-column label="站名">
+                  <template #default="scope">
+                    {{ scope.row.STNM }}
+                  </template>
+                </el-table-column>
+                <el-table-column label="站址">
+                  <template #default="scope">
+                    {{ scope.row.WEBSTLC }}
+                  </template>
+                </el-table-column>
+                <el-table-column label="河名">
+                  <template #default="scope">
+                    {{ scope.row.RVNM }}
+                  </template>
+                </el-table-column>
+                <el-table-column label="警戒水位">
+                  <template #default="scope">
+                    {{ scope.row.WRZ }}
+                  </template>
+                </el-table-column>
+                <el-table-column label="测站类型">
+                  <template #default="scope">
+                    {{ scope.row.POINTTYPE_NAME }}
+                  </template>
+                </el-table-column>
+                <el-table-column label="省">
+                  <template #default="scope">
+                    {{ scope.row.PROVINCE }}
+                  </template>
+                </el-table-column>
+                <el-table-column label="地市">
+                  <template #default="scope">
+                    {{ scope.row.CITY }}
+                  </template>
+                </el-table-column>
+                <el-table-column label="直线距离">
+                  <template #default="scope"> {{ scope.row.distance }}公里 </template>
+                </el-table-column>
+              </el-table>
+            </el-tab-pane>
+            <el-tab-pane label="附近气象站" name="meteorologyStation">
+              <el-table :data="meteorologyStations" :height="tableHeight" size="small">
+                <!-- "STATION_NAME": "桐庐",
+                "COUNTRY": "中国",
+                "PROVINCE": "浙江",
+                "CITY": "杭州市",
+                "CNTY": null,
+                "TOWN": null,
+                "STATION_ID_C": "58542",
+                "STATION_ID_D": "58542",
+                "ALTI": 44.4,
+                "PRS_SENSOR_ALTI": 45.6,
+                "WIN_S_SENSOR_HEIGH": 12,
+                "STATION_TYPE": "0",
+                "STATION_LEVL": "12",
+                "ADMIN_CODE_CHN": "330122",
+                "distance": "93.59" -->
+                <el-table-column label="区站号" fixed>
+                  <template #default="scope">
+                    {{ scope.row.STATION_ID_C }}
+                  </template>
+                </el-table-column>
+                <el-table-column label="站名" fixed>
+                  <template #default="scope">
+                    {{ scope.row.STATION_NAME }}
+                  </template>
+                </el-table-column>
+                <el-table-column label="省份">
+                  <template #default="scope">
+                    {{ scope.row.PROVINCE }}
+                  </template>
+                </el-table-column>
+                <el-table-column label="地市">
+                  <template #default="scope">
+                    {{ scope.row.CITY }}
+                  </template>
+                </el-table-column>
+                <el-table-column label="区县">
+                  <template #default="scope">
+                    {{ scope.row.CNTY }}
+                  </template>
+                </el-table-column>
+                <el-table-column label="乡镇">
+                  <template #default="scope">
+                    {{ scope.row.TOWN }}
+                  </template>
+                </el-table-column>
+                <el-table-column label="测站高度(米)">
+                  <template #default="scope">
+                    {{ scope.row.ALTI }}
+                  </template>
+                </el-table-column>
+                <el-table-column label="气压传感器海拔高度(米)">
+                  <template #default="scope">
+                    {{ scope.row.PRS_SENSOR_ALTI }}
+                  </template>
+                </el-table-column>
+                <el-table-column label="风速传感器距地面高度(米)">
+                  <template #default="scope">
+                    {{ scope.row.WIN_S_SENSOR_HEIGH }}
+                  </template>
+                </el-table-column>
+                <el-table-column label="测站类型">
+                  <template #default="scope">
+                    {{ scope.row.STATION_TYPE }}
+                  </template>
+                </el-table-column>
+                <el-table-column label="测站级别">
+                  <template #default="scope">
+                    {{ scope.row.STATION_LEVL }}
+                  </template>
+                </el-table-column>
+                <el-table-column label="行政区代码">
+                  <template #default="scope">
+                    {{ scope.row.ADMIN_CODE_CHN }}
+                  </template>
+                </el-table-column>
+                <el-table-column label="直线距离">
+                  <template #default="scope"> {{ scope.row.distance }}公里 </template>
+                </el-table-column>
+              </el-table>
+            </el-tab-pane>
           </el-tabs>
         </div>
       </template>
