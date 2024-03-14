@@ -3,6 +3,7 @@ import ChartSeaWaterQualityProportion from '../chart/SeaWaterQualityProportion.v
 import ChartSeaEutrophicationProportion from '../chart/SeaEutrophicationProportion.vue'
 import ChartSeaWaterGoodQualitySeasonColumn from '../chart/SeaWaterGoodQualitySeasonColumn.vue'
 import ChartSeaWaterGoodQualityProvinceColumn from '../chart/SeaWaterGoodQualityProvinceColumn.vue'
+import ChartSeaWaterQualityStationProportionColumn from '../chart/SeaWaterQualityStationProportionColumn.vue'
 
 export default {
   components: {
@@ -10,6 +11,7 @@ export default {
     ChartSeaEutrophicationProportion,
     ChartSeaWaterGoodQualitySeasonColumn,
     ChartSeaWaterGoodQualityProvinceColumn,
+    ChartSeaWaterQualityStationProportionColumn,
   },
   props: {
     visible: {
@@ -79,6 +81,9 @@ export default {
           </div>
           <div class="chart-container">
             <ChartSeaWaterGoodQualitySeasonColumn :chart-data="drawerData" />
+          </div>
+          <div class="chart-container">
+            <ChartSeaWaterQualityStationProportionColumn :chart-data="drawerData" />
           </div>
         </div>
       </template>
