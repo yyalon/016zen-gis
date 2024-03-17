@@ -80,9 +80,13 @@ export default {
   components: { DrawerRiverSection, ZFrame, LayerMajorPollutantsConcentrationsTrend },
   emits: ['filterparam'],
   data() {
+    const end = new Date()
+    const start = new Date()
+    start.setMonth(start.getMonth() - 12)
+
     return {
       loadingRiverSections: false,
-      areas: areas.filter(zone => ['全部', '上海市', '浙江省', '江苏省'].includes(zone.label)),
+      areas: areas.filter((zone) => ['全部', '上海市', '浙江省', '江苏省'].includes(zone.label)),
       estuary: false,
       selectedArea: '',
       selectedAreaNode: null,
@@ -96,7 +100,7 @@ export default {
       river: '',
       columns,
       showList: false,
-      timeSlot: ref([new Date(), new Date()]),
+      timeSlot: ref([start, end]),
       shortcuts: [
         {
           text: '本月',
@@ -329,6 +333,9 @@ export default {
       const code = node.code.replace(/0+$/, '')
       this.calcRivers(code)
     },
+    toggleView() {
+      this.trendVisible = !this.trendVisible
+    },
     closeLayerTrend() {
       this.trendVisible = false
     },
@@ -386,7 +393,7 @@ export default {
       </el-select>
       <el-date-picker
         v-model="timeSlot"
-        style="background-color: #070e14;border: 1px solid #64b4ff;color: #64b4ff;box-shadow: none;"
+        style="background-color: #070e14; border: 1px solid #64b4ff; color: #64b4ff; box-shadow: none;"
         size="large"
         type="monthrange"
         range-separator="-"
@@ -399,6 +406,9 @@ export default {
       />
       <el-switch v-model="estuary" style="margin-left: 10px;" active-text="入海口" @change="filterRiverSections()" />
       <el-switch v-model="showList" active-text="显示列表" />
+      <el-button type="primary" @click="toggleView">
+        浓度趋势图
+      </el-button>
     </div>
     <div v-if="showList" class="river-section-list">
       <ZFrame width="100%" height="100%">
@@ -419,9 +429,6 @@ export default {
     </div>
     <DrawerRiverSection :drawer-data="drawerData" :visible="drawerVisible" @close="drawerVisible = false" />
     <LayerMajorPollutantsConcentrationsTrend v-if="trendVisible" class="layer-trend" @close="closeLayerTrend" />
-    <el-button type="primary" class="positioned" @click="toggleView">
-      浓度趋势图
-    </el-button>
   </div>
 </template>
 

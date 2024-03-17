@@ -171,7 +171,7 @@ export default {
       </el-select>
     </div>
 
-    <ZFrame title="主要污染物浓度趋势图" width="100%" height="90%">
+    <ZFrame width="100%" height="90%">
       <Echart v-if="visible" :options="options" height="270px" width="90%" class="layer-echart" />
     </ZFrame>
   </div>
