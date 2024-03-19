@@ -5,6 +5,8 @@ import zhCn from 'element-plus/es/locale/lang/zh-cn'
 import hotkeys from 'hotkeys-js'
 import eventBus from './utils/eventBus'
 import useSettingsStore from '@/store/modules/settings'
+import useUserStore from '@/store/modules/user'
+import { toAdmin } from '@/utils/index'
 
 const settingsStore = useSettingsStore()
 
@@ -36,13 +38,14 @@ watch(
     if (settingsStore.settings.app.enableDynamicTitle && settingsStore.title) {
       const title = typeof settingsStore.title === 'function' ? settingsStore.title() : settingsStore.title
       document.title = `${title} - ${import.meta.env.VITE_APP_TITLE}`
+      // eslint-disable-next-line @typescript-eslint/brace-style
     } else {
       document.title = import.meta.env.VITE_APP_TITLE
     }
   },
   {
     immediate: true,
-  }
+  },
 )
 
 onMounted(() => {
@@ -53,6 +56,13 @@ onMounted(() => {
   hotkeys('alt+i', () => {
     eventBus.emit('global-system-info-toggle')
   })
+  setTimeout(() => {
+    const store = useUserStore()
+    if (!store.isLogin) {
+      store.logout()
+      toAdmin('/logout')
+    }
+  }, 300)
 })
 
 import.meta.env.VITE_APP_DEBUG_TOOL === 'eruda' && eruda.init()

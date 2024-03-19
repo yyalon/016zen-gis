@@ -44,7 +44,7 @@ export default {
           orient: 'vertical',
           top: 'center',
           right: '10%',
-          data: data.map(it => it.label),
+          data: data.map((it) => it.label),
           textStyle: {
             color: '#fff',
             fontSize: 12,
@@ -149,10 +149,11 @@ export default {
               label: {
                 show: true,
                 position: 'outside',
-                fontSize: 16,
+                fontSize: 14,
                 formatter(param) {
                   return `${param.name} (${parseInt(param.percent)}%)`
                 },
+                color: 'white',
               },
               labelLine: {
                 length: 2,

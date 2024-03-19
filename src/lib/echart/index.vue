@@ -38,7 +38,7 @@ export default {
     options: {
       handler(options) {
         // 设置true清空echart缓存
-        this.chart.setOption(options, true)
+        this.chart?.setOption(options, true)
       },
       deep: true,
     },
@@ -68,5 +68,5 @@ export default {
 </script>
 
 <template>
-  <div :id="id" :class="className" style="height: 100%; width: 100%" :style="{ height, width }" />
+  <div :id="id" :class="className" style="height: 100%; width: 100%;" :style="{ height, width }" />
 </template>

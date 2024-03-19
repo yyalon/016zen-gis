@@ -148,10 +148,11 @@ export default {
             label: {
               show: true,
               position: 'outside',
-              fontSize: 16,
+              fontSize: 14,
               formatter(param) {
                 return `${param.name} (${parseInt(param.percent)}%)`
               },
+              color: 'white',
             },
             labelLine: {
               length: 2,
@@ -184,9 +185,9 @@ export default {
       }
     },
     generyLine(data) {
-      let allMonth = data.filter(item => item.WQ_INF_YEAR === data[0].WQ_INF_YEAR).map(i => i.WQ_INF_MONTH)
+      let allMonth = data.filter((item) => item.WQ_INF_YEAR === data[0].WQ_INF_YEAR).map((i) => i.WQ_INF_MONTH)
       allMonth = Array.from(new Set(allMonth))
-      const allYear = Array.from(new Set(data.map(i => i.WQ_INF_YEAR)))
+      const allYear = Array.from(new Set(data.map((i) => i.WQ_INF_YEAR)))
       return {
         tooltip: {
           trigger: 'axis',
@@ -248,7 +249,7 @@ export default {
             stack: 'stack1',
             symbolSize: 6, // 空心标记的大小
             data: allMonth.map((mon) => {
-              const arr = data.filter(i => i.WQ_INF_YEAR === year && i.WQ_INF_MONTH === mon)
+              const arr = data.filter((i) => i.WQ_INF_YEAR === year && i.WQ_INF_MONTH === mon)
               const firstObj = arr[0]
               const n2023 = firstObj && firstObj.N2023
               return n2023
