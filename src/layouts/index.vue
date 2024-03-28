@@ -239,7 +239,8 @@ export default {
             })
           }
         })
-      } else {
+      }
+      else {
         this.riverLevel = null
         this.visibilities.layerRiver = false
         this.buttons.forEach((button) => {
@@ -335,7 +336,8 @@ export default {
                       season = 'average'
                       year = layerName.slice(-11, -7)
                       type = layerName.slice(0, -11)
-                    } else {
+                    }
+                    else {
                       season = layerName.slice(-6)
                       year = layerName.slice(-10, -6)
                       type = layerName.slice(0, -10)
@@ -558,7 +560,7 @@ export default {
   .layout-mask {
     z-index: 1000;
     pointer-events: none;
-    background-image: url('@/assets/images/mask.png');
+    background-image: url("@/assets/images/mask.png");
     background-repeat: no-repeat;
     background-size: 100% 100%;
   }

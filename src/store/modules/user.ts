@@ -45,7 +45,7 @@ const useUserStore = defineStore(
       setToken,
       logout,
     }
-  }
+  },
 )
 
 export default useUserStore

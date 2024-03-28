@@ -48,7 +48,7 @@ export default {
   border-radius: 5px;
 
   &::after {
-    content: ' ';
+    content: " ";
     backdrop-filter: blur(3px);
     position: absolute;
     width: 100%;
@@ -79,7 +79,7 @@ export default {
     align-content: center;
     justify-content: flex-start;
     align-items: center;
-    background-image: url('@/assets/images/frame_title_bg.png');
+    background-image: url("@/assets/images/frame_title_bg.png");
     background-repeat: no-repeat;
     background-size: 370px 36px;
   }

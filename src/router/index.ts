@@ -38,10 +38,12 @@ router.beforeEach(async (to, from, next) => {
   if (routeStore.isGenerate) {
     if (to.name === 'callback') {
       next({ name: 'home' })
-    } else {
+    }
+    else {
       next()
     }
-  } else {
+  }
+  else {
     await routeStore.generateRoutesAtFilesystem(asyncRoutesByFilesystem)
 
     // 注册并记录路由数据

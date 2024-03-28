@@ -43,9 +43,9 @@ export default {
   <div>
     <LayerSeaWaterQuality v-if="visible" @refresh-sea-water-quality-chart="refreshSeaWaterQualityChart" />
     <RightDrawer :drawer-visible="visible" @open="showChart = true">
-      <ChartSeaWaterQualityProportion v-if="showChart" :chart-data="chartData" /> <br />
-      <ChartSeaEutrophicationProportion v-if="showChart" :chart-data="chartData" /><br />
-      <ChartSeaWaterQualityStationProportionColumn v-if="showChart" :chart-data="chartData" /><br />
+      <ChartSeaWaterQualityProportion v-if="showChart" :chart-data="chartData" /> <br>
+      <ChartSeaEutrophicationProportion v-if="showChart" :chart-data="chartData" /><br>
+      <ChartSeaWaterQualityStationProportionColumn v-if="showChart" :chart-data="chartData" /><br>
       <!-- <ChartSeaWaterQualityColumn :chart-data="chartData" /><br /> -->
       <!-- <ChartSeaWaterGoodQualityProvinceColumn v-if="showChart" :chart-data="chartData" /><br /> -->
       <ChartSeaWaterGoodQualitySeasonColumn v-if="showChart" :chart-data="chartData" />

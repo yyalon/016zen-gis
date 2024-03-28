@@ -757,9 +757,9 @@ export default {
       <el-select v-model="type" placeholder="请选择类型">
         <el-option v-for="item in types" :key="item.value" :label="item.label" :value="item.value" />
       </el-select>
-      <el-switch v-model="showList" active-text="显示列表" style="margin-right: 10px" />
-      <el-switch v-model="showStations" active-text="显示点位" style="margin-right: 10px" />
-      <el-button type="warning" style="pointer-events: all" @click="showCharts()">
+      <el-switch v-model="showList" active-text="显示列表" style="margin-right: 10px;" />
+      <el-switch v-model="showStations" active-text="显示点位" style="margin-right: 10px;" />
+      <el-button type="warning" style="pointer-events: all;" @click="showCharts()">
         统计
       </el-button>
     </div>

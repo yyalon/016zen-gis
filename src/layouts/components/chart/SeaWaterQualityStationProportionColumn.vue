@@ -124,7 +124,8 @@ export default {
                     if (item.value === 1 || item.value === 2) {
                       sums[0] += item.area
                     }
-                  } else {
+                  }
+                  else {
                     if (item.value === wqLevel + 1) {
                       sums[value - 1] += item.area
                     }

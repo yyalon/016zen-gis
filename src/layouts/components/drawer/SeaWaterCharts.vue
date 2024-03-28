@@ -68,7 +68,7 @@ export default {
             </el-icon>
           </el-button>
         </div>
-        <br />
+        <br>
         <div class="drawer-body">
           <div class="chart-container">
             <ChartSeaWaterQualityProportion :chart-data="drawerData" />

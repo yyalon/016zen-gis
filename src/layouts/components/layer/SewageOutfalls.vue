@@ -34,7 +34,8 @@ export default {
       })
       if (_layer) {
         _layer.show = true
-      } else {
+      }
+      else {
         _layer = new window.$ZMap.layer.ClusterLayer({
           show: false,
           chunkedLoading: true, // 间隔添加数据，以便页面不冻结。

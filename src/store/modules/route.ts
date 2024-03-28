@@ -28,7 +28,7 @@ const useRouteStore = defineStore(
             },
           ],
           route.path,
-          route.meta?.auth
+          route.meta?.auth,
         )
       }
       return route
@@ -63,11 +63,13 @@ const useRouteStore = defineStore(
                   res[i] = item
                 }
               })
-            } else {
+            }
+            else {
               res.push(item)
             }
           })
-        } else {
+        }
+        else {
           const tmpRoute = cloneDeep(route)
           tmpRoute.path = resolveRoutePath(baseUrl, tmpRoute.path)
           // 处理面包屑导航
@@ -105,7 +107,8 @@ const useRouteStore = defineStore(
             returnRoutes.push(...tmpRoutes)
           })
           returnRoutes.forEach((item) => flatAsyncRoutes(item))
-        } else {
+        }
+        else {
           returnRoutes.push(...cloneDeep(filesystemRoutesRaw.value))
         }
       }
@@ -191,7 +194,7 @@ const useRouteStore = defineStore(
       setCurrentRemoveRoutes,
       removeRoutes,
     }
-  }
+  },
 )
 
 export default useRouteStore

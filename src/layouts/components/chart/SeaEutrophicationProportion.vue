@@ -110,18 +110,21 @@ export default {
                 if (item.value !== 1) {
                   if (proportion[item.value]) {
                     proportion[item.value] += item.area
-                  } else {
+                  }
+                  else {
                     proportion[item.value] = item.area
                   }
                 }
               })
             }
-          } else {
+          }
+          else {
             areas[this.chartData.province].forEach((item) => {
               if (item.value !== 1) {
                 if (proportion[item.value]) {
                   proportion[item.value] += item.area
-                } else {
+                }
+                else {
                   proportion[item.value] = item.area
                 }
               }
@@ -137,7 +140,8 @@ export default {
               },
             })
           }
-        } else {
+        }
+        else {
           this.options.series[0].data = []
         }
       }
