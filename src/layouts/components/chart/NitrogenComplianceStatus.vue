@@ -98,7 +98,7 @@ export default {
 
       if (res && res.code === 1000) {
         const data = res.data
-
+        console.log('###########', param)
         if (param.dm_name === '') {
           // 断面选择了全部, 使用饼图
           this.options = this.generyBingtu(data)
@@ -279,7 +279,7 @@ export default {
 </script>
 
 <template>
-  <ZFrame :height="220" title="入海河流断面总氮达标情况">
-    <Echart v-if="visible" :options="options" height="190px" width="375px" />
+  <ZFrame :height="264" title="入海河流断面总氮达标情况111">
+    <Echart v-if="visible" :options="options" height="228px" width="450px" />
   </ZFrame>
 </template>

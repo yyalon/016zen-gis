@@ -10,7 +10,7 @@ export default {
 </script>
 
 <template>
-  <ZDrawer :drawer-visible="drawerVisible" direction="rtl" :width="375">
+  <ZDrawer :drawer-visible="drawerVisible" direction="rtl" :width="450">
     <slot />
   </ZDrawer>
 </template>

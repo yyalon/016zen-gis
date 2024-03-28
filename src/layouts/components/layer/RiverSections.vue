@@ -6,6 +6,7 @@ import LayerMajorPollutantsConcentrationsTrend from '../chart/LayerMajorPollutan
 import eventBus from '@/utils/eventBus'
 import apiData from '@/api/modules/data'
 import areas from '@/utils/area.json'
+import { romanToInt } from '@/utils'
 
 let _layer = null
 
@@ -164,7 +165,7 @@ export default {
           this.filteredRiverSections.push(section)
         }
       })
-      this.refreshLayer()
+
       setTimeout(() => {
         this.loadingRiverSections = false
       }, 1000)
@@ -174,12 +175,17 @@ export default {
       _layer.clear()
       this.filteredRiverSections.forEach((riverSection) => {
         const arr = ['Ⅰ', 'Ⅱ', 'Ⅲ']
-        const compliant = arr.includes(riverSection?.level2018)
+        // const compliant = arr.includes(riverSection?.level2018)
+        let noDabiao = false
+        if (parseFloat(riverSection.N2023) > parseFloat(riverSection.N2025) || romanToInt(riverSection.W2023) > romanToInt(riverSection.W2025)) {
+          // 不达标
+          noDabiao = true
+        }
         // const compliant = this.dictWaterQuality[riverSection.code]?.compliant
         const graphic = new window.$ZMap.graphic.Marker({
-          latlng: [riverSection.latitude, riverSection.longitude],
+          latlng: [riverSection.WQ_PI_LAD, riverSection.WQ_PI_LOD],
           style: {
-            image: compliant ? 'img/marker/river.png' : 'img/marker/river_red.png',
+            image: !noDabiao ? 'img/marker/river.png' : 'img/marker/river_red.png',
             horizontalOrigin: window.$ZMap.HorizontalOrigin.CENTER,
             verticalOrigin: window.$ZMap.VerticalOrigin.BOTTOM,
           },
@@ -202,6 +208,7 @@ export default {
         graphic.on(window.$ZMap.EventType.tooltipclose, (e) => {
           window.$Utitls.unloadComponentContent(e.target)
         })
+
         _layer.addGraphic(graphic)
       })
       if (this.filteredRiverSections.length > 0) {
@@ -257,13 +264,13 @@ export default {
       this.rivers = []
       !code && this.rivers.push('全部')
       this.riverSections.forEach((riverSection) => {
-        if (!this.rivers.includes(riverSection.name) && (!code || riverSection.code.startsWith(code))) {
-          this.rivers.push(riverSection.name)
+        if (!this.rivers.includes(riverSection.WQ_PI_NAME) && (!code || riverSection.code.startsWith(code))) {
+          this.rivers.push(riverSection.WQ_PI_NAME)
         }
       })
     },
     async getData() {
-      const res = await apiData.getRiverSections()
+      const res = await apiData.getWaterQuality()
       if (res && res.code === 1000) {
         this.riverSections = res.data
       }
@@ -280,14 +287,14 @@ export default {
         show: false,
         chunkedLoading: true, // 间隔添加数据，以便页面不冻结。
         showCoverageOnHover: false, // 是否显示聚合标记的边界。
-        disableClusteringAtZoom: 18, // 此级别下不聚合
+        disableClusteringAtZoom: 1, // 此级别下不聚合
       })
       window.$zMap.addLayer(_layer)
 
       await this.getData()
 
       this.filterRiverSections()
-
+      this.refreshLayer()
       setTimeout(() => {
         _layer.show = true
         loading.close()
@@ -492,8 +499,10 @@ export default {
     left: 50%;
     transform: translateX(-50%);
     bottom: 50px;
-    width: 700px;
-    height: 300px;
+    min-width: 700px;
+    min-height: 300px;
+    width: 60vw;
+    height: 45vh;
     pointer-events: all;
   }
 }

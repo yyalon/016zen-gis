@@ -2,6 +2,7 @@
 import ZFrame from '../ZFrame.vue'
 import Echart from '@/lib/echart/index.vue'
 import ApiData from '@/api/modules/data'
+import areas from '@/utils/area.json'
 
 const types = {
   oils: '石油类(mg/L)',
@@ -26,6 +27,9 @@ export default {
       options: {},
 
       allProvince,
+      citys: [],
+      cityDisabled: true,
+      monthDisabled: true,
       allYears: [2021, 2022, 2023, 2024].map((i) => {
         return { value: i, label: i }
       }),
@@ -36,6 +40,8 @@ export default {
       selYears: [2021, 2022],
       selProvince: ['上海市', '浙江省', '江苏省'],
       selMons: [],
+      selCitys: [],
+      loading: false,
     }
   },
   computed: {
@@ -50,16 +56,31 @@ export default {
     this.handleClose()
   },
   methods: {
+    formatMonth(month) {
+      const num = parseInt(month, 10)
+      if (isNaN(num)) {
+        return month
+      }
+      return `${month}月`
+    },
     async getData() {
+      this.loading = true
       const res = await ApiData.getPollutionConcentrationTrend({
         province: this.selProvince,
         year: this.selYears,
         month: this.selMons,
+        city: this.selCitys,
       })
+      this.loading = false
       // console.log('getPollutionConcentrationTrend', res)
       if (res && res.code === 1000) {
         // this.options.xAxis[0].data = res.data.map(e => e.WQ_INF_MONTH)
         // this.options.series[0].data = res.data.map(e => Math.round(e.value))
+        if (this.selYears.length === 1 && this.selMons.length > 0) {
+          for (let index = 0; index < res.data.length; index++) {
+            res.data[index].stime = this.formatMonth(res.data[index].stime)
+          }
+        }
         this.options = this.generyLine(res.data)
         // console.log('this.options:', this.options)
         this.visible = true
@@ -79,11 +100,12 @@ export default {
       // }
       // this.options.series[0].data = data
     },
+
     generyLine(data) {
-      let allPro = data.map((i) => i.PROVINCE_NAME)
+      let allPro = data.map((i) => i.name)
       allPro = Array.from(new Set(allPro))
 
-      const allYears = Array.from(new Set(data.map((i) => i.WQ_INF_YEAR)))
+      const allYears = Array.from(new Set(data.map((i) => i.stime)))
       return {
         tooltip: {
           trigger: 'axis',
@@ -95,6 +117,12 @@ export default {
           top: '5%',
           data: allYears,
         },
+        dataZoom: [
+          {
+            show: true,
+            realtime: true,
+          },
+        ],
         grid: {
           left: '5%',
           right: '5%',
@@ -131,7 +159,7 @@ export default {
               focus: 'series',
             },
             data: allPro.map((pro) => {
-              const arr = data.filter((i) => i.WQ_INF_YEAR === year && i.PROVINCE_NAME === pro)
+              const arr = data.filter((i) => i.stime === year && i.name === pro)
               const firstObj = arr[0]
               const value = firstObj && firstObj.value.toFixed(1)
               return value
@@ -146,38 +174,64 @@ export default {
     handleClose() {
       this.$emit('close')
     },
+    provinceChange(selectProvinces) {
+      if (selectProvinces.length === 1) {
+        this.cityDisabled = false
+        this.citys = areas.filter(_ => _.label === selectProvinces[0])[0].children.map(_ => _.label)
+        this.selCitys = areas.filter(_ => _.label === selectProvinces[0])[0].children.map(_ => _.label)
+      }
+      else {
+        this.cityDisabled = true
+        this.citys = []
+        this.selCitys = []
+      }
+      this.getData()
+    },
+    yearChange(selectYears) {
+      if (selectYears.length === 1) {
+        this.monthDisabled = false
+        this.selMons = this.allMonths.slice(0, 2).map(_ => _.value)
+      }
+      else {
+        this.monthDisabled = true
+        this.selMons = []
+      }
+      this.getData()
+    },
   },
 }
 </script>
 
 <template>
   <div>
-    <div style="background-color: black; height: auto;" class="filters">
+    <div style="background-color: black; height: auto;" class="filters pollutants-filters">
       <el-button class="close-button" type="primary" circle size="small" @click="handleClose">
         <el-icon>
           <svg-icon name="ep:close" />
         </el-icon>
       </el-button>
-      <el-select v-model="selProvince" multiple collapse-tags collapse-tags-tooltip placeholder="请选择" @change="getData">
+      <el-select v-model="selProvince" style="width: 180px;" multiple collapse-tags collapse-tags-tooltip placeholder="请选择省份/直辖市" @change="provinceChange">
         <el-option v-for="item in allProvince" :key="item.value" :label="item.label" :value="item.value" />
       </el-select>
-
-      <el-select v-model="selYears" multiple collapse-tags collapse-tags-tooltip placeholder="请选择" @change="getData">
-        <el-option v-for="item in allYears" :key="item.value" :label="item.label" :value="item.value" />
+      <el-select v-model="selCitys" style="width: 180px;" multiple :disabled="cityDisabled" collapse-tags collapse-tags-tooltip placeholder="请选择市/区" @change="getData">
+        <el-option v-for="item in citys" :key="item" :label="item" :value="item" />
+      </el-select>
+      <el-select v-model="selYears" style="width: 180px;" multiple collapse-tags collapse-tags-tooltip placeholder="请选择年份" @change="yearChange">
+        <el-option v-for="item in allYears" :key="item.value" :label="`${item.label}年`" :value="item.value" />
       </el-select>
 
-      <el-select v-model="selMons" multiple collapse-tags collapse-tags-tooltip placeholder="请选择" @change="getData">
-        <el-option v-for="item in allMonths" :key="item.value" :label="item.label" :value="item.value" />
+      <el-select v-model="selMons" :disabled="monthDisabled" style="width: 180px;" multiple collapse-tags collapse-tags-tooltip placeholder="请选择" @change="getData">
+        <el-option v-for="item in allMonths" :key="item.value" :label="`${item.label}月`" :value="item.value" />
       </el-select>
     </div>
 
-    <ZFrame width="100%" height="90%">
-      <Echart v-if="visible" :options="options" height="270px" width="90%" class="layer-echart" />
+    <ZFrame width="100%" height="90%" :loading="loading">
+      <Echart v-if="visible" :options="options" height="100%" width="100%" class="layer-echart" />
     </ZFrame>
   </div>
 </template>
 
-<style lang="scss" scoped>
+<style lang="css">
 .close-button {
   position: absolute;
   top: 15px;
@@ -185,6 +239,15 @@ export default {
 }
 
 .layer-echart {
-  margin-left: 50px;
+  /* margin-left: 50px; */
+}
+
+.pollutants-filters .el-select__tags {
+  max-width: auto !important;
+  width: auto;
+}
+
+.pollutants-filters .el-select .el-select__tags-text {
+  font-size: 14px !important;
 }
 </style>

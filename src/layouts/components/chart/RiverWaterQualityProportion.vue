@@ -30,7 +30,7 @@ const data = [
     value: 240,
   },
 ]
-const colors = ['#4a90e2', '#6ea2cf', '#81adc6', '#b5cda7', '#e1e787', '#fffb6e']
+const colors = ['#91cc75', '#3ba272', '#ee6666', '#fac858', '#ee6666', '#73c0de', '#3ba272', '#fc8452', '#9a60b4', '#ea7ccc']
 export default {
   components: { ZFrame, Echart },
   data() {
@@ -108,24 +108,14 @@ export default {
       const result1 = await apiData.getRiverSectionAreaRatio(param)
       if (result1 && result1.code === 1000 && result1.data) {
         const opt = {
-          // legend: {
-          //   orient: 'vertical',
-          //   top: 'center',
-          //   right: '10%',
-          //   data: result1.data.map((it) => `${it.label}`),
-          //   textStyle: {
-          //     color: '#fff',
-          //     fontSize: 12,
-          //   },
-          // },
-          tooltip: {
-            trigger: 'item',
-            formatter(param) {
-              return `${param.name} (${param.percent}%)<br>`
-            },
-            // formatter: '{a} <br/>{b} : {c} ({d}%)',
+          legend: {
+            orient: 'vertical',
+            top: 'center',
+            right: '10%',
+            data: [],
             textStyle: {
-              fontSize: 16,
+              color: '#fff',
+              fontSize: 12,
             },
           },
           toolbox: {
@@ -139,12 +129,12 @@ export default {
           },
           series: [
             {
-              top: '10%',
+              top: '0%',
               name: '水质类别',
               type: 'pie',
               // left: '0',
               radius: ['30%', '70%'],
-              center: ['40%', '50%'],
+              center: ['50%', '50%'],
               roseType: 'radius',
               label: {
                 show: true,
@@ -184,7 +174,7 @@ export default {
 </script>
 
 <template>
-  <ZFrame :height="220" title="入海河流断面水质类别面积占比" @click="handleClick">
-    <Echart v-if="visible" :options="options" height="190px" width="375px" />
+  <ZFrame :height="264" title="入海河流断面水质类别面积占比" @click="handleClick">
+    <Echart v-if="visible" :options="options" height="228px" width="450px" />
   </ZFrame>
 </template>

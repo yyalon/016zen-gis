@@ -1,5 +1,6 @@
 <script>
 import { ElDescriptions, ElDescriptionsItem } from 'element-plus'
+import { romanToInt } from '@/utils'
 
 export default {
   components: { ElDescriptions, ElDescriptionsItem },
@@ -11,17 +12,26 @@ export default {
       },
     },
   },
-  mounted() {},
+  mounted() {
+
+  },
   unmounted() {},
-  methods: {},
+  methods: {
+    romanToInt(s) {
+      return romanToInt(s)
+    },
+  },
 }
 </script>
 
 <template>
   <div class="popup-container">
-    <ElDescriptions :title="`断面名称 :${popupData.name}`" :column="1" border size="small">
+    <ElDescriptions :title="`断面名称 :${popupData.WQ_PI_NAME}`" :column="1" border size="small">
       <ElDescriptionsItem v-if="popupData.code" label="断面编码">
         {{ popupData.code }}
+      </ElDescriptionsItem>
+      <ElDescriptionsItem v-if="popupData.N2023 && popupData.W2023" label="达标情况">
+        {{ parseFloat(popupData.N2023) > parseFloat(popupData.N2025) ? '总氮不达标' : '' }}&nbsp;{{ romanToInt(popupData.W2023) > romanToInt(popupData.W2025) ? '水质不达标' : '' }}
       </ElDescriptionsItem>
       <ElDescriptionsItem v-if="popupData.waterSystem" label="水系">
         {{ popupData.waterSystem }}
@@ -74,7 +84,7 @@ export default {
       <ElDescriptionsItem v-if="popupData.pointName" label="测点名称">
         {{ popupData.pointName }}
       </ElDescriptionsItem>
-      <ElDescriptionsItem v-if="popupData.pointName" label="所属行政区">
+      <ElDescriptionsItem v-if="popupData.area" label="所属行政区">
         {{ popupData.area }}
       </ElDescriptionsItem>
       <ElDescriptionsItem v-if="popupData.areaCode" label="行政编码">

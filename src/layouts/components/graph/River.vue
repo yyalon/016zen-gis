@@ -28,9 +28,9 @@ export default {
   <div>
     <LayerRiverSections v-if="visible" />
     <RightDrawer :drawer-visible="visible">
-      <ChartRiverWaterQualityProportion /> <br />
-      <ChartWaterQualityComplianceStatus /><br />
-      <ChartNitrogenComplianceStatus /><br />
+      <ChartRiverWaterQualityProportion /> <br>
+      <ChartWaterQualityComplianceStatus /><br>
+      <ChartNitrogenComplianceStatus /><br>
       <ChartMajorPollutantsConcentrationsTrend />
     </RightDrawer>
   </div>

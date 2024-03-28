@@ -17,6 +17,20 @@ export default {
             type: 'shadow', // 默认为直线，可选为：'line' | 'shadow'
           },
         },
+        dataZoom: [
+          {
+            show: true,
+            realtime: true,
+            start: 65,
+            end: 85,
+          },
+          {
+            type: 'inside',
+            realtime: true,
+            start: 65,
+            end: 85,
+          },
+        ],
         grid: {
           left: '10px',
           top: '10px',
@@ -77,13 +91,13 @@ export default {
     },
     async getData(param) {
       const res = await ApiData.getRiverSectionOverall(param)
+      // res.data = []
       // console.log('getRiverSectionOverall:', res)
       if (res && res.code === 1000) {
         const data = res.data.filter(e => e.result === '达标')
-
         const data1 = res.data.filter(e => e.result === '不达标')
         this.options.series[0].data = data.map(e => e.value)
-        this.options.xAxis[0].data = data.map(e => e.WQ_INF_YEAR)
+        this.options.xAxis[0].data = data.map(e => `${e.WQ_INF_YEAR}${e.WQ_INF_MONTH}`)
         this.options.series[1].data = data1.map(e => e.value)
         // this.options.xAxis[1].data = data1.map((e) => e.WQ_INF_YEAR)
         this.visible = true
@@ -95,7 +109,7 @@ export default {
 </script>
 
 <template>
-  <ZFrame :height="220" title="入海河流断面水质总体达标情况">
-    <Echart v-if="visible" :options="options" height="190px" width="375px" />
+  <ZFrame :height="264" title="入海河流断面水质总体达标情况">
+    <Echart v-if="visible" :options="options" height="228px" width="450px" />
   </ZFrame>
 </template>

@@ -47,4 +47,6 @@ export default {
 
   // 获取重点河道测站列表
   getRiverChannels: (params: any) => api.post('/app/data/river-channel/list'),
+
+  getWaterQuality: (params: any) => api.post('/admin/data/river-section/waterQuality'),
 }

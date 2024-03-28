@@ -130,7 +130,7 @@ export default {
 
   :deep(.el-select) {
     margin-right: 10px;
-    width: 140px;
+    min-width: 140px;
 
     &:hover .el-input__wrapper {
       box-shadow: none;
