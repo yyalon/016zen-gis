@@ -94,6 +94,7 @@ export default {
     this.getData(this.param)
 
     eventBus.on('filterparam', (param) => {
+      console.log('入海河流断面水质类别面积占比', param)
       // console.log('quality:filterparam:', param)
       param.flag = this.param.flag
       this.param = param

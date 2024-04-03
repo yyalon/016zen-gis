@@ -66,6 +66,7 @@ export default {
 
     eventBus.on('filterparam', (param) => {
       // console.log('water:filterparam:', param)
+      console.log('入海河流断面总氮达标情况', param)
       this.param = param
       this.getData(param)
     })
@@ -98,7 +99,6 @@ export default {
 
       if (res && res.code === 1000) {
         const data = res.data
-        console.log('###########', param)
         if (param.dm_name === '') {
           // 断面选择了全部, 使用饼图
           this.options = this.generyBingtu(data)
@@ -199,10 +199,10 @@ export default {
           data: allYear,
         },
         grid: {
-          left: '10px',
+          left: '20px',
           right: '10px',
           bottom: '10px',
-          top: '10px',
+          top: '35px',
           containLabel: true,
         },
         toolbox: {
@@ -241,6 +241,7 @@ export default {
         },
         yAxis: {
           type: 'value',
+          name: '总氮(mg/L)',
         },
         series: allYear.map((year) => {
           return {
@@ -279,7 +280,7 @@ export default {
 </script>
 
 <template>
-  <ZFrame :height="264" title="入海河流断面总氮达标情况111">
+  <ZFrame :height="264" title="入海河流断面总氮达标情况">
     <Echart v-if="visible" :options="options" height="228px" width="450px" />
   </ZFrame>
 </template>

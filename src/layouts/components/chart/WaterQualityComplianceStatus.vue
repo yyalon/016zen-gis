@@ -24,16 +24,10 @@ export default {
             start: 65,
             end: 85,
           },
-          {
-            type: 'inside',
-            realtime: true,
-            start: 65,
-            end: 85,
-          },
         ],
         grid: {
           left: '10px',
-          top: '10px',
+          top: '35px',
           right: '10px',
           bottom: '10px',
           containLabel: true,
@@ -47,6 +41,7 @@ export default {
         yAxis: [
           {
             type: 'value',
+            name: '单位个',
           },
         ],
         series: [
@@ -72,13 +67,14 @@ export default {
     await this.getData()
 
     eventBus.on('filterparam', (param) => {
-      // console.log('water:filterparam:', param)
+      console.log('入海河流断面水质总体达标情况', param)
       this.param = param
       this.getData(param)
     })
   },
   beforeUnmount() {
     eventBus.off('filterparam')
+    console.log('入海河流断面水质总体达标情况beforeUnmount-filterparam')
   },
   methods: {
     delay(ms) {

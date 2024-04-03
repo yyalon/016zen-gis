@@ -148,6 +148,7 @@ export default {
         yAxis: [
           {
             type: 'value',
+            name: '平均总氮(mg/L)',
           },
         ],
         series: allYears.map((year) => {

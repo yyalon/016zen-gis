@@ -146,30 +146,34 @@ export default {
     eventBus.off('filterparam')
   },
   methods: {
-    filterRiverSections(value) {
+    async filterRiverSections(value) {
       this.loadingRiverSections = true
       this.filteredRiverSections = []
-
+      await this.getData()
       this.riverSections.forEach((section) => {
-        let _qualitied = true
+        const _qualitied = true
         if (this.selectedArea && section.atProvince !== this.selectedArea && section.atCity !== this.selectedArea) {
-          _qualitied = false
+          // _qualitied = false
         }
         if (this.estuary && !section.type?.includes('入海口')) {
-          _qualitied = false
+          // _qualitied = false
         }
         if (this.river && section.name !== this.river) {
-          _qualitied = false
+          // _qualitied = false
         }
         if (_qualitied) {
           this.filteredRiverSections.push(section)
         }
+        // this.filteredRiverSections.push(section)
       })
-
       setTimeout(() => {
         this.loadingRiverSections = false
       }, 1000)
       this.sendRiverFilterParam()
+    },
+    estuaryChange() {
+      _layer?.remove()
+      this.showLayer()
     },
     refreshLayer() {
       _layer.clear()
@@ -183,7 +187,7 @@ export default {
         }
         // const compliant = this.dictWaterQuality[riverSection.code]?.compliant
         const graphic = new window.$ZMap.graphic.Marker({
-          latlng: [riverSection.WQ_PI_LAD, riverSection.WQ_PI_LOD],
+          latlng: [riverSection.latitude, riverSection.longitude],
           style: {
             image: !noDabiao ? 'img/marker/river.png' : 'img/marker/river_red.png',
             horizontalOrigin: window.$ZMap.HorizontalOrigin.CENTER,
@@ -264,8 +268,8 @@ export default {
       this.rivers = []
       !code && this.rivers.push('全部')
       this.riverSections.forEach((riverSection) => {
-        if (!this.rivers.includes(riverSection.WQ_PI_NAME) && (!code || riverSection.code.startsWith(code))) {
-          this.rivers.push(riverSection.WQ_PI_NAME)
+        if (!this.rivers.includes(riverSection.name) && (!code || riverSection.code.startsWith(code))) {
+          this.rivers.push(riverSection.name)
         }
       })
     },
@@ -274,6 +278,14 @@ export default {
       if (res && res.code === 1000) {
         this.riverSections = res.data
       }
+
+      if (!this.estuary) {
+        const allRivers = await apiData.getRiverSections()
+        if (res && res.code === 1000) {
+          this.riverSections = this.riverSections.concat(allRivers.data)
+        }
+      }
+
       this.calcRivers()
     },
     async showLayer() {
@@ -287,13 +299,10 @@ export default {
         show: false,
         chunkedLoading: true, // 间隔添加数据，以便页面不冻结。
         showCoverageOnHover: false, // 是否显示聚合标记的边界。
-        disableClusteringAtZoom: 1, // 此级别下不聚合
+        disableClusteringAtZoom: !this.estuary ? 18 : 1, // 此级别下不聚合
       })
       window.$zMap.addLayer(_layer)
-
-      await this.getData()
-
-      this.filterRiverSections()
+      await this.filterRiverSections()
       this.refreshLayer()
       setTimeout(() => {
         _layer.show = true
@@ -411,7 +420,7 @@ export default {
         :disabled-date="disabledDate"
         @change="selectedTimeSlot()"
       />
-      <el-switch v-model="estuary" style="margin-left: 10px;" active-text="入海口" @change="filterRiverSections()" />
+      <el-switch v-model="estuary" style="margin-left: 10px;" active-text="入海口" @change="estuaryChange" />
       <el-switch v-model="showList" active-text="显示列表" />
       <el-button type="primary" @click="toggleView">
         浓度趋势图
