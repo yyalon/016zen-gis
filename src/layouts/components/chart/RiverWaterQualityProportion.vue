@@ -87,6 +87,7 @@ export default {
           },
         ],
       },
+      loading: false,
     }
   },
   mounted() {
@@ -94,7 +95,6 @@ export default {
     this.getData(this.param)
 
     eventBus.on('filterparam', (param) => {
-      console.log('入海河流断面水质类别面积占比', param)
       // console.log('quality:filterparam:', param)
       param.flag = this.param.flag
       this.param = param
@@ -106,6 +106,7 @@ export default {
   },
   methods: {
     async getData(param) {
+      this.loading = true
       const result1 = await apiData.getRiverSectionAreaRatio(param)
       if (result1 && result1.code === 1000 && result1.data) {
         const opt = {
@@ -165,6 +166,7 @@ export default {
         this.options = opt
         // console.log('getRiverSectionAreaRatio:', result1)
       }
+      this.loading = false
     },
     handleClick() {
       this.param.flag = !this.param.flag
@@ -176,6 +178,6 @@ export default {
 
 <template>
   <ZFrame :height="264" title="入海河流断面水质类别面积占比" @click="handleClick">
-    <Echart v-if="visible" :options="options" height="228px" width="450px" />
+    <Echart v-if="visible" v-loading="loading" :options="options" height="228px" width="450px" />
   </ZFrame>
 </template>

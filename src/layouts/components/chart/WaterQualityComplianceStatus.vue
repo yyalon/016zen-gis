@@ -60,6 +60,7 @@ export default {
         ],
       },
       param: {},
+      loading: false,
     }
   },
   async mounted() {
@@ -67,14 +68,12 @@ export default {
     await this.getData()
 
     eventBus.on('filterparam', (param) => {
-      console.log('入海河流断面水质总体达标情况', param)
       this.param = param
       this.getData(param)
     })
   },
   beforeUnmount() {
     eventBus.off('filterparam')
-    console.log('入海河流断面水质总体达标情况beforeUnmount-filterparam')
   },
   methods: {
     delay(ms) {
@@ -86,12 +85,21 @@ export default {
       // console.log('handleSearch')
     },
     async getData(param) {
+      this.loading = true
       const res = await ApiData.getRiverSectionOverall(param)
       // res.data = []
       // console.log('getRiverSectionOverall:', res)
       if (res && res.code === 1000) {
         const data = res.data.filter(e => e.result === '达标')
+
         const data1 = res.data.filter(e => e.result === '不达标')
+
+        data.sort((a, b) => {
+          return new Date(`${a.WQ_INF_YEAR}-${a.WQ_INF_MONTH}`) - new Date(`${b.WQ_INF_YEAR}-${b.WQ_INF_MONTH}`)
+        })
+        data1.sort((a, b) => {
+          return new Date(`${a.WQ_INF_YEAR}-${a.WQ_INF_MONTH}`) - new Date(`${b.WQ_INF_YEAR}-${b.WQ_INF_MONTH}`)
+        })
         this.options.series[0].data = data.map(e => e.value)
         this.options.xAxis[0].data = data.map(e => `${e.WQ_INF_YEAR}${e.WQ_INF_MONTH}`)
         this.options.series[1].data = data1.map(e => e.value)
@@ -99,6 +107,7 @@ export default {
         this.visible = true
       }
       this.visible = true
+      this.loading = false
     },
   },
 }
@@ -106,6 +115,6 @@ export default {
 
 <template>
   <ZFrame :height="264" title="入海河流断面水质总体达标情况">
-    <Echart v-if="visible" :options="options" height="228px" width="450px" />
+    <Echart v-if="visible" v-loading="loading" :options="options" height="228px" width="450px" />
   </ZFrame>
 </template>

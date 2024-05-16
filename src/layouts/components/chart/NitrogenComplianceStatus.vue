@@ -51,6 +51,7 @@ export default {
         ],
       },
       param: {},
+      loading: false,
     }
   },
   mounted() {
@@ -65,8 +66,6 @@ export default {
     //   this.visible = true
 
     eventBus.on('filterparam', (param) => {
-      // console.log('water:filterparam:', param)
-      console.log('入海河流断面总氮达标情况', param)
       this.param = param
       this.getData(param)
     })
@@ -95,6 +94,7 @@ export default {
   },
   methods: {
     async getData(param) {
+      this.loading = true
       const res = await ApiData.getRiverSectionTotalDan(param)
 
       if (res && res.code === 1000) {
@@ -110,6 +110,7 @@ export default {
           this.visible = true
         }
       }
+      this.loading = false
     },
 
     generyBingtu(data) {
@@ -281,6 +282,6 @@ export default {
 
 <template>
   <ZFrame :height="264" title="入海河流断面总氮达标情况">
-    <Echart v-if="visible" :options="options" height="228px" width="450px" />
+    <Echart v-if="visible" v-loading="loading" :options="options" height="228px" width="450px" />
   </ZFrame>
 </template>
