@@ -4,6 +4,7 @@ import dayjs from 'dayjs'
 import { area, intersect } from '@turf/turf'
 
 import LayerRivers from './components/layer/Rivers.vue'
+import LayerControlUnit from './components/layer/ControlUnit.vue'
 import LayerSeaShanghai from './components/layer/SeaShanghai.vue'
 import LayerSeaJiangsu from './components/layer/SeaJiangsu.vue'
 import LayerSeaZhejiang from './components/layer/SeaZhejiang.vue'
@@ -31,6 +32,7 @@ import apiData from '@/api/modules/data'
 
 export default {
   components: {
+    LayerControlUnit,
     GraphSwitcher,
     GraphOutfall,
     GraphRiver,
@@ -75,6 +77,13 @@ export default {
           command: 'toggleLayer',
           visibility: false,
           icon: 'meteorology-station',
+        },
+        {
+          name: '控制单元',
+          value: 'controlUnit',
+          command: 'toggleLayer',
+          visibility: false,
+          icon: 'river',
         },
         {
           name: '河流',
@@ -136,6 +145,7 @@ export default {
         layerRiverChannels: false,
         layergetMeteorologyStations: false,
         layerRiver: false,
+        controlUnit: false,
       },
       riverLevel: null,
     }
@@ -239,8 +249,7 @@ export default {
             })
           }
         })
-      }
-      else {
+      } else {
         this.riverLevel = null
         this.visibilities.layerRiver = false
         this.buttons.forEach((button) => {
@@ -336,8 +345,7 @@ export default {
                       season = 'average'
                       year = layerName.slice(-11, -7)
                       type = layerName.slice(0, -11)
-                    }
-                    else {
+                    } else {
                       season = layerName.slice(-6)
                       year = layerName.slice(-10, -6)
                       type = layerName.slice(0, -10)
@@ -368,6 +376,7 @@ export default {
     <div class="layout-background" />
     <ZMap @map-loaded="mapLoaded" />
     <div class="layout-mask" />
+    <LayerControlUnit v-if="visibilities.controlUnit" />
     <LayerSeaShanghai v-if="visibilities.sea" />
     <LayerSeaZhejiang v-if="visibilities.sea" />
     <LayerSeaJiangsu v-if="visibilities.sea" />
@@ -560,7 +569,7 @@ export default {
   .layout-mask {
     z-index: 1000;
     pointer-events: none;
-    background-image: url("@/assets/images/mask.png");
+    background-image: url('@/assets/images/mask.png');
     background-repeat: no-repeat;
     background-size: 100% 100%;
   }
