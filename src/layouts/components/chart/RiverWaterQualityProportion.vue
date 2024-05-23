@@ -177,7 +177,7 @@ export default {
 </script>
 
 <template>
-  <ZFrame :height="264" title="入海河流断面水质类别面积占比" @click="handleClick">
+  <ZFrame :height="264" title="入海河流断面水质类别占比" @click="handleClick">
     <Echart v-if="visible" v-loading="loading" :options="options" height="228px" width="450px" />
   </ZFrame>
 </template>
