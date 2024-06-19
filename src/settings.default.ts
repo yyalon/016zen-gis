@@ -5,11 +5,11 @@ import type { RecursiveRequired, Settings } from '#/global'
 const globalSettingsDefault: RecursiveRequired<Settings.all> = {
   app: {
     // 标题，此项修改后需要重启项目！！！ (包括初次加载雪花屏的标题 页面的标题 浏览器的标题)
-    title: '陆海气协同防治可视化智慧决策支持平台',
+    title: '近岸海域陆海气协同防治可视化智慧决策支持平台',
     // 英文标题
     titleEn: 'Marine Governance Platform',
     // 简写
-    abbreviation: '陆海气协同防治决策平台',
+    abbreviation: '近岸海域陆海气协同防治可视化智慧决策支持平台',
     // 英文简写
     abbreviationEn: 'MGP',
     colorScheme: 'light',
