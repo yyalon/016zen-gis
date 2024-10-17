@@ -1,9 +1,6 @@
 import { setupLayouts } from 'virtual:meta-layouts'
 import generatedRoutes from 'virtual:generated-pages'
 import type { RouteRecordRaw } from 'vue-router'
-import MultilevelMenuExample from './modules/multilevel.menu.example'
-import BreadcrumbExample from './modules/breadcrumb.example'
-import type { Route } from '#/global'
 import useSettingsStore from '@/store/modules/settings'
 
 // 固定路由（默认路由）
@@ -48,19 +45,9 @@ const systemRoutes: RouteRecordRaw[] = [
       },
     ],
   },
-]
-
-// 动态路由（异步路由、导航栏路由）
-const asyncRoutes: Route.recordMainRaw[] = [
   {
-    meta: {
-      title: '演示',
-      icon: 'sidebar-default',
-    },
-    children: [
-      MultilevelMenuExample,
-      BreadcrumbExample,
-    ],
+    path: '/index',
+    component: () => import('@/views/index.vue'),
   },
 ]
 
@@ -75,7 +62,6 @@ const asyncRoutesByFilesystem = setupLayouts(generatedRoutes.filter((item) => {
 export {
   constantRoutes,
   systemRoutes,
-  asyncRoutes,
   constantRoutesByFilesystem,
   asyncRoutesByFilesystem,
 }
