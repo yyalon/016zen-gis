@@ -39,10 +39,10 @@ export default ({ mode, command }) => {
         //   changeOrigin: command === 'serve' && env.VITE_OPEN_PROXY === 'true',
         //   rewrite: path => path.replace(/\/arcmap/, ''),
         // },
-        '/file': {
-          target: env.VITE_APP_STATIC_PATH,
-          rewrite: (path) => path.replace(/\/file/, ''),
-        },
+        // '/file': {
+        //   target: env.VITE_APP_STATIC_PATH,
+        //   rewrite: (path) => path.replace(/\/file/, 'file'),
+        // },
       },
     },
     // 构建选项 https://cn.vitejs.dev/config/#server-fsserve-root
