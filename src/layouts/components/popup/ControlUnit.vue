@@ -58,7 +58,9 @@ export default {
       <ElDescriptionsItem v-if="popupData['变化情况']" label="变化情况">
         {{ popupData['变化情况'] }}
       </ElDescriptionsItem>
-      <ElDescriptionsItem v-if="popupData['面积']" label="面积"> {{ popupData['面积'] }} 平方公里 </ElDescriptionsItem>
+      <ElDescriptionsItem v-if="popupData['面积']" label="面积">
+        {{ popupData['面积'] }} 平方公里
+      </ElDescriptionsItem>
     </ElDescriptions>
   </div>
 </template>

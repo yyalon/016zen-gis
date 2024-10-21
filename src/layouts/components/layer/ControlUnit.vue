@@ -17,7 +17,8 @@ export default {
       const name = 'controlUnit'
       if (_layer) {
         _layer.show = true
-      } else {
+      }
+      else {
         const loading = this.$loading({
           lock: true,
           text: '正在加载地图数据...',
