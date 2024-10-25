@@ -10,19 +10,16 @@ export default {
 </script>
 
 <template>
-  <ZDrawer :drawer-visible="drawerVisible" direction="rtl" :width="450">
+  <ZDrawer :drawer-visible="drawerVisible" direction="rtl" :width="499">
     <slot />
   </ZDrawer>
 </template>
 
 <style lang="scss">
 .z-drawer {
-  bottom: 0 !important;
-  top: 100px !important;
-  height: fit-content !important;
-
-  .el-drawer__body {
-    padding: 0;
+  &.rtl::after {
+    left: -47px;
+    transform: rotateY(180deg);
   }
 }
 </style>

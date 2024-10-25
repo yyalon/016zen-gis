@@ -103,11 +103,14 @@ export default {
 
 <style lang="scss" scoped>
 .toolbar {
-  bottom: 26px;
-  left: 20px;
+  bottom: 88px;
+  left: 521px;
   z-index: 1000;
   position: absolute;
   user-select: none;
+  width: 156px;
+  padding: 18px;
+  background-color: #0c0f0d;
 
   .button-grounp {
     position: relative;

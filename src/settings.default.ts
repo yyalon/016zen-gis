@@ -9,7 +9,7 @@ const globalSettingsDefault: RecursiveRequired<Settings.all> = {
     // 英文标题
     titleEn: 'Marine Governance Platform',
     // 简写
-    abbreviation: '近岸海域陆海气协同防治可视化智慧决策支持平台',
+    abbreviation: '陆海气协同防治决策平台',
     // 英文简写
     abbreviationEn: 'MGP',
     colorScheme: 'light',

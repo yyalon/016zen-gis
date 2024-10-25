@@ -188,3 +188,47 @@ textarea {
 .el-select__tags .el-tag--info {
   background-color: transparent;
 }
+
+.z-frame {
+  .el-table {
+    background-color: inherit;
+    color: inherit;
+
+    tr {
+      background-color: inherit;
+    }
+
+    .el-table__cell {
+      padding: 10px 0;
+      background-color: inherit !important;
+    }
+
+    th.el-table__cell {
+      padding-top: 0;
+      font-weight: 400;
+      color: #83b0ff;
+    }
+
+    th.el-table__cell.is-leaf,
+ td.el-table__cell {
+      border: 0;
+    }
+
+    .el-table__inner-wrapper::before {
+      background-color: inherit !important;
+    }
+  }
+}
+
+.el-radio-group {
+  .el-radio-button__inner {
+    color: #fff;
+    border-color: rgb(10 81 204 / 40%) !important;
+    background: rgb(10 81 204 / 40%) !important;
+  }
+
+  .el-radio-button.is-active .el-radio-button__original-radio:not(:disabled) + .el-radio-button__inner {
+    background: rgb(10 81 204 / 60%) !important;
+    border-color: #007bff !important;
+  }
+}

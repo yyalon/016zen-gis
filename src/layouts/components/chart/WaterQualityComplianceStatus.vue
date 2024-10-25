@@ -114,7 +114,7 @@ export default {
 </script>
 
 <template>
-  <ZFrame :height="264" title="入海河流断面水质达标情况">
-    <Echart v-if="visible" v-loading="loading" :options="options" height="228px" width="450px" />
+  <ZFrame title="河流水质达标趋势分析">
+    <Echart v-if="visible" v-loading="loading" :options="options" height="281px" width="410px" />
   </ZFrame>
 </template>

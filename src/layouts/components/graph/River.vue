@@ -1,18 +1,22 @@
 <script>
+import LeftDrawer from '../LeftDrawer.vue'
 import RightDrawer from '../RightDrawer.vue'
-import ChartRiverWaterQualityProportion from '../chart/RiverWaterQualityProportion.vue'
+import RiverWaterQualityStandard from '../chart/RiverWaterQualityStandard.vue'
+import RiverWaterQualityAnalysis from '../chart/RiverWaterQualityAnalysis.vue'
 import ChartWaterQualityComplianceStatus from '../chart/WaterQualityComplianceStatus.vue'
-import ChartNitrogenComplianceStatus from '../chart/NitrogenComplianceStatus.vue'
+import RiverMonitorDetail from '../chart/RiverMonitorDetail.vue'
 import ChartMajorPollutantsConcentrationsTrend from '../chart/MajorPollutantsConcentrationsTrend.vue'
 import LayerRiverSections from '../layer/RiverSections.vue'
 
 export default {
   components: {
     LayerRiverSections,
+    LeftDrawer,
     RightDrawer,
-    ChartRiverWaterQualityProportion,
+    RiverWaterQualityStandard,
+    RiverWaterQualityAnalysis,
     ChartWaterQualityComplianceStatus,
-    ChartNitrogenComplianceStatus,
+    RiverMonitorDetail,
     ChartMajorPollutantsConcentrationsTrend,
   },
   props: {
@@ -27,11 +31,14 @@ export default {
 <template>
   <div>
     <LayerRiverSections v-if="visible" />
+    <ChartMajorPollutantsConcentrationsTrend v-if="visible" />
+    <LeftDrawer :drawer-visible="visible">
+      <RiverWaterQualityStandard />
+      <RiverWaterQualityAnalysis />
+    </LeftDrawer>
     <RightDrawer :drawer-visible="visible">
-      <ChartRiverWaterQualityProportion /> <br>
-      <ChartWaterQualityComplianceStatus /><br>
-      <ChartNitrogenComplianceStatus /><br>
-      <ChartMajorPollutantsConcentrationsTrend />
+      <ChartWaterQualityComplianceStatus />
+      <RiverMonitorDetail />
     </RightDrawer>
   </div>
 </template>

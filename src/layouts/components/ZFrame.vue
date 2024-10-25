@@ -1,4 +1,6 @@
 <script>
+import titleImg from '@/assets/images/titleImg.png'
+
 export default {
   name: 'ZFrame',
   components: {},
@@ -13,15 +15,17 @@ export default {
     },
     width: {
       type: [Number, String],
-      default: 375,
+      default: 475,
     },
     height: {
       type: [Number, String],
-      default: 220,
+      default: 465,
     },
   },
   data() {
-    return {}
+    return {
+      titleImg,
+    }
   },
   computed: {},
   mounted() {},
@@ -30,9 +34,9 @@ export default {
 </script>
 
 <template>
-  <div class="z-frame" :style="{ width: typeof width === 'Number' ? `${width}px` : width, height: typeof height === 'Number' ? `${height}px` : height }">
+  <div class="z-frame" :style="{ width: typeof width === 'number' ? `${width}px` : width, height: typeof height === 'number' ? `${height}px` : height }">
     <div v-if="title" class="z-frame-title">
-      {{ title }}
+      <img :src="titleImg">{{ title }}
     </div>
     <div v-loading="loading" class="z-frame-content">
       <slot />
@@ -42,50 +46,62 @@ export default {
 
 <style lang="scss" scoped>
 .z-frame {
+  position: relative;
   display: flex;
   flex-direction: column;
-  background: rgb(0 0 0 / 44%);
-  border-radius: 5px;
+  border: 1px solid rgb(10 204 204 / 60%);
+  padding-left: 11px;
 
-  &::after {
-    content: " ";
-    backdrop-filter: blur(3px);
+  & + .z-frame {
+    margin-top: 16px;
+  }
+
+  &::before {
+    content: "";
     position: absolute;
-    width: 100%;
-    height: 100%;
-    z-index: -1;
+    top: 0;
+    left: 0;
+    width: 41px;
+    height: 2px;
+    border-top: 2px solid #0ff;
   }
 
   .z-frame-title {
+    position: relative;
     user-select: none;
     width: 100%;
-    height: 36px;
-    font-family: SourceHanSansCN-Regular;
+    font-family: "Microsoft YaHei";
     color: rgb(255 255 255);
-    font-weight: normal;
-    font-style: normal;
-    text-decoration: none;
-    text-shadow: rgb(11 113 230 / 0%) 1px 1px 1px;
-    font-size: 1em;
-    text-indent: 0;
-    letter-spacing: 0;
-    text-align: left;
-    white-space: pre-wrap;
-    word-break: break-word;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    padding: 0 0 0 36px;
+    font-weight: 700;
+    font-size: 22px;
+    text-shadow: 0 0 6px #00e2ff;
+    padding: 23px 0 10px 1px;
     display: flex;
-    align-content: center;
-    justify-content: flex-start;
     align-items: center;
-    background-image: url("@/assets/images/frame_title_bg.png");
-    background-repeat: no-repeat;
-    background-size: 370px 36px;
+    background: linear-gradient(0deg, rgb(10 104 204 / 43.2%) 0%, rgb(10 136 204 / 0%) 100%);
+
+    &::after {
+      content: "";
+      position: absolute;
+      bottom: 3px;
+      left: 46px;
+      right: 5px;
+      height: 2px;
+      background: url("@/assets/images/titleLine.png") no-repeat;
+      background-size: 100% 100%;
+    }
+
+    & > img {
+      width: 31px;
+      margin-right: 16px;
+    }
   }
 
   .z-frame-content {
     flex: 1;
+    padding: 28px 10px 0;
+    font-size: 14px;
+    line-height: 1;
   }
 
   ::v-deep .el-loading-mask {

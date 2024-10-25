@@ -16,6 +16,7 @@ import LayerReservoirs from './components/layer/Reservoirs.vue'
 import LayerRiverChannels from './components/layer/RiverChannels.vue'
 
 import GraphSwitcher from './components/GraphSwitcher.vue'
+import GraphCockpit from './components/graph/Cockpit.vue'
 import GraphOutfall from './components/graph/Outfall.vue'
 import GraphRiver from './components/graph/River.vue'
 import GraphOcean from './components/graph/Ocean.vue'
@@ -34,6 +35,7 @@ export default {
   components: {
     LayerControlUnit,
     GraphSwitcher,
+    GraphCockpit,
     GraphOutfall,
     GraphRiver,
     GraphOcean,
@@ -54,7 +56,7 @@ export default {
   data() {
     return {
       loading: null,
-      activeGraph: 'river',
+      activeGraph: 'cockpit',
       settings,
       buttons: [
         {
@@ -205,7 +207,7 @@ export default {
     //   window.$zMap.addLayer(tileLayer)
     // })
 
-    this.activeGraph = 'river'
+    this.activeGraph = 'cockpit'
 
     // setTimeout(async () => {
     //   await this.initSeaWaterQualityAreas()
@@ -377,7 +379,6 @@ export default {
   <div class="layout">
     <div class="layout-background" />
     <ZMap @map-loaded="mapLoaded" />
-    <div class="layout-mask" />
     <LayerControlUnit v-if="visibilities.controlUnit" />
     <LayerSeaShanghai v-if="visibilities.sea" />
     <LayerSeaZhejiang v-if="visibilities.sea" />
@@ -393,41 +394,20 @@ export default {
     <!-- <LayerAllBorderMask /> -->
     <div class="layout-container">
       <div class="header">
-        <div class="left">
-          <div class="time" @click="toLogin()">
-            {{ moment(null, 'HH:mm') }}
-          </div>
-          <div class="date">
-            {{ moment(null, 'YYYY-MM-DD') }}
-          </div>
-          <div class="weekday">
-            {{ moment(null, 'dddd') }}
-          </div>
-        </div>
-        <div class="center">
+        <GraphSwitcher v-model:active-graph="activeGraph">
           <div class="title">
-            {{ settings.app.abbreviation }}
+            <img src="/breadcrumb/abbreviation.png">
           </div>
-          <div class="title-en">
-            {{ settings.app.titleEn }}
-          </div>
-        </div>
-        <div class="right">
-          <div class="setting" @click="toAdminIndex()">
-            <el-icon>
-              <svg-icon name="ep:setting" />
-            </el-icon>
-          </div>
-        </div>
+        </GraphSwitcher>
       </div>
       <div class="layout-body">
+        <GraphCockpit :visible="activeGraph === 'cockpit'" />
         <GraphRiver :visible="activeGraph === 'river'" />
         <GraphOutfall :visible="activeGraph === 'outfall'" />
         <GraphOcean :visible="activeGraph === 'ocean'" />
         <GraphBiology :visible="activeGraph === 'biology'" />
         <GraphMeteorology :visible="activeGraph === 'meteorology'" />
       </div>
-      <GraphSwitcher v-model:active-graph="activeGraph" />
     </div>
   </div>
 </template>
@@ -452,10 +432,9 @@ export default {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: black;
+    background-color: #091b31;
   }
 
-  &-mask,
   &-container {
     position: absolute;
     top: 0;
@@ -463,117 +442,42 @@ export default {
     width: 100%;
     height: 100%;
     pointer-events: none;
-  }
-
-  &-container {
     z-index: 2000;
 
     .header {
       width: 100%;
-      height: 100px;
+      height: 94px;
+      padding-bottom: 20px;
       pointer-events: all;
       display: flex;
+      justify-content: center;
+      background-color: #091b31;
 
-      .left {
-        width: 200px;
-
-        .time {
-          position: absolute;
-          top: 18px;
-          left: 120px;
-          z-index: 2000;
-          width: 64px;
-          height: 22px;
-          font-size: 30px;
-          font-family: DINPro-Regular;
-          line-height: 26px;
-          user-select: none;
-        }
-
-        .date {
-          position: absolute;
-          top: 12px;
-          left: 10px;
-          z-index: 2000;
-          width: 120px;
-          height: 11px;
-          font-family: DINPro-Regular;
-          font-size: 16px;
-          line-height: 14px;
-          user-select: none;
-        }
-
-        .weekday {
-          position: absolute;
-          top: 36px;
-          left: 55px;
-          z-index: 2000;
-          width: 120px;
-          height: 12px;
-          font-size: 16px;
-          font-family: DINPro-Regular;
-          line-height: 14px;
-          user-select: none;
-        }
-      }
-
-      .center {
-        flex-grow: 1;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-
-        .title {
-          font-family: SourceHanSansCN-Regular;
-          font-weight: bold;
-          font-size: 36px;
-          text-align: center;
-          text-shadow: rgb(11 113 230 / 0%) 1px 1px 1px;
-          user-select: none;
-        }
-
-        .title-en {
-          height: 26px;
-          clip-path: inset(1px 0);
-          font-family: SourceHanSansCN-Regular;
-          font-size: 20px;
-          color: transparent;
-          text-align: center;
-          user-select: none;
-          background: linear-gradient(360deg, rgb(155 155 155) 0%, rgb(255 255 255) 100%);
-          background-clip: text !important;
-        }
-      }
-
-      .right {
-        width: 200px;
-
-        .setting {
-          padding: 20px;
-          font-size: 26px;
-          text-align: right;
-          cursor: pointer;
-
-          :hover {
-            color: silver;
-          }
-        }
+      .title {
+        flex-shrink: 0;
+        width: 690px;
+        height: 100%;
+        padding: 15px 0;
+        text-align: center;
       }
     }
 
     .layout-body {
-      width: 1920px;
-      height: 100%;
-    }
-  }
+      width: 100%;
+      height: calc(100% - 94px);
+      position: relative;
+      padding-bottom: 6px;
 
-  .layout-mask {
-    z-index: 1000;
-    pointer-events: none;
-    background-image: url("@/assets/images/mask.png");
-    background-repeat: no-repeat;
-    background-size: 100% 100%;
+      &::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 6px;
+        background-color: #091b31;
+      }
+    }
   }
 }
 </style>

@@ -1,5 +1,7 @@
 <script>
-import { markRaw } from 'vue' // 引入默认主题
+import { markRaw } from 'vue'
+
+// 引入默认主题
 import tdTheme from './theme.json'
 
 const chart = null

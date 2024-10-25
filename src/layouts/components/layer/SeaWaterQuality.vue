@@ -796,6 +796,10 @@ export default {
 }
 
 .work-zone {
+  position: absolute;
+  top: 0;
+  left: 512px;
+  width: calc(100% - 1024px);
   display: flex;
 
   .sea-station-list {
@@ -804,8 +808,7 @@ export default {
     top: 150px;
     width: 1200px;
     height: 800px;
-    overflow-y: auto;
-    overflow-x: hidden;
+    overflow: hidden auto;
     pointer-events: all;
   }
 }

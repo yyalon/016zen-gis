@@ -58,5 +58,9 @@ div:has(> .z-drawer) {
   pointer-events: all;
   background-color: unset !important;
   box-shadow: unset !important;
+
+  .el-drawer__body {
+    padding: 0 12px 40px !important;
+  }
 }
 </style>

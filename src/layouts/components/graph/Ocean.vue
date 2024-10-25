@@ -1,23 +1,22 @@
 <script>
-import ChartSeaWaterQualityProportion from '../chart/SeaWaterQualityProportion.vue'
-import ChartSeaEutrophicationProportion from '../chart/SeaEutrophicationProportion.vue'
+import SeaWaterQualityStandard from '../chart/SeaWaterQualityStandard.vue'
+import SeaWaterQualityAnalysis from '../chart/SeaWaterQualityAnalysis.vue'
 import ChartSeaWaterGoodQualitySeasonColumn from '../chart/SeaWaterGoodQualitySeasonColumn.vue'
-
-// import ChartSeaWaterGoodQualityProvinceColumn from '../chart/SeaWaterGoodQualityProvinceColumn.vue'
-import ChartSeaWaterQualityStationProportionColumn from '../chart/SeaWaterQualityStationProportionColumn.vue'
+import ChartSeaStationEutrophicationProportion from '../chart/SeaStationEutrophicationProportion.vue'
 
 import LayerSeaWaterQuality from '../layer/SeaWaterQuality.vue'
+import LeftDrawer from '../LeftDrawer.vue'
 import RightDrawer from '../RightDrawer.vue'
 
 export default {
   components: {
+    LeftDrawer,
     RightDrawer,
     LayerSeaWaterQuality,
-    ChartSeaWaterQualityProportion,
-    ChartSeaEutrophicationProportion,
+    SeaWaterQualityStandard,
+    SeaWaterQualityAnalysis,
     ChartSeaWaterGoodQualitySeasonColumn,
-    // ChartSeaWaterGoodQualityProvinceColumn,
-    ChartSeaWaterQualityStationProportionColumn,
+    ChartSeaStationEutrophicationProportion,
   },
   props: {
     visible: {
@@ -42,13 +41,13 @@ export default {
 <template>
   <div>
     <LayerSeaWaterQuality v-if="visible" @refresh-sea-water-quality-chart="refreshSeaWaterQualityChart" />
+    <LeftDrawer :drawer-visible="visible">
+      <SeaWaterQualityStandard />
+      <SeaWaterQualityAnalysis />
+    </LeftDrawer>
     <RightDrawer :drawer-visible="visible" @open="showChart = true">
-      <ChartSeaWaterQualityProportion v-if="showChart" :chart-data="chartData" /> <br>
-      <ChartSeaEutrophicationProportion v-if="showChart" :chart-data="chartData" /><br>
-      <ChartSeaWaterQualityStationProportionColumn v-if="showChart" :chart-data="chartData" /><br>
-      <!-- <ChartSeaWaterQualityColumn :chart-data="chartData" /><br /> -->
-      <!-- <ChartSeaWaterGoodQualityProvinceColumn v-if="showChart" :chart-data="chartData" /><br /> -->
       <ChartSeaWaterGoodQualitySeasonColumn v-if="showChart" :chart-data="chartData" />
+      <ChartSeaStationEutrophicationProportion />
     </RightDrawer>
   </div>
 </template>

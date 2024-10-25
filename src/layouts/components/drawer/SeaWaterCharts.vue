@@ -111,8 +111,7 @@ export default {
     width: 100%;
     display: flex;
     flex-wrap: wrap;
-    align-content: flex-start;
-    justify-content: space-between;
+    place-content: flex-start space-between;
     gap: 20px;
 
     .chart-container {

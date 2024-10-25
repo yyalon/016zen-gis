@@ -144,7 +144,7 @@ export default {
 </script>
 
 <template>
-  <ZFrame :height="220" title="优良水质面积比例（季度）" :loading="loading">
-    <Echart :options="options" height="190px" width="375px" @on-finished="loading = flase" />
+  <ZFrame title="近岸海域优良水质面积变化趋势" :loading="loading">
+    <Echart :options="options" height="100%" width="100%" @on-finished="loading = flase" />
   </ZFrame>
 </template>
