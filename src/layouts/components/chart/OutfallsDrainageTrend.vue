@@ -11,18 +11,21 @@ export default {
         xAxis: {
           type: 'category',
           boundaryGap: false,
-          data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+          data: ['1月', '2月', '3月', '4月', '5月', '6月', '7月'],
         },
         yAxis: {
           type: 'value',
         },
         series: [
           {
-            data: [820, 932, 901, 934, 1290, 1330, 1320],
+            data: [13, 23, 23, 13, 9, 6, 16],
             type: 'line',
-            areaStyle: {},
+            areaStyle: {
+              color: 'rgba(10, 204, 204, 0.3)',
+            },
           },
         ],
+        color: '#237804',
       },
       radio1: '总氮',
     }
@@ -32,12 +35,14 @@ export default {
 
 <template>
   <ZFrame title="入海排污口排水趋势">
-    <el-radio-group v-model="radio1" is-button>
-      <el-radio-button label="排水量" />
-      <el-radio-button label="化学需氧量" />
-      <el-radio-button label="总氮" />
-      <el-radio-button label="总磷" />
-    </el-radio-group>
-    <Echart :options="options" height="232px" width="410px" />
+    <div style="text-align: center;">
+      <el-radio-group v-model="radio1" is-button>
+        <el-radio-button label="排水量" />
+        <el-radio-button label="化学需氧量" />
+        <el-radio-button label="总氮" />
+        <el-radio-button label="总磷" />
+      </el-radio-group>
+    </div>
+    <Echart :options="options" height="320px" width="410px" />
   </ZFrame>
 </template>

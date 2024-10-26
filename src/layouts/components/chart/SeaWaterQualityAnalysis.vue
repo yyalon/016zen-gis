@@ -81,11 +81,12 @@ export default {
 
 <style lang="scss" scoped>
   .river-water-wrapper {
+    width: 391px;
     margin: 22px auto 0;
   }
 
   .river-water-title,
- .river-water-item {
+  .river-water-item {
     display: flex;
 
     > div {
@@ -93,22 +94,15 @@ export default {
       vertical-align: middle;
       padding: 0 8px;
 
-      &:not(:last-child) {
-        border-right: 1px solid rgb(116 202 255 / 18%);
+      &:not(:first-child) {
+        flex: 1;
+        border-left: 1px solid rgb(116 202 255 / 18%);
       }
     }
 
     > div:nth-child(1) {
       width: 88px;
       text-align: center;
-    }
-
-    > div:nth-child(2) {
-      width: 150px;
-    }
-
-    > div:nth-child(3) {
-      width: 150px;
     }
   }
 

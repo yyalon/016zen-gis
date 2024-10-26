@@ -25,7 +25,7 @@ export default {
           <div class="river-water-label">
             现状
           </div>
-          <div><span class="number">12</span>%</div>
+          <div><span class="number">12</span>%<span class="status succes">1.7%</span></div>
         </div>
         <el-divider direction="vertical" />
         <div style="width: 25%;" />
@@ -47,7 +47,7 @@ export default {
           <div class="river-water-label">
             现状
           </div>
-          <div><span class="number">12</span>%</div>
+          <div><span class="number">12</span>%<span class="status succes">1.7%</span></div>
         </div>
         <el-divider direction="vertical" />
         <div style="width: 25%;" />
@@ -111,7 +111,7 @@ export default {
     &.el-divider--vertical {
       margin: 0;
       height: auto;
-      background: linear-gradient(270deg, rgb(25 117 255 / 0%) 0%, rgb(25 117 255 / 60%) 51%, rgb(25 117 255 / 0%) 100%);
+      background: linear-gradient(rgb(25 117 255 / 0%) 0%, rgb(25 117 255 / 60%) 51%, rgb(25 117 255 / 0%) 100%);
     }
   }
 
@@ -124,6 +124,30 @@ export default {
     .number {
       font-size: 24px;
       margin-right: 2px;
+    }
+
+    .status {
+      position: relative;
+      margin-left: 8px;
+      padding-left: 16px;
+
+      &::before {
+        content: "";
+        position: absolute;
+        top: -2px;
+        left: 0;
+        width: 0;
+        height: 0;
+        border: 6px solid transparent;
+      }
+
+      &.succes::before {
+        border-bottom-color: rgb(0 202 3 / 80%);
+      }
+
+      &.error::before {
+        border-bottom-color: rgb(255 53 53 / 80%);
+      }
     }
 
     > div:first-child {

@@ -119,7 +119,7 @@ export default {
       &.el-divider--vertical {
         margin: 0;
         height: auto;
-        background: linear-gradient(270deg, rgb(25 117 255 / 0%) 0%, rgb(25 117 255 / 60%) 51%, rgb(25 117 255 / 0%) 100%);
+        background: linear-gradient(rgb(25 117 255 / 0%) 0%, rgb(25 117 255 / 60%) 51%, rgb(25 117 255 / 0%) 100%);
       }
     }
 

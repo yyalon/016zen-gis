@@ -25,7 +25,8 @@ const legend = {
 
 const arySeasons = ['spring', 'summer', 'autumn', 'average']
 const arySeas = ['shanghai', 'jiangsu', 'zhejiang', 'all']
-const aryYears = [2019, 2020, 2021, 2022, 2023]
+// const aryYears = [2019, 2020, 2021, 2022, 2023]
+const aryYears = [2021, 2022]
 
 export default {
   components: { ZFrame, Echart },
@@ -46,23 +47,19 @@ export default {
       options: {
         tooltip: {
           trigger: 'axis',
-          formatter(param) {
-            let label = `<b style="font-size:16px">${param[0].name}</b><br>`
-            param.forEach((item) => {
-              label += `${item.seriesName} 占比${parseFloat(item.value) || '-'}%<br>`
-            })
-            return label
-          },
           axisPointer: {
             type: 'shadow',
           },
         },
-        legend: {},
+        legend: {
+          left: 'center',
+          top: 'top',
+        },
         grid: {
-          left: '5%',
-          right: '5%',
-          bottom: '5%',
-          top: '15%',
+          left: '10px',
+          top: '35px',
+          right: '10px',
+          bottom: '10px',
           containLabel: true,
         },
         xAxis: [
@@ -76,20 +73,35 @@ export default {
         yAxis: [
           {
             type: 'value',
+            name: '%',
+            max: 100,
           },
         ],
-        series: aryYears.map((year) => {
+        series: [{
+          name: '同比变化',
+          type: 'line',
+          tooltip: {
+            valueFormatter(value) {
+              return `${value}%`
+            },
+          },
+          data: [],
+        }].concat(aryYears.map((year) => {
           return {
             name: year,
             type: 'bar',
-            emphasis: {
-              focus: 'series',
+            barWidth: '8px',
+            tooltip: {
+              valueFormatter(value) {
+                return `${value}%`
+              },
             },
             data: arySeasons.map((key) => {
               return 0
             }),
           }
-        }),
+        })),
+        color: ['#36FF00', '#FFF200', '#00C8FF'],
       },
     }
   },
@@ -105,8 +117,9 @@ export default {
   methods: {
     update() {
       this.loading = true
+      console.log('this.chartData.areas', this.chartData.areas)
       if (this.chartData.areas) {
-        this.options.series = aryYears.map((year) => {
+        aryYears.forEach((year, yearIndex) => {
           const sums = {}
           arySeasons.forEach((season) => {
             const name = `wq-${year}-${season}`
@@ -126,17 +139,12 @@ export default {
 
             sums[season] = ((sumGood / sumWhole) * 100).toFixed(1)
           })
-          return {
-            name: year,
-            type: 'bar',
-            emphasis: {
-              focus: 'series',
-            },
-            data: arySeasons.map((key) => {
-              return sums[key]
-            }),
-          }
+
+          this.options.series[yearIndex + 1].data = arySeasons.map((key) => {
+            return sums[key]
+          })
         })
+        this.options.series[0].data = this.options.series[2].data.map((value, idx) => (value - this.options.series[1].data[idx]).toFixed(1))
       }
     },
   },

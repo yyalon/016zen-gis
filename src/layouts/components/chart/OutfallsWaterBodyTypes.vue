@@ -8,36 +8,34 @@ export default {
   data() {
     return {
       options: {
-        title: {
-          text: 'Referer of a Website',
-          subtext: 'Fake Data',
-          left: 'center',
-        },
-        tooltip: {
-          trigger: 'item',
-        },
-        legend: {
-          orient: 'vertical',
-          left: 'left',
-        },
+        color: ['#FAC01F', '#3AACFF', '#FB466C'],
         series: [
           {
-            name: 'Access From',
+            name: '受纳水体排口类型统计',
             type: 'pie',
             radius: '50%',
+            startAngle: 75,
             data: [
-              { value: 1048, name: 'Search Engine' },
-              { value: 735, name: 'Direct' },
-              { value: 580, name: 'Email' },
-              { value: 484, name: 'Union Ads' },
-              { value: 300, name: 'Video Ads' },
+              { value: 16, name: '工业排污口' },
+              { value: 48, name: '城镇污水处理厂排污口' },
+              { value: 34, name: '农业排口' },
             ],
-            emphasis: {
-              itemStyle: {
-                shadowBlur: 10,
-                shadowOffsetX: 0,
-                shadowColor: 'rgba(0, 0, 0, 0.5)',
+            label: {
+              show: true,
+              position: 'outside',
+              fontSize: 12,
+              formatter(param) {
+                return `${param.name} (${parseInt(param.percent)}%)`
               },
+              color: 'white',
+            },
+            labelLine: {
+              lineStyle: {
+                color: 'white',
+              },
+            },
+            emphasis: {
+              disabled: true,
             },
           },
         ],
@@ -49,6 +47,6 @@ export default {
 
 <template>
   <ZFrame title="受纳水体排口类型统计">
-    <Echart :options="options" height="281px" width="410px" />
+    <Echart :options="options" height="360px" width="410px" />
   </ZFrame>
 </template>

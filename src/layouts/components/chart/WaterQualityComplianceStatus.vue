@@ -17,6 +17,10 @@ export default {
             type: 'shadow', // 默认为直线，可选为：'line' | 'shadow'
           },
         },
+        legend: {
+          left: 'center',
+          top: 'top',
+        },
         dataZoom: [
           {
             show: true,
@@ -41,23 +45,45 @@ export default {
         yAxis: [
           {
             type: 'value',
-            name: '单位个',
+            name: '%',
+            max: 100,
           },
         ],
         series: [
           {
-            name: '达标断面数',
-            type: 'bar',
-            barWidth: '8px',
+            name: '同比变化',
+            type: 'line',
+            tooltip: {
+              valueFormatter(value) {
+                return `${value}%`
+              },
+            },
             data: [],
           },
           {
-            name: '不达标断面数',
+            name: '不达标',
             type: 'bar',
             barWidth: '8px',
+            tooltip: {
+              valueFormatter(value) {
+                return `${value}%`
+              },
+            },
+            data: [],
+          },
+          {
+            name: '达标',
+            type: 'bar',
+            barWidth: '8px',
+            tooltip: {
+              valueFormatter(value) {
+                return `${value}%`
+              },
+            },
             data: [],
           },
         ],
+        color: ['#36FF00', '#FFF200', '#00C8FF'],
       },
       param: {},
       loading: false,
@@ -90,19 +116,29 @@ export default {
       // res.data = []
       // console.log('getRiverSectionOverall:', res)
       if (res && res.code === 1000) {
-        const data = res.data.filter(e => e.result === '达标')
-
-        const data1 = res.data.filter(e => e.result === '不达标')
-
+        const data = []
+        res.data.forEach((e) => {
+          const key = `${e.WQ_INF_YEAR}-${e.WQ_INF_MONTH}`
+          const index = data.findIndex((o) => o.key === key)
+          if (index === -1) {
+            data.push({
+              ...e,
+              key,
+              [e.result]: e.value,
+            })
+          }
+          else {
+            data[index][e.result] = e.value
+            data[index].value = Number(data[index].value) + Number(e.value)
+          }
+        })
         data.sort((a, b) => {
-          return new Date(`${a.WQ_INF_YEAR}-${a.WQ_INF_MONTH}`) - new Date(`${b.WQ_INF_YEAR}-${b.WQ_INF_MONTH}`)
+          return new Date(a.key) - new Date(b.key)
         })
-        data1.sort((a, b) => {
-          return new Date(`${a.WQ_INF_YEAR}-${a.WQ_INF_MONTH}`) - new Date(`${b.WQ_INF_YEAR}-${b.WQ_INF_MONTH}`)
-        })
-        this.options.series[0].data = data.map(e => e.value)
-        this.options.xAxis[0].data = data.map(e => `${e.WQ_INF_YEAR}${e.WQ_INF_MONTH}`)
-        this.options.series[1].data = data1.map(e => e.value)
+        this.options.xAxis[0].data = data.map(e => e.key)
+        this.options.series[0].data = data.map(e => ((e['达标'] - e['不达标']) / e.value * 100).toFixed(0))
+        this.options.series[1].data = data.map(e => (e['不达标'] / e.value * 100).toFixed(0))
+        this.options.series[2].data = data.map(e => (e['达标'] / e.value * 100).toFixed(0))
         // this.options.xAxis[1].data = data1.map((e) => e.WQ_INF_YEAR)
         this.visible = true
       }
@@ -115,6 +151,6 @@ export default {
 
 <template>
   <ZFrame title="河流水质达标趋势分析">
-    <Echart v-if="visible" v-loading="loading" :options="options" height="281px" width="410px" />
+    <Echart v-if="visible" v-loading="loading" :options="options" height="360px" width="410px" />
   </ZFrame>
 </template>

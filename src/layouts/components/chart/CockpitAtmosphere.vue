@@ -22,9 +22,15 @@ export default {
     </div>
     <el-table :data="tableData" style="width: 100%;">
       <el-table-column prop="text1" label="站点" />
-      <el-table-column prop="text2" :align="center" label="AQI" />
-      <el-table-column prop="text3" :align="center" label="空气质量等级" />
-      <el-table-column prop="text4" :align="center" label="首要污染物" />
+      <el-table-column prop="text2" align="center" label="AQI" />
+      <el-table-column prop="text3" align="center" label="空气质量等级">
+        <template #default="scope">
+          <el-tag color="#F9D000" style="color: #000; border: 0;">
+            {{ scope.row.text3 }}
+          </el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column prop="text4" align="center" label="首要污染物" />
     </el-table>
   </ZFrame>
 </template>
