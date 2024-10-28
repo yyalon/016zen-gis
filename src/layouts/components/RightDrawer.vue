@@ -16,8 +16,10 @@ export default {
 </template>
 
 <style lang="scss">
-.z-drawer {
-  &.rtl::after {
+.z-drawer.rtl {
+  background-position: bottom right;
+
+  &::after {
     left: -47px;
     transform: rotateY(180deg);
   }

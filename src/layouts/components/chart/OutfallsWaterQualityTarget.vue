@@ -129,7 +129,19 @@ export default {
     text-align: center;
 
     &:last-child {
+      position: relative;
       margin-right: 0;
+
+      &::before {
+        content: "";
+        position: absolute;
+        top: -1px;
+        left: -11px;
+        width: 12px;
+        background-image: url("/zen-gis/src/assets/images/line.png");
+        height: 7px;
+        background-color: #061b41;
+      }
     }
 
     .outfalls-item-label {
@@ -147,7 +159,6 @@ export default {
       font-size: 36px;
       font-weight: 700;
       background: linear-gradient(180deg, #ff835a 0%, #ff3c3c 99%);
-      background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
       text-fill-color: transparent;
@@ -156,7 +167,6 @@ export default {
     &:first-child {
       .outfalls-item-value {
         background: linear-gradient(180deg, #ffe95a 0%, #ff3c3c 99%);
-        background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
         text-fill-color: transparent;

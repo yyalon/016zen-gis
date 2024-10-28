@@ -63,7 +63,7 @@ export default {
   align-items: flex-start;
 
   .graph-left,
- .graph-right {
+  .graph-right {
     display: flex;
     flex-grow: 1;
     position: relative;
@@ -88,7 +88,7 @@ export default {
     height: 44px;
     line-height: 32px;
     cursor: pointer;
-    padding: 6px 0;
+    padding: 10px 0 6px;
     position: relative;
     transition: 0.1s all ease-in-out;
 
