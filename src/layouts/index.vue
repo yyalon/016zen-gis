@@ -396,7 +396,9 @@ export default {
       <div class="header">
         <GraphSwitcher v-model:active-graph="activeGraph">
           <div class="title">
+            <div class="titleBeforeLine" />
             <img src="/breadcrumb/abbreviation.png">
+            <div class="titleAfterLine" />
           </div>
         </GraphSwitcher>
       </div>
@@ -432,7 +434,7 @@ export default {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: #091b31;
+    background-color: #071a3f;
   }
 
   &-container {
@@ -451,14 +453,41 @@ export default {
       pointer-events: all;
       display: flex;
       justify-content: center;
-      background-color: #091b31;
+      background-color: #071a3f;
 
       .title {
+        position: relative;
         flex-shrink: 0;
         width: 690px;
         height: 100%;
         padding: 15px 0;
         text-align: center;
+        margin-left: -57px;
+        margin-right: -37px;
+        z-index: 1;
+
+        .titleBeforeLine {
+          width: 60px;
+          height: 61px;
+          position: absolute;
+          top: 3px;
+          left: -16px;
+          background-image: url("@/assets/images/header/union.png");
+          transform: rotateY(180deg);
+        }
+
+        .titleAfterLine {
+          width: 60px;
+          height: 61px;
+          position: absolute;
+          top: 3px;
+          right: -35px;
+          background-image: url("@/assets/images/header/union.png");
+        }
+
+        img {
+          margin-top: -29px;
+        }
       }
     }
 
@@ -475,7 +504,7 @@ export default {
         left: 0;
         width: 100%;
         height: 6px;
-        background-color: #091b31;
+        background-color: #071a3f;
       }
     }
   }

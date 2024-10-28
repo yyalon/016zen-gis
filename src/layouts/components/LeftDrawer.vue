@@ -18,10 +18,16 @@ export default {
 <style lang="scss">
 .z-drawer {
   bottom: 0 !important;
-  top: 94px !important;
-  height: calc(100% - 94px) !important;
-  background-color: #091b31 !important;
+  top: 74px !important;
+  padding-top: 20px;
+  height: calc(100% - 74px) !important;
+  background-color: #071a3f !important;
+  background-image: url("@/assets/images/bodyBg.jpg");
   overflow: visible;
+
+  &.ltr {
+    background-position: bottom left;
+  }
 
   &::after {
     content: "";
