@@ -220,3 +220,9 @@ export interface SeaWaterEutrophication {
   data: number[] // 数量
   color: string[] // 颜色
 }
+
+export interface OperationResult<T> {
+  code: string
+  message: string
+  data: T[]
+}
