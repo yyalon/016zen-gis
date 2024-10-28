@@ -432,7 +432,7 @@ export default {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: #091b31;
+    background-color: #071a3f;
   }
 
   &-container {
@@ -451,7 +451,7 @@ export default {
       pointer-events: all;
       display: flex;
       justify-content: center;
-      background-color: #091b31;
+      background-color: #071a3f;
 
       .title {
         flex-shrink: 0;
@@ -475,7 +475,7 @@ export default {
         left: 0;
         width: 100%;
         height: 6px;
-        background-color: #091b31;
+        background-color: #071a3f;
       }
     }
   }

@@ -20,7 +20,7 @@ export default {
   bottom: 0 !important;
   top: 94px !important;
   height: calc(100% - 94px) !important;
-  background-color: #091b31 !important;
+  background-color: #071a3f !important;
   overflow: visible;
 
   &::after {
