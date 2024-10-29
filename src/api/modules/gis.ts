@@ -65,49 +65,49 @@ export default {
   getMeteorology: (query: GeneralQuery): Promise<OperationResult<Meteorology[]>> => api.post('/app/data/gis-data/meteorology', query),
 
   /**
-   * 入海河流-河流水质达标考核
+   * 入海河流-河流水质达标考核(左上)
    * @param query
    * @returns
    */
   getWaterQualityComplianceResult: (query: GeneralQuery): Promise<OperationResult<WaterQualityComplianceResult>> => api.post('/app/data/gis-data/water-compliance', query),
 
   /**
-   * 入海河流-水质现状统计分析
+   * 入海河流-水质现状统计分析(左下)
    * @param query
    * @returns
    */
   getWaterYoyProportion: (query: GeneralQuery): Promise<OperationResult<WaterYoyProportion>> => api.post('/app/data/gis-data/water-yoy', query),
 
   /**
-   * 入海河流-水质达标率趋势分析
+   * 入海河流-水质达标率趋势分析(右上)
    * @param query
    * @returns
    */
   getWaterQualityTrend: (query: GeneralQuery): Promise<OperationResult<WaterQualityTrend>> => api.post('/app/data/gis-data/water-trend', query),
 
   /**
-   * 入海河流-断面监测详情
+   * 入海河流-断面监测详情(右下)
    * @param query
    * @returns
    */
   getWaterQualityDetail: (query: GeneralQuery): Promise<OperationResult<WaterQualityDetail>> => api.post('/app/data/gis-data/water-wq-detal', query),
 
   /**
-   * 入海排污口-入海排污口统计
+   * 入海排污口-入海排污口统计(左上)
    * @param query
    * @returns
    */
   getOutfallOverallStats: (query: GeneralQuery): Promise<OperationResult<OutfallOverallStats>> => api.post('/app/data/gis-data/outfall-stat', query),
 
   /**
-   * 入海排污口-收纳水体排污口类型分析
+   * 入海排污口-收纳水体排污口类型分析(右上)
    * @param query
    * @returns
    */
   getOutfallTypeStats: (query: GeneralQuery): Promise<OperationResult<OutfallTypeStats>> => api.post('/app/data/gis-data/outfall-type-stat', query),
 
   /**
-   * 入海排污口-收纳水体目标统计
+   * 入海排污口-收纳水体目标统计(右下)
    * @param query
    * @returns
    */
