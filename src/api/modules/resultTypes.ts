@@ -25,6 +25,7 @@ export interface AirStation {
   AQI: string // AQI
   quality: string // 空气质量等级
   primaryPollutant: string // 首要污染物
+  color: string // 颜色
 }
 
 /**
@@ -224,5 +225,5 @@ export interface SeaWaterEutrophication {
 export interface OperationResult<T> {
   code: string
   message: string
-  data: T[]
+  data: T
 }

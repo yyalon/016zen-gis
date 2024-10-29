@@ -1,16 +1,35 @@
 <script>
 import ZFrame from '../ZFrame.vue'
+import gisData from '@/api/modules/gis'
 
 export default {
   name: 'CockpitAtmosphere',
   components: { ZFrame },
   data() {
     return {
-      tableData: [
-        { text1: 'xx子站', text2: 32, text3: '良', text4: 'CO' },
-        { text1: 'xx子站', text2: 32, text3: '良', text4: 'CO' },
-      ],
+      loading: false,
+      tableData: [],
     }
+  },
+  created() {
+    this.getData()
+  },
+  methods: {
+    getData() {
+      this.loading = true
+      gisData.getAirStation({ time: '2023-09-01' }).then(({ data }) => {
+        this.loading = false
+        this.tableData = data.map(item => {
+          return {
+            text1: item.stationName,
+            text2: item.AQI,
+            text3: item.quality,
+            text4: item.primaryPollutant,
+            color: item.color,
+          }
+        })
+      })
+    },
   },
 }
 </script>

@@ -1,33 +1,70 @@
 <script>
 import ZFrame from '../ZFrame.vue'
+import gisData from '@/api/modules/gis'
 
 export default {
   name: 'CockpitOcean',
   components: { ZFrame },
   data() {
     return {
+      loading: false,
       lists: [
         {
           text: '监测断面数量',
-          num: 21,
+          num: 0,
           unit: '个',
-          percent: 89.5,
-          items: [{ goal: 64.6, diff: 4.5, text: '江苏' }, { goal: 17.5, diff: 4.5, text: '上海' }],
+          percent: 0,
+          diff: 0,
+          items: [{ goal: 0, diff: 0, text: '' }, { goal: 0, diff: 0, text: '' }],
         },
         {
           text: '监测面积（km2）',
-          num: 18507,
-          percent: 89.5,
-          items: [{ goal: 64.6, diff: 4.5, text: '江苏' }, { goal: 17.5, diff: 4.5, text: '上海' }],
+          num: 0,
+          percent: 0,
+          diff: 0,
+          items: [{ goal: 0, diff: 0, text: '' }, { goal: 0, diff: 0, text: '' }],
         },
       ],
     }
+  },
+  created() {
+    this.getData()
+  },
+  methods: {
+    getData() {
+      this.loading = true
+      gisData.getSeaWaterOverall({ time: '2023-07-01' }).then(({ data }) => {
+        console.log(data)
+        this.loading = false
+        this.lists[0].num = data.point.currentMonthTotal
+        this.lists[0].percent = data.point.currentMonthGoodAreaRatio
+        this.lists[0].diff = data.point.goodAreaRatioDifference
+        this.lists[0].items = data.point.provinceResults.map(item => {
+          return {
+            goal: item.target,
+            diff: item.targetDifference,
+            text: item.province,
+          }
+        })
+
+        this.lists[0].num = data.area.currentMonthTotal
+        this.lists[0].percent = data.area.currentMonthGoodAreaRatio
+        this.lists[0].diff = data.area.goodAreaRatioDifference
+        this.lists[0].items = data.area.provinceResults.map(item => {
+          return {
+            goal: item.target,
+            diff: item.targetDifference,
+            text: item.province,
+          }
+        })
+      })
+    },
   },
 }
 </script>
 
 <template>
-  <ZFrame title="近岸海域">
+  <ZFrame v-loading="loading" title="近岸海域">
     <div class="cockpit-ocean-card">
       <div
         v-for="(group, index) in lists" :key="index"

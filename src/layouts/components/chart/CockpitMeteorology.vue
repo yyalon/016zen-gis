@@ -1,35 +1,49 @@
 <script>
 import ZFrame from '../ZFrame.vue'
+import gisData from '@/api/modules/gis'
 
 export default {
   name: 'CockpitMeteorology',
   components: { ZFrame },
   data() {
     return {
-      tableData: [
-        { text1: 'xx子站', text2: 32, text3: '南', color: '#F9D000', text4: 32 },
-        { text1: 'xx子站', text2: 32, text3: '北', color: '#26B200', text4: 18 },
-      ],
+      loading: false,
+      tableData: [],
     }
+  },
+  created() {
+    this.getData()
+  },
+  methods: {
+    getData() {
+      this.loading = true
+      gisData.getMeteorology({ time: '2023-09-01' }).then(({ data }) => {
+        this.loading = false
+        console.log(data)
+        this.tableData = data.map(item => {
+          return {
+            text1: item.stationName,
+            text2: item.winSpeed,
+            text3: item.winDirection,
+            color: '',
+            text4: item.RHU,
+          }
+        })
+      })
+    },
   },
 }
 </script>
 
 <template>
-  <ZFrame title="气象实况">
+  <ZFrame v-loading="loading" title="气象实况">
     <div class="subtitle">
       监测站监测数据
     </div>
     <el-table :data="tableData" style="width: 100%;">
       <el-table-column prop="text1" label="站点" />
       <el-table-column prop="text2" align="center" label="风速" />
-      <el-table-column prop="text3" align="center" label="风向">
-        <template #default="scope">
-          <el-tag :color="scope.row.color" style="color: #000; border: 0;">
-            {{ scope.row.text3 }}
-          </el-tag>
-        </template>
-      </el-table-column>
+      <el-table-column prop="text3" align="center" label="风向" />
       <el-table-column prop="text4" align="center" label="湿度" />
     </el-table>
   </ZFrame>

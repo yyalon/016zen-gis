@@ -3,7 +3,7 @@
  */
 export interface GeneralQuery {
   area?: string// 区域 攻坚战或者 东海区
-  time: string// 时间，默认当前时间
+  time?: string// 时间，默认当前时间
   province?: string// 身份
   city?: string// 城市
 }

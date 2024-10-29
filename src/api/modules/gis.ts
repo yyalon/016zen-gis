@@ -52,7 +52,10 @@ export default {
    * @param query
    * @returns
    */
-  getSeaWaterOverall: (query: GeneralQuery): Promise<OperationResult<SeaWaterOverallStats[]>> => api.post('/app/data/gis-data/sea-water-overall', query),
+  getSeaWaterOverall: (query: GeneralQuery): Promise<OperationResult<{
+    area: SeaWaterOverallStats
+    point: SeaWaterOverallStats
+  }>> => api.post('/app/data/gis-data/sea-water-overall', query),
 
   /**
    * 驾驶舱-气象实况(右下)
