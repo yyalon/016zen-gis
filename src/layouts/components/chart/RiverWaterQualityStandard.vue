@@ -35,7 +35,7 @@ export default {
       <div class="river-water-title">
         <img :src="water"><span style="margin: 0 4px;">达到攻坚战水质要求</span>
         <span :class="data.complianceRate === data.complianceRate ? 'up' : 'notup'">
-          {{ data.complianceRate === data.complianceRate ? '达标' : '未达标' }}
+          {{ data.complianceRate === data.complianceRate ? '已达标' : '未达标' }}
         </span>
       </div>
       <el-divider />
@@ -46,7 +46,7 @@ export default {
           </div>
           <div>
             <span class="number">{{ data.complianceRate }}</span>%
-            <span :class="data.yoyComplianceRate > 0 ? 'succes' : 'failed'" class="status">{{ data.yoyComplianceRate }}%</span>
+            <span :class="data.yoyComplianceRate >= 0 ? 'succes' : 'error'" class="status">{{ data.yoyComplianceRate }}%</span>
           </div>
         </div>
         <el-divider direction="vertical" />
@@ -73,7 +73,7 @@ export default {
       <div class="river-water-title">
         <img :src="water"><span style="margin: 0 4px;">劣V类比例</span>
         <span :class="data.poorRate === data.poorTargetRate ? 'up' : 'notup'">
-          {{ data.poorRate === data.poorTargetRate ? '达标' : '未达标' }}
+          {{ data.poorRate === data.poorTargetRate ? '已达标' : '未达标' }}
         </span>
       </div>
       <el-divider />
@@ -84,7 +84,7 @@ export default {
           </div>
           <div>
             <span class="number">{{ data.poorRate }}</span>%
-            <span :class="data.yoyPoorRate <= 0 ? 'success' : 'error'" class="status">{{ data.yoyPoorRate }}%</span>
+            <span :class="data.yoyPoorRate <= 0 ? 'succes' : 'error'" class="status">{{ data.yoyPoorRate }}%</span>
           </div>
         </div>
         <el-divider direction="vertical" />
@@ -143,6 +143,19 @@ export default {
     font-size: 14px;
     color: rgb(255 53 53 / 80%);
     background-image: url("@/assets/images/notupBg.png");
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+  }
+
+  .up {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 65px;
+    height: 21px;
+    font-size: 14px;
+    color: rgb(0 202 3 / 80%);
+    background-image: url("@/assets/images/upBg.png");
     background-size: 100% 100%;
     background-repeat: no-repeat;
   }

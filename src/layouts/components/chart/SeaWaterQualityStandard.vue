@@ -8,6 +8,25 @@ export default {
   data() {
     return {
       water,
+      data: [{
+        province: '江苏',
+        compliance: '未达标',
+        percent: 12,
+        diff: 1.7,
+        complianceTargetRate: 64.6,
+      }, {
+        province: '上海',
+        compliance: '未达标',
+        percent: 12,
+        diff: 1.7,
+        complianceTargetRate: 18,
+      }, {
+        province: '浙江',
+        compliance: '已达标',
+        percent: 12,
+        diff: 1.7,
+        complianceTargetRate: 18,
+      }],
     }
   },
 }
@@ -16,9 +35,9 @@ export default {
 <template>
   <ZFrame title="近岸海域水质达标考核">
     <div class="sea-water">
-      <div class="river-water-wrapper">
+      <div v-for="item in data" :key="item.province" class="river-water-wrapper">
         <div class="river-water-title">
-          <img :src="water"><span style="margin: 0 4px;">江苏：水质优良 (一、二类)比例</span><span class="notup">未达标</span>
+          <img :src="water"><span style="margin: 0 4px;">{{ item.province }}：水质优良 (一、二类)比例</span><span :class="item.compliance === '未达标' ? 'notup' : 'up'">{{ item.compliance }}</span>
         </div>
         <el-divider />
         <div class="river-water-content">
@@ -26,7 +45,7 @@ export default {
             <div class="river-water-label">
               现状
             </div>
-            <div><span class="number">12</span>%<span class="status succes">1.7%</span></div>
+            <div><span class="number">{{ item.percent }}</span>%<span class="status" :class="item.diff >= 0 ? 'succes' : 'error'">{{ item.diff }}%</span></div>
           </div>
           <el-divider direction="vertical" />
           <div style="width: 25%;" />
@@ -34,29 +53,7 @@ export default {
             <div class="river-water-label">
               2025年
             </div>
-            <div><span class="number" style="color: #cd303b;">64.6</span>%</div>
-          </div>
-        </div>
-      </div>
-      <div class="river-water-wrapper">
-        <div class="river-water-title">
-          <img :src="water"><span style="margin: 0 4px;">上海：水质优良 (一、二类)比例</span><span class="notup">未达标</span>
-        </div>
-        <el-divider />
-        <div class="river-water-content">
-          <div style="width: 50%;">
-            <div class="river-water-label">
-              现状
-            </div>
-            <div><span class="number">12</span>%<span class="status succes">1.7%</span></div>
-          </div>
-          <el-divider direction="vertical" />
-          <div style="width: 25%;" />
-          <div style="width: 25%;">
-            <div class="river-water-label">
-              2025年
-            </div>
-            <div><span class="number" style="color: #cd303b;">18</span>%</div>
+            <div><span class="number" style="color: #cd303b;">{{ item.complianceTargetRate }}</span>%</div>
           </div>
         </div>
       </div>
@@ -103,6 +100,19 @@ export default {
       font-size: 14px;
       color: rgb(255 53 53 / 80%);
       background-image: url("@/assets/images/notupBg.png");
+      background-size: 100% 100%;
+      background-repeat: no-repeat;
+    }
+
+    .up {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 65px;
+      height: 21px;
+      font-size: 14px;
+      color: rgb(0 202 3 / 80%);
+      background-image: url("@/assets/images/upBg.png");
       background-size: 100% 100%;
       background-repeat: no-repeat;
     }

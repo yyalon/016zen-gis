@@ -47,10 +47,10 @@ export default {
           }
         })
 
-        this.lists[0].num = data.area.currentMonthTotal
-        this.lists[0].percent = data.area.currentMonthGoodAreaRatio
-        this.lists[0].diff = data.area.goodAreaRatioDifference
-        this.lists[0].items = data.area.provinceResults.map(item => {
+        this.lists[1].num = data.area.currentMonthTotal
+        this.lists[1].percent = data.area.currentMonthGoodAreaRatio
+        this.lists[1].diff = data.area.goodAreaRatioDifference
+        this.lists[1].items = data.area.provinceResults.map(item => {
           return {
             goal: item.target,
             diff: item.targetDifference,
@@ -79,7 +79,7 @@ export default {
             <div class="cockpit-ocean-label">
               水质优良比例
             </div>
-            <div><span class="number">{{ group.percent }}</span>%<span class="status succes">1.7%</span></div>
+            <div><span class="number">{{ group.percent }}</span>%<span :class="`status ${group.diff >= 0 ? 'succes' : 'error'}`">{{ group.diff }}%</span></div>
           </div>
           <el-divider />
           <div class="cockpit-ocean-analysis">
