@@ -15,47 +15,49 @@ export default {
 
 <template>
   <ZFrame title="近岸海域水质达标考核">
-    <div class="river-water-wrapper">
-      <div class="river-water-title">
-        <img :src="water"><span style="margin: 0 4px;">江苏：水质优良 (一、二类)比例</span><span class="notup">未达标</span>
-      </div>
-      <el-divider />
-      <div class="river-water-content">
-        <div style="width: 50%;">
-          <div class="river-water-label">
-            现状
-          </div>
-          <div><span class="number">12</span>%<span class="status succes">1.7%</span></div>
+    <div class="sea-water">
+      <div class="river-water-wrapper">
+        <div class="river-water-title">
+          <img :src="water"><span style="margin: 0 4px;">江苏：水质优良 (一、二类)比例</span><span class="notup">未达标</span>
         </div>
-        <el-divider direction="vertical" />
-        <div style="width: 25%;" />
-        <div style="width: 25%;">
-          <div class="river-water-label">
-            2025年
+        <el-divider />
+        <div class="river-water-content">
+          <div style="width: 50%;">
+            <div class="river-water-label">
+              现状
+            </div>
+            <div><span class="number">12</span>%<span class="status succes">1.7%</span></div>
           </div>
-          <div><span class="number" style="color: #cd303b;">64.6</span>%</div>
+          <el-divider direction="vertical" />
+          <div style="width: 25%;" />
+          <div style="width: 25%;">
+            <div class="river-water-label">
+              2025年
+            </div>
+            <div><span class="number" style="color: #cd303b;">64.6</span>%</div>
+          </div>
         </div>
       </div>
-    </div>
-    <div class="river-water-wrapper">
-      <div class="river-water-title">
-        <img :src="water"><span style="margin: 0 4px;">上海：水质优良 (一、二类)比例</span><span class="notup">未达标</span>
-      </div>
-      <el-divider />
-      <div class="river-water-content">
-        <div style="width: 50%;">
-          <div class="river-water-label">
-            现状
-          </div>
-          <div><span class="number">12</span>%<span class="status succes">1.7%</span></div>
+      <div class="river-water-wrapper">
+        <div class="river-water-title">
+          <img :src="water"><span style="margin: 0 4px;">上海：水质优良 (一、二类)比例</span><span class="notup">未达标</span>
         </div>
-        <el-divider direction="vertical" />
-        <div style="width: 25%;" />
-        <div style="width: 25%;">
-          <div class="river-water-label">
-            2025年
+        <el-divider />
+        <div class="river-water-content">
+          <div style="width: 50%;">
+            <div class="river-water-label">
+              现状
+            </div>
+            <div><span class="number">12</span>%<span class="status succes">1.7%</span></div>
           </div>
-          <div><span class="number" style="color: #cd303b;">18</span>%</div>
+          <el-divider direction="vertical" />
+          <div style="width: 25%;" />
+          <div style="width: 25%;">
+            <div class="river-water-label">
+              2025年
+            </div>
+            <div><span class="number" style="color: #cd303b;">18</span>%</div>
+          </div>
         </div>
       </div>
     </div>
@@ -63,15 +65,21 @@ export default {
 </template>
 
 <style lang="scss" scoped>
+  .sea-water {
+    margin-top: 24px;
+    height: 323px;
+    overflow-y: auto;
+  }
+
   .river-water-wrapper {
     width: 400px;
-    margin: 24px auto;
+    margin: 0 auto 48px;
     background-image: url("@/assets/images/waterQualityBg.png");
     background-size: 100% 100%;
     background-repeat: no-repeat;
 
-    &:not(:last-child) {
-      margin-bottom: 48px;
+    &:last-child {
+      margin-bottom: 24px;
     }
   }
 

@@ -123,10 +123,21 @@ export default {
     display: flex;
     flex-direction: column;
     align-items: center;
-    background-image: url("@/assets/images/outfallsBg.png");
     background-repeat: no-repeat;
     background-size: 100% 100%;
     text-align: center;
+
+    &:nth-child(1) {
+      background-image: url("@/assets/images/waterBodyBg1.png");
+    }
+
+    &:nth-child(2) {
+      background-image: url("@/assets/images/waterBodyBg2.png");
+    }
+
+    &:nth-child(3) {
+      background-image: url("@/assets/images/waterBodyBg3.png");
+    }
 
     &:last-child {
       position: relative;

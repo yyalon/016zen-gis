@@ -79,33 +79,23 @@ export default {
             <div class="cockpit-ocean-label">
               水质优良比例
             </div>
-            <div><span class="number">{{ group.percent }}</span>%</div>
+            <div><span class="number">{{ group.percent }}</span>%<span class="status succes">1.7%</span></div>
           </div>
           <el-divider />
           <div class="cockpit-ocean-analysis">
-            <div class="cockpit-ocean-area">
-              <div class="cockpit-ocean-label" />
-              <div v-for="(item, itemIndex) in group.items" :key="itemIndex" class="cockpit-ocean-value">
-                {{ item.text }}
-              </div>
-            </div>
-            <div class="cockpit-ocean-analysis-percent">
-              <div class="cockpit-ocean-label">
-                考核目标
-              </div>
-              <div v-for="(item, itemIndex) in group.items" :key="itemIndex" class="cockpit-ocean-value">
-                <span class="number" style="color: #f90;">{{ item.goal }}</span>%
-              </div>
-            </div>
-            <el-divider direction="vertical" />
-            <div class="cockpit-ocean-analysis-percent">
-              <div class="cockpit-ocean-label">
-                优于目标
-              </div>
-              <div v-for="(item, itemIndex) in group.items" :key="itemIndex" class="cockpit-ocean-value">
-                <span class="number" style="color: rgb(0 202 3 / 80%);">{{ item.diff }}</span>%
-              </div>
-            </div>
+            <el-table :data="group.items" :height="95" style="width: 100%;">
+              <el-table-column prop="text" width="43" />
+              <el-table-column prop="goal" align="center" label="考核目标">
+                <template #default="scope">
+                  <span class="number" style="color: #f90;">{{ scope.row.goal }}</span>%
+                </template>
+              </el-table-column>
+              <el-table-column prop="diff" align="center" label="优于目标">
+                <template #default="scope">
+                  <span class="number" style="color: rgb(0 202 3 / 80%);">{{ scope.row.diff }}</span>%
+                </template>
+              </el-table-column>
+            </el-table>
           </div>
         </div>
       </div>
@@ -115,7 +105,7 @@ export default {
 
 <style lang="scss" scoped>
 .cockpit-ocean-card {
-  margin-top: -13px;
+  margin-top: -16px;
 
   .cockpit-ocean-item {
     display: flex;
@@ -123,7 +113,7 @@ export default {
     border-radius: 4px;
 
     & + .cockpit-ocean-item {
-      margin-top: 18px;
+      margin-top: 12px;
     }
   }
 
@@ -144,6 +134,30 @@ export default {
   .cockpit-ocean-right {
     flex: 1;
     padding: 8px 8px 0;
+
+    .status {
+      position: relative;
+      margin-left: 8px;
+      padding-left: 16px;
+
+      &::before {
+        content: "";
+        position: absolute;
+        top: -2px;
+        left: 0;
+        width: 0;
+        height: 0;
+        border: 6px solid transparent;
+      }
+
+      &.succes::before {
+        border-bottom-color: rgb(0 202 3 / 80%);
+      }
+
+      &.error::before {
+        border-bottom-color: rgb(255 53 53 / 80%);
+      }
+    }
 
     ::v-deep .el-divider {
       border: 0;
@@ -172,38 +186,41 @@ export default {
   }
 
   .cockpit-ocean-analysis {
-    display: flex;
-    align-items: stretch;
+    position: relative;
+
+    &::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      right: 108px;
+      width: 1px;
+      background: linear-gradient(rgb(25 117 255 / 0%) 0%, rgb(25 117 255 / 60%) 51%, rgb(25 117 255 / 0%) 100%);
+    }
+
+    ::v-deep .el-table {
+      th.el-table__cell {
+        color: #fff;
+        padding: 0 !important;
+      }
+
+      td.el-table__cell {
+        padding-top: 4.5px !important;
+        padding-bottom: 4.5px !important;
+      }
+
+      td.el-table__cell:first-child {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+
+        .cell {
+          padding: 0;
+        }
+      }
+    }
 
     .number {
       font-size: 24px;
-    }
-
-    .cockpit-ocean-label {
-      height: 16px;
-    }
-
-    .cockpit-ocean-area {
-      width: 43px;
-    }
-
-    .cockpit-ocean-analysis-percent {
-      flex: 1;
-      text-align: center;
-
-      .cockpit-ocean-value {
-        justify-content: center;
-      }
-    }
-
-    .cockpit-ocean-value {
-      height: 24px;
-      display: flex;
-      align-items: flex-end;
-
-      & + .cockpit-ocean-value {
-        margin-top: 9px;
-      }
     }
   }
 }

@@ -40,7 +40,7 @@ export default {
     <div class="subtitle">
       监测站监测数据
     </div>
-    <el-table :data="tableData" style="width: 100%;">
+    <el-table :data="tableData" :height="313" style="width: 100%;">
       <el-table-column prop="text1" label="站点" />
       <el-table-column prop="text2" align="center" label="风速" />
       <el-table-column prop="text3" align="center" label="风向" />

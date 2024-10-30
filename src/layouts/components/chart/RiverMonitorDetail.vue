@@ -22,7 +22,7 @@ export default {
 
 <template>
   <ZFrame title="断面监测数据详情">
-    <el-table :data="tableData" style="width: 100%;">
+    <el-table :data="tableData" :height="343" style="width: 100%;">
       <el-table-column prop="text1" label="断面名称" />
       <el-table-column prop="text2" align="center" label="所属河流" />
       <el-table-column prop="text3" align="center" label="水质目标">

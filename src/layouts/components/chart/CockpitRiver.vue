@@ -61,7 +61,10 @@ export default {
               </div>
             </div>
             <div class="compliance-progress">
-              <div />
+              <div class="compliance-progress-content">
+                <div class="progress-default" />
+                <div class="progress-active" :style="{ width: `${((item.value / item.goal) * 100).toFixed(0)}%` }" />
+              </div>
             </div>
           </div>
         </div>
@@ -110,6 +113,30 @@ export default {
     height: 12px;
     background: rgb(0 163 255 / 10%);
     border: 1px solid rgb(48 131 255 / 20%);
+  }
+
+  .compliance-progress-content {
+    position: relative;
+    width: 360px;
+    height: 12px;
+  }
+
+  .progress-default {
+    width: 100%;
+    height: 12px;
+    background-image: url("@/assets/images/progress-default.jpg");
+    background-size: auto 100%;
+    background-position: top left;
+  }
+
+  .progress-active {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background-image: url("@/assets/images/progress-active.jpg");
+    background-size: auto 100%;
+    background-position: top left;
   }
 
   .cockpit-river-item:last-child {

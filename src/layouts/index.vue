@@ -454,6 +454,7 @@ export default {
       display: flex;
       justify-content: center;
       background-color: #071a3f;
+      overflow: hidden;
 
       .title {
         position: relative;

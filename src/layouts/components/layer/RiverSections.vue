@@ -127,24 +127,26 @@ export default {
         },
       ],
       trendVisible: false,
+      checkboxGroup1: '攻坚战区域',
+      radio1: '水质类别',
     }
   },
-  watch: {},
-  async mounted() {
-    eventBus.on('showtrend', () => {
-      this.trendVisible = !this.trendVisible
-    })
-    // await this.getWaterQuality()
-    await this.showLayer()
-  },
-  unmounted() {
-    _layer?.clear()
-    window.$zMap.removeLayer(_layer)
-    _layer = null
-  },
-  beforeUnmount() {
-    eventBus.off('filterparam')
-  },
+  // watch: {},
+  // async mounted() {
+  //   eventBus.on('showtrend', () => {
+  //     this.trendVisible = !this.trendVisible
+  //   })
+  //   // await this.getWaterQuality()
+  //   await this.showLayer()
+  // },
+  // unmounted() {
+  //   _layer?.clear()
+  //   window.$zMap.removeLayer(_layer)
+  //   _layer = null
+  // },
+  // beforeUnmount() {
+  //   eventBus.off('filterparam')
+  // },
   methods: {
     async filterRiverSections(value) {
       this.loadingRiverSections = true
@@ -393,38 +395,46 @@ export default {
 <template>
   <div class="work-zone">
     <div class="filters">
-      <el-tree-select
-        v-model="selectedArea"
-        :data="areas"
-        :render-after-expand="false"
-        node-key="label"
-        check-strictly
-        size="large"
-        @node-click="handleAreasClick"
-        @change="filterRiverSections"
-      />
+      <div>
+        <el-checkbox v-model="checkboxGroup1" label="攻坚战区域" border>
+          攻坚战区域
+        </el-checkbox>
 
-      <el-select v-model="river" filterable placeholder="请选择断面" size="large" @change="filterRiverSections">
-        <el-option v-for="(item, index) in rivers" :key="index" :label="item" :value="item" />
-      </el-select>
-      <el-date-picker
-        v-model="timeSlot"
-        style="background-color: #070e14; border: 1px solid #64b4ff; color: #64b4ff; box-shadow: none;"
-        size="large"
-        type="monthrange"
-        range-separator="-"
-        start-placeholder="开始月份"
-        end-placeholder="结束月份"
-        unlink-panels
-        :shortcuts="shortcuts"
-        :disabled-date="disabledDate"
-        @change="selectedTimeSlot()"
-      />
-      <el-switch v-model="estuary" style="margin-left: 10px;" active-text="入海口" @change="estuaryChange" />
+        <el-tree-select
+          v-model="selectedArea"
+          :data="areas"
+          :render-after-expand="false"
+          node-key="label"
+          check-strictly
+          @node-click="handleAreasClick"
+          @change="filterRiverSections"
+        />
+
+        <el-select v-model="river" filterable placeholder="请选择断面" @change="filterRiverSections">
+          <el-option v-for="(item, index) in rivers" :key="index" :label="item" :value="item" />
+        </el-select>
+        <el-date-picker
+          v-model="timeSlot"
+          style="background-color: rgb(0 117 255 / 80%); border: 1px solid rgb(0 117 255 / 80%); color: #fff; box-shadow: none;"
+          type="monthrange"
+          range-separator="-"
+          start-placeholder="开始月份"
+          end-placeholder="结束月份"
+          unlink-panels
+          :shortcuts="shortcuts"
+          :disabled-date="disabledDate"
+          @change="selectedTimeSlot()"
+        />
+      </div>
+      <el-radio-group v-model="radio1" is-button style="margin-top: 20px;">
+        <el-radio-button label="水质类别" />
+        <el-radio-button label="总氮" />
+      </el-radio-group>
+      <!-- <el-switch v-model="estuary" style="margin-left: 10px;" active-text="入海口" @change="estuaryChange" />
       <el-switch v-model="showList" active-text="显示列表" />
       <el-button type="primary" @click="toggleView">
         浓度趋势图
-      </el-button>
+      </el-button> -->
     </div>
     <div v-if="showList" class="river-section-list">
       <ZFrame width="100%" height="100%">

@@ -90,25 +90,66 @@ textarea {
 .filters {
   padding: 10px;
 
+  .el-checkbox {
+    position: relative;
+    top: 1px;
+    background: rgb(10 81 204 / 40%);
+    border-color: rgb(10 81 204 / 40%);
+    color: #fff;
+    margin-right: 8px;
+
+    .el-checkbox__input {
+      display: none;
+    }
+
+    .el-checkbox__label {
+      margin-left: 0;
+    }
+  }
+
+  .el-checkbox.is-bordered.is-checked {
+    border-color: rgb(0 117 255 / 80%);
+    background: rgb(0 117 255 / 80%);
+    color: #fff;
+  }
+
+  .el-checkbox__input.is-checked + .el-checkbox__label {
+    color: #fff;
+  }
+
   .el-select {
-    margin-right: 10px;
+    margin-right: 8px;
     width: 140px;
+    pointer-events: all;
 
     &:hover .el-input__wrapper {
       box-shadow: none;
-      border: 1px solid #72b3f0;
+      border: 1px solid rgb(0 117 255 / 80%);
     }
 
     .el-input__wrapper {
-      border: 1px solid #64b4ff;
-      background: #070e14;
-      color: #64b4ff;
+      border: 1px solid rgb(0 117 255 / 80%);
+      background: rgb(0 117 255 / 80%);
+      color: #fff;
       box-shadow: none;
+    }
+
+    .el-select__wrapper {
+      background: rgb(0 117 255 / 80%);
+      box-shadow: none;
+    }
+
+    .el-select__placeholder {
+      color: #fff;
+    }
+
+    .el-select__caret {
+      color: #fff;
     }
 
     .el-input__inner {
       cursor: pointer;
-      color: #64b4ff;
+      color: #fff;
     }
   }
 
@@ -117,31 +158,43 @@ textarea {
   }
 
   .el-date-editor {
+    .el-range__icon {
+      color: #fff;
+    }
+
+    .el-range-separator {
+      color: #fff;
+    }
+
+    .el-range__close-icon {
+      color: #fff;
+    }
+
     .el-input__wrapper {
-      border: 1px solid #64b4ff;
-      background: #070e14;
-      color: #64b4ff;
+      border: 1px solid rgb(0 117 255 / 80%);
+      background: rgb(0 117 255 / 80%);
+      color: #fff;
       box-shadow: none;
     }
 
     .el-input {
-      background: black;
+      background: rgb(0 117 255 / 80%);
     }
 
     .el-range-input {
       cursor: pointer;
-      color: #64b4ff;
+      color: #fff;
     }
     // #app > div.layout > div.layout-container > div.layout-body > div:nth-child(1) > div.work-zone > div.filters > div.el-date-editor.el-date-editor--monthrange.el-input__wrapper.is-active.el-range-editor.el-range-editor--large.el-tooltip__trigger.el-tooltip__trigger
 
     .el-picker-panel {
       color: #fff;
-      background: #070e14;
-      border: 1px solid #1384b4;
+      background: rgb(0 117 255 / 80%);
+      border: 1px solid rgb(0 117 255 / 80%);
 
       &:hover .el-input__wrapper {
         box-shadow: none;
-        border: 1px solid #72b3f0;
+        border: 1px solid rgb(0 117 255 / 80%);
       }
 
       .el-picker-panel__icon-btn {

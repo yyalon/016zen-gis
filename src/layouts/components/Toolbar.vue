@@ -110,7 +110,6 @@ export default {
   user-select: none;
   width: 156px;
   padding: 18px;
-  background-color: #0c0f0d;
 
   .button-grounp {
     position: relative;
