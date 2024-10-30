@@ -3,24 +3,35 @@ import ZFrame from '../ZFrame.vue'
 
 import direct3 from '@/assets/images/direct3.png'
 
+import gisData from '@/api/modules/gis'
+
 export default {
   name: 'OutfallsWaterQualityTarget',
   components: { ZFrame },
   data() {
     return {
-      lists: [
-        { type: 'I', num: 10, exceed: 3 },
-        { type: 'II', num: 40, exceed: 12 },
-        { type: 'III', num: 50, exceed: 15 },
-      ],
+      loading: false,
+      lists: [],
       direct3,
     }
+  },
+  created() {
+    this.getData()
+  },
+  methods: {
+    getData() {
+      this.loading = true
+      gisData.getOutfallGoalStats({ time: '2023-09-01' }).then((res) => {
+        this.loading = false
+        this.lists = res.data.data
+      })
+    },
   },
 }
 </script>
 
 <template>
-  <ZFrame title="受纳水体水质目标统计">
+  <ZFrame v-loading="loading" title="受纳水体水质目标统计">
     <div class="outfalls-lists">
       <div
         v-for="(group, index) in lists" :key="index"
@@ -29,13 +40,13 @@ export default {
         <div class="outfalls-title">
           <img :src="direct3">
           <div class="outfalls-type">
-            {{ group.type }}类
+            {{ group.waterQualityGoal }}
           </div>
           <div class="outfalls-percent">
-            <div class="outfalls-proportion" :style="{ width: `${group.num / lists.reduce((sum, o) => o.num + sum, 0) * 100}%` }" />
+            <div class="outfalls-proportion" :style="{ width: `${group.rate}%` }" />
             <div class="outfalls-percent-content">
-              <span>{{ group.num }}个</span>
-              <span style="font-weight: 700;">{{ group.num / lists.reduce((sum, o) => o.num + sum, 0) * 100 }}%</span>
+              <span>{{ group.count }}个</span>
+              <span style="font-weight: 700;">{{ group.rate }}%</span>
             </div>
           </div>
         </div>
@@ -45,7 +56,7 @@ export default {
               排污口总数
             </div>
             <div class="outfalls-item-value">
-              {{ group.num }}
+              {{ group.count }}
             </div>
           </div>
           <div class="outfalls-item">
@@ -53,7 +64,7 @@ export default {
               超标数量
             </div>
             <div class="outfalls-item-value">
-              {{ group.exceed }}
+              {{ group.exceeCount }}
             </div>
           </div>
           <div class="outfalls-item">
@@ -61,7 +72,7 @@ export default {
               超标占比
             </div>
             <div class="outfalls-item-value">
-              {{ group.exceed / group.num * 100 }}%
+              {{ group.exceeRate }}%
             </div>
           </div>
         </div>
@@ -73,6 +84,8 @@ export default {
 <style lang="scss" scoped>
   .outfalls-lists {
     margin-top: -22px;
+    height: 390px;
+    overflow-y: auto;
   }
 
   .outfalls-group {
@@ -97,7 +110,7 @@ export default {
       align-items: center;
       justify-content: space-between;
       position: relative;
-      width: 343px;
+      width: 320px;
       background: rgb(0 167 252 / 20%);
       padding: 11px 10px;
 

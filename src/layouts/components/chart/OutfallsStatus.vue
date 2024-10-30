@@ -3,26 +3,26 @@ import ZFrame from '../ZFrame.vue'
 import Echart from '@/lib/echart/index.vue'
 
 import direct from '@/assets/images/direct.png'
+import gisData from '@/api/modules/gis'
 
 export default {
   name: 'ChartOutfallsStatus',
   components: { ZFrame, Echart },
   data() {
     return {
+      loading: false,
       options: {
         polar: {},
-        radiusAxis: {
-          max: 250,
-        },
+        radiusAxis: {},
         angleAxis: {
           type: 'category',
-          data: ['调味品、发酵制品制造', '酒的制造', '纸制品制造', '涂料、油墨、颜料及类似', '铸造及其他金属制品制造', '砖瓦、石材等建筑材料制造', '玻璃制造', '屠宰及肉类加工', '方便食品制造', '饮料制造'],
+          data: [],
           startAngle: 90,
         },
         tooltip: {},
         series: {
           type: 'bar',
-          data: [220, 210, 120, 110, 95, 100, 60, 55, 50, 45],
+          data: [],
           coordinateSystem: 'polar',
         },
         animation: false,
@@ -31,18 +31,31 @@ export default {
       direct,
     }
   },
+  created() {
+    this.getData()
+  },
+  methods: {
+    getData() {
+      this.loading = true
+      gisData.getOutfallOverallStats({ time: '2023-09-01' }).then((res) => {
+        this.loading = false
+        this.options.angleAxis.data = res.data.chartData.industry
+        this.options.series.data = res.data.chartData.industryCount
+      })
+    },
+  },
 }
 </script>
 
 <template>
-  <ZFrame title="入海排污口统计">
+  <ZFrame v-loading="loading" title="入海排污口统计">
     <div class="outfalls-header">
       <span>攻坚战区域国控河流入海排污口</span>
       <span class="number">166</span>
     </div>
     <div class="outfalls-subtitle">
       <img :src="direct">
-      <span>责任主体（污染源）行业TOP 10统计</span>
+      <span>责任主体（污染源）行业TOP {{ options.angleAxis.data.length }}统计</span>
     </div>
     <div class="outfalls-chart">
       <Echart :options="options" height="220px" width="410px" />
