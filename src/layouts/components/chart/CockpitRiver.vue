@@ -4,6 +4,7 @@ import ZFrame from '../ZFrame.vue'
 import rain from '@/assets/images/rain.png'
 import area from '@/assets/images/area.png'
 import gisData from '@/api/modules/gis'
+import eventBus from '@/utils/eventBus'
 
 export default {
   name: 'CockpitRiver',
@@ -19,6 +20,11 @@ export default {
   },
   created() {
     this.getData()
+  },
+  mounted() {
+    eventBus.on('filterparam', (param) => {
+      console.log('filterparam:', param)
+    })
   },
   methods: {
     getData() {
