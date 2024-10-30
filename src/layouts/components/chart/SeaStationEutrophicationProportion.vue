@@ -1,12 +1,14 @@
 <script>
 import ZFrame from '../ZFrame.vue'
 import Echart from '@/lib/echart/index.vue'
+import gisData from '@/api/modules/gis'
 
 export default {
   name: 'SeaStationEutrophicationProportion',
   components: { ZFrame, Echart },
   data() {
     return {
+      loading: false,
       options: {
         color: ['#FAC01F', '#3AACFF', '#FB466C'],
         series: [
@@ -41,11 +43,23 @@ export default {
       },
     }
   },
+  created() {
+    this.getData()
+  },
+  methods: {
+    getData() {
+      this.loading = true
+      gisData.getSeaWaterEutrophication({ time: '2023-09-01' }).then((res) => {
+        this.loading = false
+        console.log('近岸海域富营养化程度占比', res)
+      })
+    },
+  },
 }
 </script>
 
 <template>
-  <ZFrame title="近岸海域富营养化程度占比">
+  <ZFrame v-loading="loading" title="近岸海域富营养化程度占比">
     <Echart :options="options" height="360px" width="410px" />
   </ZFrame>
 </template>

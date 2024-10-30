@@ -2,11 +2,14 @@
 import ZFrame from '../ZFrame.vue'
 import Echart from '@/lib/echart/index.vue'
 
+import gisData from '@/api/modules/gis'
+
 export default {
   name: 'ChartOutfallsDrainageTrend',
   components: { ZFrame, Echart },
   data() {
     return {
+      loading: false,
       options: {
         xAxis: {
           type: 'category',
@@ -30,11 +33,23 @@ export default {
       radio1: '总氮',
     }
   },
+  created() {
+    this.getData()
+  },
+  methods: {
+    getData() {
+      this.loading = true
+      gisData.getOutfallOverallStats({ time: '2023-09-01' }).then((res) => {
+        this.loading = false
+        // console.log('入海排污口排水趋势', res)
+      })
+    },
+  },
 }
 </script>
 
 <template>
-  <ZFrame title="入海排污口排水趋势">
+  <ZFrame v-loading="loading" title="入海排污口排水趋势">
     <div style="text-align: center;">
       <el-radio-group v-model="radio1" is-button>
         <el-radio-button label="排水量" />

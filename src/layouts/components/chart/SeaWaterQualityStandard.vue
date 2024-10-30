@@ -2,11 +2,13 @@
 import ZFrame from '../ZFrame.vue'
 
 import water from '@/assets/images/water.png'
+import gisData from '@/api/modules/gis'
 
 export default {
   components: { ZFrame },
   data() {
     return {
+      loading: false,
       water,
       data: [{
         province: '江苏',
@@ -29,11 +31,23 @@ export default {
       }],
     }
   },
+  created() {
+    this.getData()
+  },
+  methods: {
+    getData() {
+      this.loading = true
+      gisData.getSeaWaterQualityCompliance({ time: '2023-09-01' }).then((res) => {
+        this.loading = false
+        console.log('近岸海域水质达标考核', res)
+      })
+    },
+  },
 }
 </script>
 
 <template>
-  <ZFrame title="近岸海域水质达标考核">
+  <ZFrame v-loading="loading" title="近岸海域水质达标考核">
     <div class="sea-water">
       <div v-for="item in data" :key="item.province" class="river-water-wrapper">
         <div class="river-water-title">

@@ -2,23 +2,38 @@
 import ZFrame from '../ZFrame.vue'
 
 import water from '@/assets/images/water.png'
+import gisData from '@/api/modules/gis'
 
 export default {
   components: { ZFrame },
   data() {
     return {
+      loading: false,
       water,
+      data: {},
     }
+  },
+  created() {
+    this.getData()
+  },
+  methods: {
+    getData() {
+      this.loading = true
+      gisData.getSeaWaterStats({ time: '2023-09-01' }).then((res) => {
+        this.loading = false
+        this.data = res.data
+      })
+    },
   },
 }
 </script>
 
 <template>
-  <ZFrame title="水质现状统计分析">
+  <ZFrame v-loading="loading" title="水质现状统计分析">
     <div class="river-water-wrapper">
       <div class="river-water-title">
         <div>时间</div>
-        <div>秋季</div>
+        <div>{{ data.season }}</div>
         <div>本年累计</div>
       </div>
       <div class="river-water-item">
@@ -26,25 +41,25 @@ export default {
         <div>
           <div class="river-water-type-item">
             <span>I-II类</span>
-            <span>77.3%</span>
-            <span style="color: #0bffa2;">+8个</span>
+            <span>{{ data.area?.currentSeasonClass1And2Rate }}%</span>
+            <span :style="`color: ${data.area?.class1And2SeasonDifference >= 0 ? '#0bffa2' : '#f90'}`">{{ data.area?.class1And2SeasonDifference >= 0 ? `+${data.area?.class1And2SeasonDifference}` : data.area?.class1And2SeasonDifference }}个</span>
           </div>
           <div class="river-water-type-item">
             <span>劣IV类</span>
-            <span>0.3%</span>
-            <span style="color: #f90;">-8个</span>
+            <span>{{ data.area?.currentSeasonAboveClass4Rate }}%</span>
+            <span :style="`color: ${data.area?.aboveClass4SeasonDifference <= 0 ? '#0bffa2' : '#f90'}`">{{ data.area?.aboveClass4SeasonDifference <= 0 ? `-${Math.abs(data.area?.aboveClass4SeasonDifference)}` : `+${data.area?.aboveClass4SeasonDifference}` }}个</span>
           </div>
         </div>
         <div>
           <div class="river-water-type-item">
             <span>I-II类</span>
-            <span>77.3%</span>
-            <span style="color: #0bffa2;">+8个</span>
+            <span>{{ data.area?.currentYearClass1And2Rate }}%</span>
+            <span :style="`color: ${data.area?.class1And2YearDifference >= 0 ? '#0bffa2' : '#f90'}`">{{ data.area?.class1And2YearDifference >= 0 ? `+${data.area?.class1And2YearDifference}` : data.area?.class1And2YearDifference }}个</span>
           </div>
           <div class="river-water-type-item">
             <span>劣IV类</span>
-            <span>0.3%</span>
-            <span style="color: #f90;">-8个</span>
+            <span>{{ data.area?.currentYearAboveClass4Rate }}%</span>
+            <span :style="`color: ${data.area?.aboveClass4YearDifference <= 0 ? '#0bffa2' : '#f90'}`">{{ data.area?.aboveClass4YearDifference <= 0 ? `-${Math.abs(data.area?.aboveClass4YearDifference)}` : `+${data.area?.aboveClass4YearDifference}` }}个</span>
           </div>
         </div>
       </div>
@@ -53,25 +68,25 @@ export default {
         <div>
           <div class="river-water-type-item">
             <span>I-II类</span>
-            <span>77.3%</span>
-            <span style="color: #0bffa2;">+8个</span>
+            <span>{{ data.point?.currentSeasonClass1And2Rate }}%</span>
+            <span :style="`color: ${data.point?.class1And2SeasonDifference >= 0 ? '#0bffa2' : '#f90'}`">{{ data.point?.class1And2SeasonDifference >= 0 ? `+${data.point?.class1And2SeasonDifference}` : data.point?.class1And2SeasonDifference }}个</span>
           </div>
           <div class="river-water-type-item">
             <span>劣IV类</span>
-            <span>0.3%</span>
-            <span style="color: #f90;">-8个</span>
+            <span>{{ data.point?.currentSeasonAboveClass4Rate }}%</span>
+            <span :style="`color: ${data.point?.aboveClass4SeasonDifference <= 0 ? '#0bffa2' : '#f90'}`">{{ data.point?.aboveClass4SeasonDifference <= 0 ? `-${Math.abs(data.point?.aboveClass4SeasonDifference)}` : `+${data.point?.aboveClass4SeasonDifference}` }}个</span>
           </div>
         </div>
         <div>
           <div class="river-water-type-item">
             <span>I-II类</span>
-            <span>77.3%</span>
-            <span style="color: #0bffa2;">+8个</span>
+            <span>{{ data.point?.currentYearClass1And2Rate }}%</span>
+            <span :style="`color: ${data.point?.class1And2YearDifference >= 0 ? '#0bffa2' : '#f90'}`">{{ data.point?.class1And2YearDifference >= 0 ? `+${data.point?.class1And2YearDifference}` : data.point?.class1And2YearDifference }}个</span>
           </div>
           <div class="river-water-type-item">
             <span>劣IV类</span>
-            <span>0.3%</span>
-            <span style="color: #f90;">-8个</span>
+            <span>{{ data.point?.currentYearAboveClass4Rate }}%</span>
+            <span :style="`color: ${data.point?.aboveClass4YearDifference <= 0 ? '#0bffa2' : '#f90'}`">{{ data.point?.aboveClass4YearDifference <= 0 ? `-${Math.abs(data.point?.aboveClass4YearDifference)}` : `+${data.point?.aboveClass4YearDifference}` }}个</span>
           </div>
         </div>
       </div>
