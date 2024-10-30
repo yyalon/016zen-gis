@@ -119,6 +119,8 @@ export interface WaterQualityDetail {
   waterChange: number // 变化差值
   lastMotnType: string // 上月水质类型
   lat: string // 维度
+  color: string // 水质对应颜色
+  targetColor: string // 目标水质颜色
 }
 
 /**
@@ -173,7 +175,7 @@ export interface SeaWaterQualityCompliance {
     year2020ComplianceRate: number
     targetComplianceRate: number
     isCompliance: boolean
-  }[]
+  }
 }
 
 /**

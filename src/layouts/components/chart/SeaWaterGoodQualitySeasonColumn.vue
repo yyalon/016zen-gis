@@ -1,6 +1,8 @@
-<script>
+<script lang="ts">
 import ZFrame from '../ZFrame.vue'
+import gisData from '@/api/modules/gis'
 import Echart from '@/lib/echart/index.vue'
+import type { SeaWaterQualityTrend } from '@/api/modules/resultTypes'
 
 const seas = {
   all: { value: 'all', label: '所有海域', name: '所有海域', short: '所有' },
@@ -65,9 +67,7 @@ export default {
         xAxis: [
           {
             type: 'category',
-            data: arySeasons.map((key) => {
-              return seasons[key]
-            }),
+            data: [],
           },
         ],
         yAxis: [
@@ -76,76 +76,73 @@ export default {
             name: '%',
             max: 100,
           },
+          {
+            type: 'value',
+            name: '%',
+            max: 100,
+            min: -100,
+          },
         ],
         series: [{
-          name: '同比变化',
+          name: '环比',
           type: 'line',
+          yAxisIndex: 1,
           tooltip: {
             valueFormatter(value) {
               return `${value}%`
             },
           },
           data: [],
-        }].concat(aryYears.map((year) => {
-          return {
-            name: year,
-            type: 'bar',
-            barWidth: '8px',
-            tooltip: {
-              valueFormatter(value) {
-                return `${value}%`
-              },
+        }, {
+          name: '上年同期',
+          type: 'bar',
+          tooltip: {
+            valueFormatter(value) {
+              return `${value}%`
             },
-            data: arySeasons.map((key) => {
-              return 0
-            }),
-          }
-        })),
+          },
+          data: [],
+        }, {
+          name: '本年度',
+          type: 'bar',
+          tooltip: {
+            valueFormatter(value) {
+              return `${value}%`
+            },
+          },
+          data: [],
+        }],
         color: ['#36FF00', '#FFF200', '#00C8FF'],
       },
     }
   },
   watch: {
-    chartData: {
+    /* chartData: {
+      loading: false,
       deep: true,
       immediate: true,
       handler() {
         this.update()
       },
-    },
+    }, */
+  },
+  created() {
+    this.getData()
   },
   methods: {
-    update() {
+    update(data: SeaWaterQualityTrend) {
+      this.options.xAxis[0].data = data.seasons
+      this.options.series[0].data = data.waterQualityQoqChanges
+      this.options.series[1].data = data.waterQualityYoYChanges
+      this.options.series[2].data = data.waterQualityComplianceRates
+    },
+    getData() {
       this.loading = true
-      console.log('this.chartData.areas', this.chartData.areas)
-      if (this.chartData.areas) {
-        aryYears.forEach((year, yearIndex) => {
-          const sums = {}
-          arySeasons.forEach((season) => {
-            const name = `wq-${year}-${season}`
-            let sumGood = 0 // 单个省份海域的良好水质面积
-            let sumWhole = 0 // 单个省份海域的总面积
-            if (this.chartData.areas[name]) {
-              for (const key in this.chartData.areas[name]) {
-                const areas = this.chartData.areas[name][key] || []
-                areas.forEach((item) => {
-                  if (item.value === 1 || item.value === 2) {
-                    sumGood += item.area
-                  }
-                  sumWhole += item.area
-                })
-              }
-            }
 
-            sums[season] = ((sumGood / sumWhole) * 100).toFixed(1)
-          })
-
-          this.options.series[yearIndex + 1].data = arySeasons.map((key) => {
-            return sums[key]
-          })
-        })
-        this.options.series[0].data = this.options.series[2].data.map((value, idx) => (value - this.options.series[1].data[idx]).toFixed(1))
-      }
+      gisData.getSeaWaterQualityTrend({ }).then(({ data }) => {
+        this.loading = false
+        this.update(data)
+      })
     },
   },
 }

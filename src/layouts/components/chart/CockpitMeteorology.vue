@@ -19,7 +19,6 @@ export default {
       this.loading = true
       gisData.getMeteorology({ time: '2023-09-01' }).then(({ data }) => {
         this.loading = false
-        console.log(data)
         this.tableData = data.map(item => {
           return {
             text1: item.stationName,

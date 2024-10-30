@@ -1,5 +1,6 @@
-<script>
+<script lang="ts">
 import ZFrame from '../ZFrame.vue'
+import gisData from '@/api/modules/gis'
 import Echart from '@/lib/echart/index.vue'
 
 export default {
@@ -7,6 +8,7 @@ export default {
   components: { ZFrame, Echart },
   data() {
     return {
+      loading: false,
       options: {
         color: ['#FAC01F', '#3AACFF', '#FB466C'],
         series: [
@@ -14,11 +16,7 @@ export default {
             name: '富营养化程度占比',
             type: 'pie',
             radius: '50%',
-            data: [
-              { value: 16, name: '中度' },
-              { value: 48, name: '轻度' },
-              { value: 34, name: '重度' },
-            ],
+            data: [],
             label: {
               show: true,
               position: 'outside',
@@ -40,6 +38,27 @@ export default {
         ],
       },
     }
+  },
+  created() {
+    this.getData()
+  },
+  methods: {
+    getData() {
+      this.loading = true
+      gisData.getSeaWaterEutrophication({ time: '2024-08' }).then(({ data }) => {
+        this.loading = false
+        this.options.color = data.color
+        for (let i = 0; i < data.names.length; i++) {
+          const name = data.names[i]
+          const num = data.data[i]
+          this.options.series[0].data.push({
+            value: num, name,
+          })
+        }
+
+        console.log('getSeaWaterEutrophication', this.options)
+      })
+    },
   },
 }
 </script>

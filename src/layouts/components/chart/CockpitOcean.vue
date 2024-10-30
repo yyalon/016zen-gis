@@ -34,7 +34,6 @@ export default {
     getData() {
       this.loading = true
       gisData.getSeaWaterOverall({ time: '2023-07-01' }).then(({ data }) => {
-        console.log(data)
         this.loading = false
         this.lists[0].num = data.point.currentMonthTotal
         this.lists[0].percent = data.point.currentMonthGoodAreaRatio
