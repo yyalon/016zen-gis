@@ -48,6 +48,12 @@ export default {
             name: '%',
             max: 100,
           },
+          {
+            type: 'value',
+            name: '%',
+            max: 100,
+            min: -100,
+          },
         ],
         series: [
           {
@@ -55,7 +61,7 @@ export default {
             type: 'line',
             tooltip: {
               valueFormatter(value) {
-                return `${value}%`
+                return typeof value !== 'number' ? '-' : `${value}%`
               },
             },
             data: [],
@@ -66,7 +72,7 @@ export default {
             barWidth: '8px',
             tooltip: {
               valueFormatter(value) {
-                return `${value}%`
+                return typeof value !== 'number' ? '-' : `${value}%`
               },
             },
             data: [],
@@ -77,7 +83,7 @@ export default {
             barWidth: '8px',
             tooltip: {
               valueFormatter(value) {
-                return `${value}%`
+                return typeof value !== 'number' ? '-' : `${value}%`
               },
             },
             data: [],

@@ -76,13 +76,19 @@ export default {
             name: '%',
             max: 100,
           },
+          {
+            type: 'value',
+            name: '%',
+            max: 100,
+            min: -100,
+          },
         ],
         series: [{
           name: '环比',
           type: 'line',
           tooltip: {
             valueFormatter(value) {
-              return `${value}%`
+              return typeof value !== 'number' ? '-' : `${value}%`
             },
           },
           data: [],
@@ -91,7 +97,7 @@ export default {
           type: 'bar',
           tooltip: {
             valueFormatter(value) {
-              return `${value}%`
+              return typeof value !== 'number' ? '-' : `${value}%`
             },
           },
           data: [],
@@ -100,7 +106,7 @@ export default {
           type: 'bar',
           tooltip: {
             valueFormatter(value) {
-              return `${value}%`
+              return typeof value !== 'number' ? '-' : `${value}%`
             },
           },
           data: [],
@@ -143,6 +149,6 @@ export default {
 
 <template>
   <ZFrame title="近岸海域优良水质面积变化趋势" :loading="loading">
-    <Echart :options="options" height="100%" width="100%" @on-finished="loading = flase" />
+    <Echart :options="options" height="360px" width="410px" @on-finished="loading = flase" />
   </ZFrame>
 </template>

@@ -11,16 +11,6 @@ export default {
       loading: false,
       options: {
         color: ['#FAC01F', '#3AACFF', '#FB466C'],
-        tooltip: {
-          trigger: 'item',
-          formatter(param) {
-            return `${param.name} (${param.percent}%)<br> ${param.value}`
-          },
-          // formatter: '{a} <br/>{b} : {c} ({d}%)',
-          textStyle: {
-            fontSize: 16,
-          },
-        },
         series: [
           {
             name: '富营养化程度占比',
