@@ -34,8 +34,8 @@ export default {
     <div class="river-water-wrapper">
       <div class="river-water-title">
         <img :src="water"><span style="margin: 0 4px;">达到攻坚战水质要求</span>
-        <span :class="data.complianceRate === data.complianceRate ? 'up' : 'notup'">
-          {{ data.complianceRate === data.complianceRate ? '已达标' : '未达标' }}
+        <span :class="data.complianceRate >= data.complianceTargetRate ? 'up' : 'notup'">
+          {{ data.complianceRate >= data.complianceTargetRate ? '已达标' : '未达标' }}
         </span>
       </div>
       <el-divider />
@@ -72,8 +72,8 @@ export default {
     <div class="river-water-wrapper">
       <div class="river-water-title">
         <img :src="water"><span style="margin: 0 4px;">劣V类比例</span>
-        <span :class="data.poorRate === data.poorTargetRate ? 'up' : 'notup'">
-          {{ data.poorRate === data.poorTargetRate ? '已达标' : '未达标' }}
+        <span :class="data.poorRate <= data.poorTargetRate ? 'up' : 'notup'">
+          {{ data.poorRate <= data.poorTargetRate ? '已达标' : '未达标' }}
         </span>
       </div>
       <el-divider />

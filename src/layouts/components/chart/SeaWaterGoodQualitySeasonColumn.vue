@@ -76,17 +76,10 @@ export default {
             name: '%',
             max: 100,
           },
-          {
-            type: 'value',
-            name: '%',
-            max: 100,
-            min: -100,
-          },
         ],
         series: [{
           name: '环比',
           type: 'line',
-          yAxisIndex: 1,
           tooltip: {
             valueFormatter(value) {
               return `${value}%`

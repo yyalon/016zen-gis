@@ -10,10 +10,7 @@ export default {
   components: { ZFrame },
   data() {
     return {
-      lists: [
-        { text: '东海区', goal: 0, value: 0, time: '' },
-        { text: '攻坚战区域', goal: 0, value: 0, time: '' },
-      ],
+      lists: [],
       loading: false,
       area,
       rain,
@@ -28,13 +25,8 @@ export default {
       this.loading = true
       gisData.getRiverOverall({ time: '2023-09-01' }).then((res) => {
         this.loading = false
-        this.lists[0].goal = res.data.sea.sectionCount
-        this.lists[0].value = res.data.sea.qualifyCount
-        this.lists[0].time = res.data.sea.time
-
-        this.lists[1].goal = res.data.battle.sectionCount
-        this.lists[1].value = res.data.battle.qualifyCount
-        this.lists[1].time = res.data.battle.time
+        this.lists[0] = { ...res.data.sea, text: '东海区' }
+        this.lists[1] = { ...res.data.battle, text: '攻坚战区域' }
       })
     },
   },
@@ -48,22 +40,22 @@ export default {
         <div class="cockpit-river-title">
           <div><img :src="area" style="vertical-align: middle;">{{ item.text }}</div>
           <div>
-            <span class="number">{{ item.value }}</span>条III类及以上
+            <span class="number">{{ item.qualifyCount }}</span>条III类及以上
           </div>
         </div>
         <div class="cockpit-river-content">
-          <div>{{ item.time }}，共监测{{ item.goal }}个断面，其中达到考核目标水质的断面{{ item.value }}个，达标率{{ ((item.value / item.goal) * 100).toFixed(0) }}%</div>
+          <div>{{ item.time }}，共监测{{ item.sectionCount }}个断面，其中达到考核目标水质的断面{{ item.qualifyCount }}个，达标率{{ item.qualifyRate }}%</div>
           <div class="compliance">
             <div class="compliance-title">
               <div><img :src="rain" style="vertical-align: middle;">水质达标率</div>
               <div>
-                <span class="number">{{ ((item.value / item.goal) * 100).toFixed(0) }}</span> %
+                <span class="number">{{ item.qualifyRate }}</span> %
               </div>
             </div>
             <div class="compliance-progress">
               <div class="compliance-progress-content">
                 <div class="progress-default" />
-                <div class="progress-active" :style="{ width: `${((item.value / item.goal) * 100).toFixed(0)}%` }" />
+                <div class="progress-active" :style="{ width: `${item.qualifyRate}%` }" />
               </div>
             </div>
           </div>

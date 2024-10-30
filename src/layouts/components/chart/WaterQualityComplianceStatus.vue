@@ -1,7 +1,7 @@
 <script>
 import ZFrame from '../ZFrame.vue'
 import Echart from '@/lib/echart/index.vue'
-import ApiData from '@/api/modules/data'
+import gisData from '@/api/modules/gis'
 import eventBus from '@/utils/eventBus'
 
 export default {
@@ -112,34 +112,17 @@ export default {
     },
     async getData(param) {
       this.loading = true
-      const res = await ApiData.getRiverSectionOverall(param)
+      const res = await gisData.getWaterQualityTrend(param)
       // res.data = []
-      // console.log('getRiverSectionOverall:', res)
+      // console.log('getWaterQualityTrend:', res)
       if (res && res.code === 1000) {
-        const data = []
-        res.data.forEach((e) => {
-          const key = `${e.WQ_INF_YEAR}-${e.WQ_INF_MONTH}`
-          const index = data.findIndex((o) => o.key === key)
-          if (index === -1) {
-            data.push({
-              ...e,
-              key,
-              [e.result]: e.value,
-            })
-          }
-          else {
-            data[index][e.result] = e.value
-            data[index].value = Number(data[index].value) + Number(e.value)
-          }
-        })
-        data.sort((a, b) => {
-          return new Date(a.key) - new Date(b.key)
-        })
-        this.options.xAxis[0].data = data.map(e => e.key)
-        this.options.series[0].data = data.map(e => ((e['达标'] - e['不达标']) / e.value * 100).toFixed(0))
-        this.options.series[1].data = data.map(e => (e['不达标'] / e.value * 100).toFixed(0))
-        this.options.series[2].data = data.map(e => (e['达标'] / e.value * 100).toFixed(0))
-        // this.options.xAxis[1].data = data1.map((e) => e.WQ_INF_YEAR)
+        this.options.xAxis[0].data = res.data.months
+        this.options.series[0].data = res.data.waterQualityYoYChanges
+        this.options.series[1].data = res.data.waterQualityNonComplianceRates
+        this.options.series[2].data = res.data.waterQualityComplianceRates
+        // this.options.series[0].data = res.data.totalNitrogenYoYChanges
+        // this.options.series[1].data = res.data.totalNitrogenNonComplianceRates
+        // this.options.series[2].data = res.data.totalNitrogenComplianceRates
         this.visible = true
       }
       this.visible = true

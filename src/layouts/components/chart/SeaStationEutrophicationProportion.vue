@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
 import ZFrame from '../ZFrame.vue'
 import gisData from '@/api/modules/gis'
 import Echart from '@/lib/echart/index.vue'
@@ -11,6 +11,16 @@ export default {
       loading: false,
       options: {
         color: ['#FAC01F', '#3AACFF', '#FB466C'],
+        tooltip: {
+          trigger: 'item',
+          formatter(param) {
+            return `${param.name} (${param.percent}%)<br> ${param.value}`
+          },
+          // formatter: '{a} <br/>{b} : {c} ({d}%)',
+          textStyle: {
+            fontSize: 16,
+          },
+        },
         series: [
           {
             name: '富营养化程度占比',
@@ -22,7 +32,7 @@ export default {
               position: 'outside',
               fontSize: 12,
               formatter(param) {
-                return `${param.name} (${parseInt(param.percent)}%)`
+                return `${param.name} (${param.percent}%)`
               },
               color: 'white',
             },
@@ -48,15 +58,7 @@ export default {
       gisData.getSeaWaterEutrophication({ time: '2024-08' }).then(({ data }) => {
         this.loading = false
         this.options.color = data.color
-        for (let i = 0; i < data.names.length; i++) {
-          const name = data.names[i]
-          const num = data.data[i]
-          this.options.series[0].data.push({
-            value: num, name,
-          })
-        }
-
-        console.log('getSeaWaterEutrophication', this.options)
+        this.options.series[0].data = data.names.map((name, index) => ({ value: data.data[index], name }))
       })
     },
   },

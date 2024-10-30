@@ -19,15 +19,7 @@ export default {
       this.loading = true
       gisData.getAirStation({ time: '2023-09-01' }).then(({ data }) => {
         this.loading = false
-        this.tableData = data.map(item => {
-          return {
-            text1: item.stationName,
-            text2: item.AQI,
-            text3: item.quality,
-            text4: item.primaryPollutant,
-            color: item.color,
-          }
-        })
+        this.tableData = data
       })
     },
   },
@@ -40,16 +32,16 @@ export default {
       监测站监测数据
     </div>
     <el-table :data="tableData" :height="313" style="width: 100%;">
-      <el-table-column prop="text1" label="站点" />
-      <el-table-column prop="text2" align="center" label="AQI" />
-      <el-table-column prop="text3" align="center" label="空气质量等级">
+      <el-table-column prop="stationName" label="站点" />
+      <el-table-column prop="AQI" align="center" label="AQI" />
+      <el-table-column prop="quality" align="center" label="空气质量等级">
         <template #default="scope">
-          <el-tag color="#F9D000" :style="{ color: '#000', ...scope.row.color, border: 0 }">
-            {{ scope.row.text3 }}
+          <el-tag :color="scope.row.color" style="color: #fff; border: 0;">
+            {{ scope.row.quality }}
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="text4" align="center" label="首要污染物" />
+      <el-table-column prop="primaryPollutant" align="center" label="首要污染物" />
     </el-table>
   </ZFrame>
 </template>

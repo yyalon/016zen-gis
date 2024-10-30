@@ -19,15 +19,7 @@ export default {
       this.loading = true
       gisData.getMeteorology({ time: '2023-09-01' }).then(({ data }) => {
         this.loading = false
-        this.tableData = data.map(item => {
-          return {
-            text1: item.stationName,
-            text2: item.winSpeed,
-            text3: item.winDirection,
-            color: '',
-            text4: item.RHU,
-          }
-        })
+        this.tableData = data
       })
     },
   },
@@ -40,10 +32,10 @@ export default {
       监测站监测数据
     </div>
     <el-table :data="tableData" :height="313" style="width: 100%;">
-      <el-table-column prop="text1" label="站点" />
-      <el-table-column prop="text2" align="center" label="风速" />
-      <el-table-column prop="text3" align="center" label="风向" />
-      <el-table-column prop="text4" align="center" label="湿度" />
+      <el-table-column prop="stationName" label="站点" />
+      <el-table-column prop="winSpeed" align="center" label="风速" />
+      <el-table-column prop="winDirection" align="center" label="风向" />
+      <el-table-column prop="RHU" align="center" label="湿度" />
     </el-table>
   </ZFrame>
 </template>

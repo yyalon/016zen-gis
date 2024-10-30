@@ -2,49 +2,65 @@
 import ZFrame from '../ZFrame.vue'
 
 import water from '@/assets/images/water.png'
+import gisData from '@/api/modules/gis'
 
 export default {
   components: { ZFrame },
   data() {
     return {
       water,
+      loading: false,
+      data: {},
     }
+  },
+  created() {
+    this.getData()
+  },
+  methods: {
+    getData() {
+      this.loading = true
+      gisData.getWaterYoyProportion({ time: '2023-09-01' }).then((res) => {
+        this.loading = false
+        this.data = res.data
+        console.log('水质现状统计分析', res.data)
+      })
+    },
   },
 }
 </script>
 
 <template>
-  <ZFrame title="水质现状统计分析">
+  <ZFrame v-loading="loading" title="水质现状统计分析">
     <div class="river-water-wrapper">
       <div class="river-water-title">
         <div>时间</div>
-        <div>9月</div>
-        <div>1-9月</div>
+        <div>{{ data?.seaYoyProportion?.header?.[0] || data?.battleYoyProportion?.header?.[0] }}</div>
+        <div>{{ data?.seaYoyProportion?.header?.[1] || data?.battleYoyProportion?.header?.[1] }}</div>
       </div>
       <div class="river-water-item">
         <div>东海区域</div>
         <div>
           <div class="river-water-type-item">
             <span>I-III类</span>
-            <span>77.3%</span>
-            <span style="color: #0bffa2;">+8个</span>
+            <span>{{ data?.seaYoyProportion?.data?.good?.[0]?.currrentMon }}%</span>
+            <span :style="`color: ${data?.seaYoyProportion?.data?.good?.[0]?.yoyRate >= 0 ? '#0bffa2' : '#f90'}`">{{ data?.seaYoyProportion?.data?.good?.[0]?.yoyRate >= 0 ? `+${data?.seaYoyProportion?.data?.good?.[0]?.yoyRate}` : data?.seaYoyProportion?.data?.good?.[0]?.yoyRate }}%</span>
           </div>
           <div class="river-water-type-item">
             <span>劣V类</span>
-            <span>0.3%</span>
-            <span style="color: #f90;">-8个</span>
+            <span>{{ data?.seaYoyProportion?.data?.poor?.[0]?.currrentMon }}%</span>
+            <span :style="`color: ${data?.seaYoyProportion?.data?.poor?.[0]?.yoyRate <= 0 ? '#0bffa2' : '#f90'}`">{{ data?.seaYoyProportion?.data?.poor?.[0]?.yoyRate >= 0 ? `+${data?.seaYoyProportion?.data?.poor?.[0]?.yoyRate}` : data?.seaYoyProportion?.data?.poor?.[0]?.yoyRate }}%</span>
           </div>
         </div>
         <div>
           <div class="river-water-type-item">
             <span>I-III类</span>
-            <span>77.3%</span>
-            <span style="color: #0bffa2;">+8个</span>
+            <span>{{ data?.seaYoyProportion?.data?.good?.[1]?.currrentMon }}%</span>
+            <span :style="`color: ${data?.seaYoyProportion?.data?.good?.[1]?.yoyRate >= 0 ? '#0bffa2' : '#f90'}`">{{ data?.seaYoyProportion?.data?.good?.[1]?.yoyRate >= 0 ? `+${data?.seaYoyProportion?.data?.good?.[1]?.yoyRate}` : data?.seaYoyProportion?.data?.good?.[1]?.yoyRate }}%</span>
           </div>
           <div class="river-water-type-item">
             <span>劣V类</span>
-            <span>0.3%</span>
-            <span style="color: #f90;">-8个</span>
+            <span>{{ data?.seaYoyProportion?.data?.poor?.[1]?.currrentMon }}%</span>
+            <span :style="`color: ${data?.seaYoyProportion?.data?.poor?.[1]?.yoyRate <= 0 ? '#0bffa2' : '#f90'}`">{{ data?.seaYoyProportion?.data?.poor?.[1]?.yoyRate >= 0 ? `+${data?.seaYoyProportion?.data?.poor?.[1]?.yoyRate}` : data?.seaYoyProportion?.data?.poor?.[1]?.yoyRate }}%</span>
           </div>
         </div>
       </div>
@@ -53,25 +69,25 @@ export default {
         <div>
           <div class="river-water-type-item">
             <span>I-III类</span>
-            <span>77.3%</span>
-            <span style="color: #0bffa2;">+8个</span>
+            <span>{{ data?.battleYoyProportion?.data?.good?.[0]?.currrentMon }}%</span>
+            <span :style="`color: ${data?.battleYoyProportion?.data?.good?.[0]?.yoyRate >= 0 ? '#0bffa2' : '#f90'}`">{{ data?.battleYoyProportion?.data?.good?.[0]?.yoyRate >= 0 ? `+${data?.battleYoyProportion?.data?.good?.[0]?.yoyRate}` : data?.battleYoyProportion?.data?.good?.[0]?.yoyRate }}%</span>
           </div>
           <div class="river-water-type-item">
             <span>劣V类</span>
-            <span>0.3%</span>
-            <span style="color: #f90;">-8个</span>
+            <span>{{ data?.battleYoyProportion?.data?.poor?.[0]?.currrentMon }}%</span>
+            <span :style="`color: ${data?.battleYoyProportion?.data?.poor?.[0]?.yoyRate <= 0 ? '#0bffa2' : '#f90'}`">{{ data?.battleYoyProportion?.data?.poor?.[0]?.yoyRate >= 0 ? `+${data?.battleYoyProportion?.data?.poor?.[0]?.yoyRate}` : data?.battleYoyProportion?.data?.poor?.[0]?.yoyRate }}%</span>
           </div>
         </div>
         <div>
           <div class="river-water-type-item">
             <span>I-III类</span>
-            <span>77.3%</span>
-            <span style="color: #0bffa2;">+8个</span>
+            <span>{{ data?.battleYoyProportion?.data?.good?.[1]?.currrentMon }}%</span>
+            <span :style="`color: ${data?.battleYoyProportion?.data?.good?.[1]?.yoyRate >= 0 ? '#0bffa2' : '#f90'}`">{{ data?.battleYoyProportion?.data?.good?.[1]?.yoyRate >= 0 ? `+${data?.battleYoyProportion?.data?.good?.[1]?.yoyRate}` : data?.battleYoyProportion?.data?.good?.[1]?.yoyRate }}%</span>
           </div>
           <div class="river-water-type-item">
             <span>劣V类</span>
-            <span>0.3%</span>
-            <span style="color: #f90;">-8个</span>
+            <span>{{ data?.battleYoyProportion?.data?.poor?.[1]?.currrentMon }}%</span>
+            <span :style="`color: ${data?.battleYoyProportion?.data?.poor?.[1]?.yoyRate <= 0 ? '#0bffa2' : '#f90'}`">{{ data?.battleYoyProportion?.data?.poor?.[1]?.yoyRate >= 0 ? `+${data?.battleYoyProportion?.data?.poor?.[1]?.yoyRate}` : data?.battleYoyProportion?.data?.poor?.[1]?.yoyRate }}%</span>
           </div>
         </div>
       </div>

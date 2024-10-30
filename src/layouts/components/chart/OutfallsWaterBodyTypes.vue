@@ -33,7 +33,7 @@ export default {
               position: 'outside',
               fontSize: 12,
               formatter(param) {
-                return `${param.name} (${parseInt(param.percent)}%)`
+                return `${param.name} (${param.percent}%)`
               },
               color: 'white',
             },
