@@ -1,6 +1,7 @@
 <script>
 import ZFrame from '../ZFrame.vue'
 import gisData from '@/api/modules/gis'
+import eventBus from '@/utils/eventBus'
 
 export default {
   name: 'CockpitMeteorology',
@@ -9,15 +10,22 @@ export default {
     return {
       loading: false,
       tableData: [],
+      param: {},
     }
   },
-  created() {
-    this.getData()
+  mounted() {
+    eventBus.on('filterparam', (param) => {
+      this.param = param
+      this.getData(param)
+    })
+  },
+  beforeUnmount() {
+    eventBus.off('filterparam')
   },
   methods: {
-    getData() {
+    getData(param) {
       this.loading = true
-      gisData.getMeteorology({ time: '2023-09-01' }).then(({ data }) => {
+      gisData.getMeteorology(param).then(({ data }) => {
         this.loading = false
         this.tableData = data
       })

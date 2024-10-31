@@ -90,33 +90,6 @@ textarea {
 .filters {
   padding: 10px;
 
-  .el-checkbox {
-    position: relative;
-    top: 1px;
-    background: rgb(10 81 204 / 40%);
-    border-color: rgb(10 81 204 / 40%);
-    color: #fff;
-    margin-right: 8px;
-
-    .el-checkbox__input {
-      display: none;
-    }
-
-    .el-checkbox__label {
-      margin-left: 0;
-    }
-  }
-
-  .el-checkbox.is-bordered.is-checked {
-    border-color: rgb(0 117 255 / 80%);
-    background: rgb(0 117 255 / 80%);
-    color: #fff;
-  }
-
-  .el-checkbox__input.is-checked + .el-checkbox__label {
-    color: #fff;
-  }
-
   .el-select {
     margin-right: 8px;
     width: 140px;
@@ -158,6 +131,20 @@ textarea {
   }
 
   .el-date-editor {
+    width: 140px;
+
+    .el-input__prefix {
+      color: #fff;
+    }
+
+    .el-input__inner {
+      color: #fff;
+    }
+
+    .el-input__suffix {
+      color: #fff;
+    }
+
     .el-range__icon {
       color: #fff;
     }

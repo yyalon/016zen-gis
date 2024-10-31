@@ -3,6 +3,7 @@ import ZFrame from '../ZFrame.vue'
 
 import water from '@/assets/images/water.png'
 import gisData from '@/api/modules/gis'
+import eventBus from '@/utils/eventBus'
 
 export default {
   components: { ZFrame },
@@ -11,18 +12,24 @@ export default {
       water,
       loading: false,
       data: {},
+      param: {},
     }
   },
-  created() {
-    this.getData()
+  mounted() {
+    eventBus.on('filterparam', (param) => {
+      this.param = param
+      this.getData(param)
+    })
+  },
+  beforeUnmount() {
+    eventBus.off('filterparam')
   },
   methods: {
-    getData() {
+    getData(param) {
       this.loading = true
-      gisData.getWaterYoyProportion({ time: '2023-09-01' }).then((res) => {
+      gisData.getWaterYoyProportion(param).then((res) => {
         this.loading = false
         this.data = res.data
-        console.log('水质现状统计分析', res.data)
       })
     },
   },

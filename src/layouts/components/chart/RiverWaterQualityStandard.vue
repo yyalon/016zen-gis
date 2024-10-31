@@ -3,6 +3,7 @@ import ZFrame from '../ZFrame.vue'
 
 import water from '@/assets/images/water.png'
 import gisData from '@/api/modules/gis'
+import eventBus from '@/utils/eventBus'
 import type { WaterQualityComplianceResult } from '@/api/modules/resultTypes'
 
 export default {
@@ -12,15 +13,22 @@ export default {
       loading: false,
       water,
       data: {} as WaterQualityComplianceResult,
+      param: {},
     }
   },
-  created() {
-    this.getData()
+  mounted() {
+    eventBus.on('filterparam', (param) => {
+      this.param = param
+      this.getData(param)
+    })
+  },
+  beforeUnmount() {
+    eventBus.off('filterparam')
   },
   methods: {
-    getData() {
+    getData(param) {
       this.loading = true
-      gisData.getWaterQualityComplianceResult({ time: '2023-09-01' }).then(({ data }) => {
+      gisData.getWaterQualityComplianceResult(param).then(({ data }) => {
         this.loading = false
         this.data = data
       })
@@ -30,10 +38,10 @@ export default {
 </script>
 
 <template>
-  <ZFrame title="河流水质达标考核">
+  <ZFrame v-loading="loading" title="河流水质达标考核">
     <div class="river-water-wrapper">
       <div class="river-water-title">
-        <img :src="water"><span style="margin: 0 4px;">达到攻坚战水质要求</span>
+        <img :src="water"><span style="margin: 0 4px;">达到{{ param?.area }}水质要求</span>
         <span :class="data.complianceRate >= data.complianceTargetRate ? 'up' : 'notup'">
           {{ data.complianceRate >= data.complianceTargetRate ? '已达标' : '未达标' }}
         </span>

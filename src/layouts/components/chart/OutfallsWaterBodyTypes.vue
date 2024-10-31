@@ -3,6 +3,7 @@ import ZFrame from '../ZFrame.vue'
 import Echart from '@/lib/echart/index.vue'
 
 import gisData from '@/api/modules/gis'
+import eventBus from '@/utils/eventBus'
 
 export default {
   name: 'ChartOutfallsWaterBodyTypes',
@@ -48,18 +49,24 @@ export default {
           },
         ],
       },
+      param: {},
     }
   },
-  created() {
-    this.getData()
+  mounted() {
+    eventBus.on('filterparam', (param) => {
+      this.param = param
+      this.getData(param)
+    })
+  },
+  beforeUnmount() {
+    eventBus.off('filterparam')
   },
   methods: {
-    getData() {
+    getData(param) {
       this.loading = true
-      gisData.getOutfallTypeStats({ time: '2023-09-01' }).then((res) => {
+      gisData.getOutfallTypeStats(param).then((res) => {
         this.loading = false
         this.options.series[0].data = res.data.chartData.type.map((type, index) => ({ value: res.data.chartData.typeCount[index], name: type }))
-        console.log('受纳水体排口类型统计', res)
       })
     },
   },

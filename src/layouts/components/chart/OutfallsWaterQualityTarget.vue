@@ -4,6 +4,7 @@ import ZFrame from '../ZFrame.vue'
 import direct3 from '@/assets/images/direct3.png'
 
 import gisData from '@/api/modules/gis'
+import eventBus from '@/utils/eventBus'
 
 export default {
   name: 'OutfallsWaterQualityTarget',
@@ -13,15 +14,22 @@ export default {
       loading: false,
       lists: [],
       direct3,
+      param: {},
     }
   },
-  created() {
-    this.getData()
+  mounted() {
+    eventBus.on('filterparam', (param) => {
+      this.param = param
+      this.getData(param)
+    })
+  },
+  beforeUnmount() {
+    eventBus.off('filterparam')
   },
   methods: {
-    getData() {
+    getData(param) {
       this.loading = true
-      gisData.getOutfallGoalStats({ time: '2023-09-01' }).then((res) => {
+      gisData.getOutfallGoalStats(param).then((res) => {
         this.loading = false
         this.lists = res.data.data
       })

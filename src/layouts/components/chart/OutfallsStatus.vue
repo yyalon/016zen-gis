@@ -4,6 +4,7 @@ import Echart from '@/lib/echart/index.vue'
 
 import direct from '@/assets/images/direct.png'
 import gisData from '@/api/modules/gis'
+import eventBus from '@/utils/eventBus'
 
 export default {
   name: 'ChartOutfallsStatus',
@@ -29,16 +30,27 @@ export default {
         color: '#fff',
       },
       direct,
+      param: {},
+      count: 0,
+      name: '攻坚战区域国控河流入海排污口',
     }
   },
-  created() {
-    this.getData()
+  mounted() {
+    eventBus.on('filterparam', (param) => {
+      this.param = param
+      this.getData(param)
+    })
+  },
+  beforeUnmount() {
+    eventBus.off('filterparam')
   },
   methods: {
-    getData() {
+    getData(param) {
       this.loading = true
-      gisData.getOutfallOverallStats({ time: '2023-09-01' }).then((res) => {
+      gisData.getOutfallOverallStats(param).then((res) => {
         this.loading = false
+        this.name = res.data.name
+        this.count = res.data.count
         this.options.angleAxis.data = res.data.chartData.industry
         this.options.series.data = res.data.chartData.industryCount
       })
@@ -50,8 +62,8 @@ export default {
 <template>
   <ZFrame v-loading="loading" title="入海排污口统计">
     <div class="outfalls-header">
-      <span>攻坚战区域国控河流入海排污口</span>
-      <span class="number">166</span>
+      <span>{{ name }}</span>
+      <span class="number">{{ count }}</span>
     </div>
     <div class="outfalls-subtitle">
       <img :src="direct">

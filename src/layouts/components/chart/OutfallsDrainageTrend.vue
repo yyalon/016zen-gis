@@ -3,6 +3,7 @@ import ZFrame from '../ZFrame.vue'
 import Echart from '@/lib/echart/index.vue'
 
 import gisData from '@/api/modules/gis'
+import eventBus from '@/utils/eventBus'
 
 export default {
   name: 'ChartOutfallsDrainageTrend',
@@ -31,15 +32,22 @@ export default {
         color: '#237804',
       },
       radio1: '总氮',
+      param: {},
     }
   },
-  created() {
-    this.getData()
+  mounted() {
+    eventBus.on('filterparam', (param) => {
+      this.param = param
+      this.getData(param)
+    })
+  },
+  beforeUnmount() {
+    eventBus.off('filterparam')
   },
   methods: {
-    getData() {
+    getData(param) {
       this.loading = true
-      gisData.getOutfallOverallStats({ time: '2023-09-01' }).then((res) => {
+      gisData.getOutfallOverallStats(param).then((res) => {
         this.loading = false
         // console.log('入海排污口排水趋势', res)
       })

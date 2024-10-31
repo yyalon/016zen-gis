@@ -3,6 +3,7 @@ import autofit from 'autofit.js'
 import dayjs from 'dayjs'
 import { area, intersect } from '@turf/turf'
 
+import LayerRiverSections from './components/layer/RiverSections.vue'
 import LayerRivers from './components/layer/Rivers.vue'
 import LayerControlUnit from './components/layer/ControlUnit.vue'
 import LayerSeaShanghai from './components/layer/SeaShanghai.vue'
@@ -52,6 +53,7 @@ export default {
     LayerRivers,
     GraphMeteorology,
     Toolbar,
+    LayerRiverSections,
   },
   data() {
     return {
@@ -403,6 +405,7 @@ export default {
         </GraphSwitcher>
       </div>
       <div class="layout-body">
+        <LayerRiverSections v-if="activeGraph !== 'ocean'" />
         <GraphCockpit :visible="activeGraph === 'cockpit'" />
         <GraphRiver :visible="activeGraph === 'river'" />
         <GraphOutfall :visible="activeGraph === 'outfall'" />

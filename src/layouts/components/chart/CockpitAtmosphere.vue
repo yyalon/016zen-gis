@@ -1,6 +1,7 @@
 <script>
 import ZFrame from '../ZFrame.vue'
 import gisData from '@/api/modules/gis'
+import eventBus from '@/utils/eventBus'
 
 export default {
   name: 'CockpitAtmosphere',
@@ -9,15 +10,22 @@ export default {
     return {
       loading: false,
       tableData: [],
+      param: {},
     }
   },
-  created() {
-    this.getData()
+  mounted() {
+    eventBus.on('filterparam', (param) => {
+      this.param = param
+      this.getData(param)
+    })
+  },
+  beforeUnmount() {
+    eventBus.off('filterparam')
   },
   methods: {
-    getData() {
+    getData(param) {
       this.loading = true
-      gisData.getAirStation({ time: '2023-09-01' }).then(({ data }) => {
+      gisData.getAirStation(param).then(({ data }) => {
         this.loading = false
         this.tableData = data
       })
@@ -27,7 +35,7 @@ export default {
 </script>
 
 <template>
-  <ZFrame title="大气实况">
+  <ZFrame v-loading="loading" title="大气实况">
     <div class="subtitle">
       监测站监测数据
     </div>

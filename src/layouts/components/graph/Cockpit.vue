@@ -5,7 +5,6 @@ import CockpitRiver from '../chart/CockpitRiver.vue'
 import CockpitAtmosphere from '../chart/CockpitAtmosphere.vue'
 import CockpitOcean from '../chart/CockpitOcean.vue'
 import CockpitMeteorology from '../chart/CockpitMeteorology.vue'
-import LayerRiverSections from '../layer/RiverSections.vue'
 
 export default {
   components: {
@@ -15,7 +14,6 @@ export default {
     CockpitAtmosphere,
     CockpitOcean,
     CockpitMeteorology,
-    LayerRiverSections,
   },
   props: {
     visible: {
@@ -28,7 +26,6 @@ export default {
 
 <template>
   <div>
-    <LayerRiverSections v-if="visible" />
     <LeftDrawer :drawer-visible="visible">
       <CockpitRiver />
       <CockpitAtmosphere />

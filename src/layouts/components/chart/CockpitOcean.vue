@@ -1,6 +1,7 @@
 <script>
 import ZFrame from '../ZFrame.vue'
 import gisData from '@/api/modules/gis'
+import eventBus from '@/utils/eventBus'
 
 export default {
   name: 'CockpitOcean',
@@ -25,15 +26,22 @@ export default {
           items: [{ goal: 0, diff: 0, text: '' }, { goal: 0, diff: 0, text: '' }],
         },
       ],
+      param: {},
     }
   },
-  created() {
-    this.getData()
+  mounted() {
+    eventBus.on('filterparam', (param) => {
+      this.param = param
+      this.getData(param)
+    })
+  },
+  beforeUnmount() {
+    eventBus.off('filterparam')
   },
   methods: {
-    getData() {
+    getData(param) {
       this.loading = true
-      gisData.getSeaWaterOverall({ time: '2023-07-01' }).then(({ data }) => {
+      gisData.getSeaWaterOverall(param).then(({ data }) => {
         this.loading = false
         this.lists[0].num = data.point.currentMonthTotal
         this.lists[0].percent = data.point.currentMonthGoodAreaRatio

@@ -1,4 +1,5 @@
 <script>
+import dayjs from 'dayjs'
 import DrawerRiverSection from '../drawer/RiverSection.vue'
 import PopupRiverSection from '../popup/RiverSection.vue'
 import ZFrame from '../ZFrame.vue'
@@ -82,14 +83,14 @@ export default {
   emits: ['filterparam'],
   data() {
     const end = new Date()
-    const start = new Date()
-    start.setMonth(start.getMonth() - 12)
+    end.setDate(1)
+    end.setMonth(end.getMonth() - 1)
 
     return {
       loadingRiverSections: false,
       areas: areas.filter((zone) => ['全部', '上海市', '浙江省', '江苏省'].includes(zone.label)),
       estuary: false,
-      selectedArea: '',
+      selectedArea: '全部',
       selectedAreaNode: null,
       riverSections: [],
       filteredRiverSections: [],
@@ -98,55 +99,31 @@ export default {
       watersheds: [],
       watershed: '',
       rivers: [],
-      river: '',
+      river: '全部',
       columns,
       showList: false,
-      timeSlot: ref([start, end]),
-      shortcuts: [
-        {
-          text: '本月',
-          value: [new Date(), new Date()],
-        },
-        {
-          text: '最近半年',
-          value: () => {
-            const end = new Date()
-            const start = new Date()
-            start.setMonth(start.getMonth() - 6)
-            return [start, end]
-          },
-        },
-        {
-          text: '最近一年',
-          value: () => {
-            const end = new Date()
-            const start = new Date()
-            start.setMonth(start.getMonth() - 12)
-            return [start, end]
-          },
-        },
-      ],
+      timeSlot: end,
       trendVisible: false,
-      checkboxGroup1: '攻坚战区域',
-      radio1: '水质类别',
+      area: '东海区',
+      radio1: '水质',
     }
   },
-  // watch: {},
-  // async mounted() {
-  //   eventBus.on('showtrend', () => {
-  //     this.trendVisible = !this.trendVisible
-  //   })
-  //   // await this.getWaterQuality()
-  //   await this.showLayer()
-  // },
-  // unmounted() {
-  //   _layer?.clear()
-  //   window.$zMap.removeLayer(_layer)
-  //   _layer = null
-  // },
-  // beforeUnmount() {
-  //   eventBus.off('filterparam')
-  // },
+  watch: {},
+  async mounted() {
+    eventBus.on('showtrend', () => {
+      this.trendVisible = !this.trendVisible
+    })
+    // await this.getWaterQuality()
+    await this.showLayer()
+  },
+  unmounted() {
+    _layer?.clear()
+    window.$zMap.removeLayer(_layer)
+    _layer = null
+  },
+  beforeUnmount() {
+    eventBus.off('filterparam')
+  },
   methods: {
     async filterRiverSections(value) {
       this.loadingRiverSections = true
@@ -325,23 +302,21 @@ export default {
         city = this.selectedArea
         province = this.selectedAreaNode.parent.data.label
       }
+      const area = this.area === '东海区' ? '' : this.area
       const river = this.river === '全部' ? '' : this.river
       eventBus.emit('filterparam', {
+        area,
         dm_name: river,
         city,
         province,
-        timeSlot: {
-          start: this.timeSlot[0],
-          startYear: this.timeSlot[0].getFullYear().toString(),
-          startMon: (this.timeSlot[0].getMonth() + 1).toString().padStart(2, 0),
-          end: this.timeSlot[1],
-          endYear: this.timeSlot[1].getFullYear().toString(),
-          endMon: (this.timeSlot[1].getMonth() + 1).toString().padStart(2, 0),
-        },
+        time: dayjs(this.timeSlot).format('YYYY-MM-DD'),
       })
     },
     disabledDate(time) {
-      return time.getTime() > Date.now()
+      const end = new Date()
+      end.setDate(1)
+      end.setMonth(end.getMonth() - 1)
+      return time.getTime() > end.getTime()
     },
 
     handleAreasClick(node, curentNode) {
@@ -396,9 +371,10 @@ export default {
   <div class="work-zone">
     <div class="filters">
       <div>
-        <el-checkbox v-model="checkboxGroup1" label="攻坚战区域" border>
-          攻坚战区域
-        </el-checkbox>
+        <el-select v-model="area" @change="selectedTimeSlot()">
+          <el-option label="东海区" value="东海区" />
+          <el-option label="攻坚战区域" value="攻坚战" />
+        </el-select>
 
         <el-tree-select
           v-model="selectedArea"
@@ -416,19 +392,14 @@ export default {
         <el-date-picker
           v-model="timeSlot"
           style="background-color: rgb(0 117 255 / 80%); border: 1px solid rgb(0 117 255 / 80%); color: #fff; box-shadow: none;"
-          type="monthrange"
-          range-separator="-"
-          start-placeholder="开始月份"
-          end-placeholder="结束月份"
-          unlink-panels
-          :shortcuts="shortcuts"
+          type="month"
           :disabled-date="disabledDate"
           @change="selectedTimeSlot()"
         />
       </div>
       <el-radio-group v-model="radio1" is-button style="margin-top: 20px;">
-        <el-radio-button label="水质类别" />
-        <el-radio-button label="总氮" />
+        <el-radio-button label="水质类别" value="水质" />
+        <el-radio-button label="总氮" value="总氮" />
       </el-radio-group>
       <!-- <el-switch v-model="estuary" style="margin-left: 10px;" active-text="入海口" @change="estuaryChange" />
       <el-switch v-model="showList" active-text="显示列表" />

@@ -15,21 +15,22 @@ export default {
       loading: false,
       area,
       rain,
-      time: '',
+      param: {},
     }
   },
-  created() {
-    this.getData()
-  },
-  mounted() {
+  async mounted() {
     eventBus.on('filterparam', (param) => {
-      console.log('filterparam:', param)
+      this.param = param
+      this.getData(param)
     })
   },
+  beforeUnmount() {
+    eventBus.off('filterparam')
+  },
   methods: {
-    getData() {
+    getData(param) {
       this.loading = true
-      gisData.getRiverOverall({ time: '2023-09-01' }).then((res) => {
+      gisData.getRiverOverall(param).then((res) => {
         this.loading = false
         this.lists[0] = { ...res.data.sea, text: '东海区' }
         this.lists[1] = { ...res.data.battle, text: '攻坚战区域' }
