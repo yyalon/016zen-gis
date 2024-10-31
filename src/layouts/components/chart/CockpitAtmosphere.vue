@@ -17,10 +17,11 @@ export default {
     eventBus.on('filterparam', (param) => {
       this.param = param
       this.getData(param)
+      console.log('大气实况', param)
     })
   },
   beforeUnmount() {
-    eventBus.off('filterparam')
+    // eventBus.off('filterparam')
   },
   methods: {
     getData(param) {

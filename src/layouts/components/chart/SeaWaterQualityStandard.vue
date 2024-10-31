@@ -2,6 +2,7 @@
 import ZFrame from '../ZFrame.vue'
 import gisData from '@/api/modules/gis'
 import water from '@/assets/images/water.png'
+import eventBus from '@/utils/eventBus'
 
 export default {
   components: { ZFrame },
@@ -15,10 +16,19 @@ export default {
   created() {
     this.getData()
   },
+  async mounted() {
+    eventBus.on('refreshSeaWaterQualityChart', (param) => {
+      this.param = param
+      this.getData(param)
+    })
+  },
+  beforeUnmount() {
+    eventBus.off('refreshSeaWaterQualityChart')
+  },
   methods: {
-    getData() {
+    getData(param) {
       this.loading = true
-      gisData.getSeaWaterQualityCompliance({ time: '2022-11-01' }).then(({ data }) => {
+      gisData.getSeaWaterQualityCompliance(param).then(({ data }) => {
         this.loading = false
         this.data = data.map((item) => {
           return {
@@ -63,6 +73,9 @@ export default {
             </div>
           </div>
         </div>
+      </div>
+      <div v-if="data.length === 0">
+        暂无数据
       </div>
     </div>
   </ZFrame>

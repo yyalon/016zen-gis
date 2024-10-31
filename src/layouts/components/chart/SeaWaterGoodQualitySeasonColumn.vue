@@ -1,8 +1,8 @@
-<script lang="ts">
+<script>
 import ZFrame from '../ZFrame.vue'
 import gisData from '@/api/modules/gis'
 import Echart from '@/lib/echart/index.vue'
-import type { SeaWaterQualityTrend } from '@/api/modules/resultTypes'
+import eventBus from '@/utils/eventBus'
 
 const seas = {
   all: { value: 'all', label: '所有海域', name: '所有海域', short: '所有' },
@@ -24,11 +24,6 @@ const legend = {
   3: { color: '#ff9900', label: '中度' },
   4: { color: '#ff0000', label: '重度' },
 }
-
-const arySeasons = ['spring', 'summer', 'autumn', 'average']
-const arySeas = ['shanghai', 'jiangsu', 'zhejiang', 'all']
-// const aryYears = [2019, 2020, 2021, 2022, 2023]
-const aryYears = [2021, 2022]
 
 export default {
   components: { ZFrame, Echart },
@@ -115,32 +110,27 @@ export default {
       },
     }
   },
-  watch: {
-    /* chartData: {
-      loading: false,
-      deep: true,
-      immediate: true,
-      handler() {
-        this.update()
-      },
-    }, */
-  },
   created() {
     this.getData()
   },
+  async mounted() {
+    eventBus.on('refreshSeaWaterQualityChart', (param) => {
+      this.getData(param)
+    })
+  },
+  beforeUnmount() {
+    eventBus.off('refreshSeaWaterQualityChart')
+  },
   methods: {
-    update(data: SeaWaterQualityTrend) {
-      this.options.xAxis[0].data = data.seasons
-      this.options.series[0].data = data.waterQualityQoqChanges
-      this.options.series[1].data = data.waterQualityYoYChanges
-      this.options.series[2].data = data.waterQualityComplianceRates
-    },
-    getData() {
+    getData(param) {
       this.loading = true
 
-      gisData.getSeaWaterQualityTrend({ }).then(({ data }) => {
+      gisData.getSeaWaterQualityTrend(param).then(({ data }) => {
         this.loading = false
-        this.update(data)
+        this.options.xAxis[0].data = data.seasons
+        this.options.series[0].data = data.waterQualityQoqChanges
+        this.options.series[1].data = data.waterQualityYoYChanges
+        this.options.series[2].data = data.waterQualityComplianceRates
       })
     },
   },

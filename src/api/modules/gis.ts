@@ -1,5 +1,5 @@
 import api from '../index'
-import type { GeneralQuery, RegionQuery } from './queryTypes'
+import type { GeneralQuery, RegionQuery, SeaWaterQuery } from './queryTypes'
 import type {
   AirStation,
   Meteorology,
@@ -118,26 +118,26 @@ export default {
    * @param query
    * @returns
    */
-  getSeaWaterQualityCompliance: (query: GeneralQuery): Promise<OperationResult<SeaWaterQualityCompliance[]>> => api.post('/app/data/gis-data/sea-compliance', query),
+  getSeaWaterQualityCompliance: (query: SeaWaterQuery): Promise<OperationResult<SeaWaterQualityCompliance[]>> => api.post('/app/data/gis-data/sea-compliance', query),
 
   /**
    * 近岸海域-水质现状分析（左下）
    * @param query
    * @returns
    */
-  getSeaWaterStats: (query: GeneralQuery): Promise<OperationResult<SeaWaterStats>> => api.post('/app/data/gis-data/sea-stats', query),
+  getSeaWaterStats: (query: SeaWaterQuery): Promise<OperationResult<SeaWaterStats>> => api.post('/app/data/gis-data/sea-stats', query),
 
   /**
    * 近岸海域-近岸水域面积变化趋势(右上)
    * @param query
    * @returns
    */
-  getSeaWaterQualityTrend: (query: GeneralQuery): Promise<OperationResult<SeaWaterQualityTrend>> => api.post('/app/data/gis-data/sea-water-trend', query),
+  getSeaWaterQualityTrend: (query: SeaWaterQuery): Promise<OperationResult<SeaWaterQualityTrend>> => api.post('/app/data/gis-data/sea-water-trend', query),
 
   /**
    * 近岸海域-富营养化（右下）
    * @param query
    * @returns
    */
-  getSeaWaterEutrophication: (query: GeneralQuery): Promise<OperationResult<SeaWaterEutrophication>> => api.post('/app/data/gis-data/sea-water-e', query),
+  getSeaWaterEutrophication: (query: SeaWaterQuery): Promise<OperationResult<SeaWaterEutrophication>> => api.post('/app/data/gis-data/sea-water-e', query),
 }

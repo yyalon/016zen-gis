@@ -2,6 +2,7 @@
 import ZFrame from '../ZFrame.vue'
 import gisData from '@/api/modules/gis'
 import Echart from '@/lib/echart/index.vue'
+import eventBus from '@/utils/eventBus'
 
 export default {
   name: 'SeaStationEutrophicationProportion',
@@ -42,10 +43,18 @@ export default {
   created() {
     this.getData()
   },
+  async mounted() {
+    eventBus.on('refreshSeaWaterQualityChart', (param) => {
+      this.getData(param)
+    })
+  },
+  beforeUnmount() {
+    eventBus.off('refreshSeaWaterQualityChart')
+  },
   methods: {
-    getData() {
+    getData(param) {
       this.loading = true
-      gisData.getSeaWaterEutrophication({ time: '2024-08' }).then(({ data }) => {
+      gisData.getSeaWaterEutrophication(param).then(({ data }) => {
         this.loading = false
         this.options.color = data.color
         this.options.series[0].data = data.names.map((name, index) => ({ value: data.data[index], name }))

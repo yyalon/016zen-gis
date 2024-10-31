@@ -3,6 +3,7 @@ import ZFrame from '../ZFrame.vue'
 import gisData from '@/api/modules/gis'
 import type { SeaWaterStats } from '@/api/modules/resultTypes'
 import water from '@/assets/images/water.png'
+import eventBus from '@/utils/eventBus'
 
 export default {
   components: { ZFrame },
@@ -38,10 +39,18 @@ export default {
   created() {
     this.getData()
   },
+  async mounted() {
+    eventBus.on('refreshSeaWaterQualityChart', (param) => {
+      this.getData(param)
+    })
+  },
+  beforeUnmount() {
+    eventBus.off('refreshSeaWaterQualityChart')
+  },
   methods: {
-    getData() {
+    getData(param?: any) {
       this.loading = true
-      gisData.getSeaWaterStats({ time: '2022-11-01' }).then(({ data }) => {
+      gisData.getSeaWaterStats(param).then(({ data }) => {
         this.loading = false
         this.data = data
       })

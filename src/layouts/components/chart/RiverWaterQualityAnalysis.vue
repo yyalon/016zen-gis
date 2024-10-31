@@ -22,7 +22,7 @@ export default {
     })
   },
   beforeUnmount() {
-    eventBus.off('filterparam')
+    // eventBus.off('filterparam')
   },
   methods: {
     getData(param) {

@@ -90,7 +90,7 @@ export default {
     // }
   },
   beforeUnmount() {
-    eventBus.off('filterparam')
+    // eventBus.off('filterparam')
   },
   methods: {
     async getData(param) {

@@ -14,3 +14,12 @@ export interface GeneralQuery {
 export interface RegionQuery {
   area: string // 攻坚战 或者 东海区
 }
+
+/**
+ * 近岸海域查询对象
+ */
+export interface SeaWaterQuery {
+  province?: string// 省份
+  year?: string// 年份
+  season: string// 季节
+}

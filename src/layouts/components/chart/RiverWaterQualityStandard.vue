@@ -13,7 +13,7 @@ export default {
       loading: false,
       water,
       data: {} as WaterQualityComplianceResult,
-      param: {},
+      param: {} as any,
     }
   },
   mounted() {
@@ -23,10 +23,10 @@ export default {
     })
   },
   beforeUnmount() {
-    eventBus.off('filterparam')
+    // eventBus.off('filterparam')
   },
   methods: {
-    getData(param) {
+    getData(param?: any) {
       this.loading = true
       gisData.getWaterQualityComplianceResult(param).then(({ data }) => {
         this.loading = false
