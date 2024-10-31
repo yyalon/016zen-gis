@@ -2,8 +2,16 @@
  * 行政区域返回值
  */
 export interface ProvinceCityTree {
-  province: string // 省份名称
-  citys: string[] // 城市列表
+  province: string
+  citys: {
+    name: string
+    riverSections: RiverSectionItem
+  }[]
+}
+
+export interface RiverSectionItem {
+  name: string
+  code: string
 }
 
 /**
