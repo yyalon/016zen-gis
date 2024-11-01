@@ -1,0 +1,197 @@
+<script>
+import dayjs from 'dayjs'
+import RiverWater from './RiverWater.vue'
+import eventBus from '@/utils/eventBus'
+import apiData from '@/api/modules/data'
+import areas from '@/utils/area.json'
+
+const _layer = null
+
+export default {
+  components: { RiverWater },
+  props: {
+    activeGraph: {
+      type: String,
+      default: 'cockpit',
+    },
+  },
+  emits: ['filterparam'],
+  data() {
+    const end = new Date()
+    end.setDate(1)
+    end.setMonth(end.getMonth() - 1)
+
+    return {
+      areas: areas.filter((zone) => ['全部', '上海市', '浙江省', '江苏省'].includes(zone.label)),
+      selectedArea: '全部',
+      selectedAreaNode: null,
+      riverSections: [],
+      filteredRiverSections: [],
+      rivers: [],
+      river: '全部',
+      timeSlot: end,
+      area: '东海区',
+      radio1: '水质',
+    }
+  },
+  watch: {
+    activeGraph: {
+      immediate: true,
+      handler(n) {
+        if (n === 'outfall') {
+          this.river = '全部'
+          this.radio1 = '水质'
+        }
+      },
+    },
+  },
+  async created() {
+    await this.getData()
+  },
+  beforeUnmount() {
+    eventBus.off('filterparam')
+  },
+  methods: {
+    async filterRiverSections() {
+      this.filteredRiverSections = []
+
+      let city = ''
+      let province = ''
+      if (this.selectedAreaNode?.level === 1) {
+        city = ''
+        province = this.selectedArea === '全部' ? '' : this.selectedArea
+      }
+      else if (this.selectedAreaNode?.level === 2) {
+        city = this.selectedArea
+        province = this.selectedAreaNode.parent.data.label
+      }
+      this.riverSections.forEach((section) => {
+        let _qualitied = true
+        if ((province && province !== section.atProvince)
+          || (city && city !== section.atCity)
+        ) {
+          _qualitied = false
+        }
+        if (_qualitied) {
+          this.filteredRiverSections.push(section)
+        }
+      })
+
+      const code = this.selectedArea === '全部' ? '' : this.selectedAreaNode?.data?.code
+      this.rivers = ['全部']
+      this.filteredRiverSections.forEach((riverSection) => {
+        if (!this.rivers.includes(riverSection.name) && (!code || riverSection.code.startsWith(code))) {
+          this.rivers.push(riverSection.name)
+        }
+      })
+      this.sendRiverFilterParam()
+    },
+    async getData() {
+      const res = await apiData.getWaterQuality()
+      if (res && res.code === 1000) {
+        this.riverSections = res.data
+      }
+
+      const allRivers = await apiData.getRiverSections()
+      if (res && res.code === 1000) {
+        this.riverSections = this.riverSections.concat(allRivers.data)
+      }
+
+      this.filterRiverSections()
+    },
+    sendRiverFilterParam() {
+      let city = ''
+      let province = ''
+      if (this.selectedAreaNode?.level === 1) {
+        city = ''
+        province = this.selectedArea === '全部' ? '' : this.selectedArea
+      }
+      else if (this.selectedAreaNode?.level === 2) {
+        city = this.selectedArea
+        province = this.selectedAreaNode.parent.data.label
+      }
+      const area = this.area === '东海区' ? '' : this.area
+      const river = this.river === '全部' ? '' : this.river
+      eventBus.emit('filterparam', {
+        area,
+        dm_name: river,
+        city,
+        province,
+        time: dayjs(this.timeSlot).format('YYYY-MM-DD'),
+      })
+    },
+    disabledDate(time) {
+      const end = new Date()
+      end.setDate(1)
+      end.setMonth(end.getMonth() - 1)
+      return time.getTime() > end.getTime()
+    },
+    handleAreasClick(node, curentNode) {
+      this.selectedAreaNode = curentNode
+      this.river = '全部'
+    },
+  },
+}
+</script>
+
+<template>
+  <div class="work-zone">
+    <div class="filters">
+      <div>
+        <el-select v-model="area" @change="filterRiverSections">
+          <el-option label="东海区" value="东海区" />
+          <el-option label="攻坚战区域" value="攻坚战" />
+        </el-select>
+
+        <el-tree-select
+          v-model="selectedArea"
+          :data="areas"
+          :render-after-expand="false"
+          node-key="label"
+          check-strictly
+          @node-click="handleAreasClick"
+          @change="filterRiverSections"
+        />
+
+        <el-select v-if="activeGraph !== 'outfall'" v-model="river" placeholder="请选择断面" @change="sendRiverFilterParam">
+          <el-option v-for="(item, index) in rivers" :key="index" :label="item" :value="item" />
+        </el-select>
+        <el-date-picker
+          v-model="timeSlot"
+          style="background-color: rgb(0 117 255 / 80%); border: 1px solid rgb(0 117 255 / 80%); color: #fff; box-shadow: none;"
+          type="month"
+          :clearable="false"
+          :disabled-date="disabledDate"
+          @change="sendRiverFilterParam"
+        />
+      </div>
+      <el-radio-group v-if="activeGraph !== 'outfall'" v-model="radio1" is-button style="margin-top: 20px;">
+        <el-radio-button label="水质类别" value="水质" />
+        <el-radio-button label="总氮" value="总氮" />
+      </el-radio-group>
+    </div>
+    <RiverWater v-if="activeGraph !== 'outfall'" />
+  </div>
+</template>
+
+<style lang="scss" scoped>
+.el-date-picker {
+  :deep .el-input__inner {
+    background-color: transparent !important;
+    border-color: #80ffff;
+    box-shadow: 1px 1px 5px 1px rgb(128 255 255 / 80%) inset;
+  }
+}
+
+.work-zone {
+  position: absolute;
+  top: 0;
+  left: 512px;
+  width: calc(100% - 1024px);
+  display: flex;
+
+  .filters {
+    pointer-events: all;
+  }
+}
+</style>
