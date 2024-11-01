@@ -130,6 +130,15 @@ export default {
       this.selectedAreaNode = curentNode
       this.river = '全部'
     },
+    selectRiver() {
+      const river = this.river === '全部' ? '' : this.river
+      const bounds = L.latLngBounds(this.filteredRiverSections.filter((section) => !river || river === section.name).map((section) => ([section.latitude, section.longitude])))
+      window.$zMap.flyToBounds(bounds, {
+        padding: [80, 80],
+        duration: 5,
+      })
+      this.sendRiverFilterParam()
+    },
   },
 }
 </script>
@@ -153,7 +162,7 @@ export default {
           @change="filterRiverSections"
         />
 
-        <el-select v-if="activeGraph !== 'outfall'" v-model="river" placeholder="请选择断面" @change="sendRiverFilterParam">
+        <el-select v-if="activeGraph !== 'outfall'" v-model="river" placeholder="请选择断面" @change="selectRiver">
           <el-option v-for="(item, index) in rivers" :key="index" :label="item" :value="item" />
         </el-select>
         <el-date-picker
