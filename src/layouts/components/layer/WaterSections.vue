@@ -129,6 +129,14 @@ export default {
     handleAreasClick(node, curentNode) {
       this.selectedAreaNode = curentNode
       this.river = '全部'
+
+      const code = node.code.replace(/^0+$/, '')
+      if (code) {
+        this.showLayer(code)
+      }
+      else {
+        window.$zMap.flyHome()
+      }
     },
     selectRiver() {
       const river = this.river === '全部' ? '' : this.river
@@ -138,6 +146,58 @@ export default {
         duration: 5,
       })
       this.sendRiverFilterParam()
+    },
+    showLayer(code) {
+      const _layer = window.$zMap.getLayerById(code)
+      if (!_layer) {
+        const _layer = new window.$ZMap.layer.GeoJsonLayer({
+          id: code,
+          zIndex: 2000,
+          name: code,
+          url: `/geojson/${code}.geojson`,
+          symbol: {
+            styleOptions: {
+              fillColor: '#3388ff',
+              fillOpacity: 0.2,
+              outline: true,
+              outlineColor: '#3388ff',
+              outlineOpacity: 0.5,
+              outlineWidth: 2,
+            },
+          },
+        })
+
+        window.$zMap.addLayer(_layer)
+        _layer.on(window.$ZMap.EventType.load, (e) => {
+          e.graphics.forEach((graphic) => {
+            if (graphic.center && graphic.attr && graphic.attr.name) {
+              const label = new window.$ZMap.graphic.Label({
+                latlng: graphic.center,
+                style: {
+                  text: graphic.attr.name,
+                  color: '#ffffff',
+                  font_size: 12,
+                  font_family: '楷体',
+                  border: true,
+                  border_width: 1,
+                  border_style: '',
+                  border_color: '#000000',
+                  className: 'label-name',
+                },
+              })
+              _layer.addGraphic(label)
+            }
+          })
+          setTimeout(() => {
+            _layer.show = true
+
+            window.$zMap.fitBounds(_layer.getBounds(), { padding: [40, 40], duration: 5 })
+          }, 500)
+        })
+      }
+      else {
+        window.$zMap.fitBounds(_layer.getBounds(), { padding: [40, 40], duration: 5 })
+      }
     },
   },
 }
