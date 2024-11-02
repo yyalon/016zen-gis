@@ -13,12 +13,19 @@ export default {
       loading: false,
       data: {},
       param: {},
+      waterQualityDimension: '水质',
     }
   },
   mounted() {
     eventBus.on('filterparam', (param) => {
       this.param = param
       this.getData(param)
+    })
+
+    eventBus.on('waterQualityDimension', (param) => {
+      if (param && param.waterQualityDimension) {
+        this.waterQualityDimension = param.waterQualityDimension
+      }
     })
   },
   beforeUnmount() {
@@ -38,7 +45,68 @@ export default {
 
 <template>
   <ZFrame v-loading="loading" title="水质现状统计分析">
-    <div class="river-water-wrapper">
+    <div v-if="waterQualityDimension === '总氮'" class="river-water-wrapper">
+      <div class="river-water-title">
+        <div>时间</div>
+        <div>{{ data?.seaYoyProportion?.header?.[0] || data?.battleYoyProportion?.header?.[0] }}</div>
+        <div>{{ data?.seaYoyProportion?.header?.[1] || data?.battleYoyProportion?.header?.[1] }}</div>
+      </div>
+      <div class="river-water-item">
+        <div>东海区域</div>
+        <div>
+          <div class="river-water-type-item">
+            <span>达标</span>
+            <span>{{ data?.seaYoyProportion?.data?.good?.[0]?.currrentTnMon }}%</span>
+            <span :style="`color: ${data?.seaYoyProportion?.data?.good?.[0]?.yoyTnRate >= 0 ? '#0bffa2' : '#f90'}`">{{ data?.seaYoyProportion?.data?.good?.[0]?.yoyTnRate >= 0 ? `+${data?.seaYoyProportion?.data?.good?.[0]?.yoyTnRate}` : data?.seaYoyProportion?.data?.good?.[0]?.yoyTnRate }}%</span>
+          </div>
+          <div class="river-water-type-item">
+            <span>不达标</span>
+            <span>{{ data?.seaYoyProportion?.data?.poor?.[0]?.currrentTnMon }}%</span>
+            <span :style="`color: ${data?.seaYoyProportion?.data?.poor?.[0]?.yoyTnRate <= 0 ? '#0bffa2' : '#f90'}`">{{ data?.seaYoyProportion?.data?.poor?.[0]?.yoyTnRate >= 0 ? `+${data?.seaYoyProportion?.data?.poor?.[0]?.yoyTnRate}` : data?.seaYoyProportion?.data?.poor?.[0]?.yoyTnRate }}%</span>
+          </div>
+        </div>
+        <div>
+          <div class="river-water-type-item">
+            <span>达标</span>
+            <span>{{ data?.seaYoyProportion?.data?.good?.[1]?.currrentTnMon }}%</span>
+            <span :style="`color: ${data?.seaYoyProportion?.data?.good?.[1]?.yoyTnRate >= 0 ? '#0bffa2' : '#f90'}`">{{ data?.seaYoyProportion?.data?.good?.[1]?.yoyTnRate >= 0 ? `+${data?.seaYoyProportion?.data?.good?.[1]?.yoyTnRate}` : data?.seaYoyProportion?.data?.good?.[1]?.yoyTnRate }}%</span>
+          </div>
+          <div class="river-water-type-item">
+            <span>不达标</span>
+            <span>{{ data?.seaYoyProportion?.data?.poor?.[1]?.currrentTnMon }}%</span>
+            <span :style="`color: ${data?.seaYoyProportion?.data?.poor?.[1]?.yoyTnRate <= 0 ? '#0bffa2' : '#f90'}`">{{ data?.seaYoyProportion?.data?.poor?.[1]?.yoyTnRate >= 0 ? `+${data?.seaYoyProportion?.data?.poor?.[1]?.yoyTnRate}` : data?.seaYoyProportion?.data?.poor?.[1]?.yoyTnRate }}%</span>
+          </div>
+        </div>
+      </div>
+      <div class="river-water-item">
+        <div>攻坚战区域</div>
+        <div>
+          <div class="river-water-type-item">
+            <span>达标</span>
+            <span>{{ data?.battleYoyProportion?.data?.good?.[0]?.currrentTnMon }}%</span>
+            <span :style="`color: ${data?.battleYoyProportion?.data?.good?.[0]?.yoyTnRate >= 0 ? '#0bffa2' : '#f90'}`">{{ data?.battleYoyProportion?.data?.good?.[0]?.yoyTnRate >= 0 ? `+${data?.battleYoyProportion?.data?.good?.[0]?.yoyTnRate}` : data?.battleYoyProportion?.data?.good?.[0]?.yoyTnRate }}%</span>
+          </div>
+          <div class="river-water-type-item">
+            <span>不达标</span>
+            <span>{{ data?.battleYoyProportion?.data?.poor?.[0]?.currrentTnMon }}%</span>
+            <span :style="`color: ${data?.battleYoyProportion?.data?.poor?.[0]?.yoyTnRate <= 0 ? '#0bffa2' : '#f90'}`">{{ data?.battleYoyProportion?.data?.poor?.[0]?.yoyTnRate >= 0 ? `+${data?.battleYoyProportion?.data?.poor?.[0]?.yoyTnRate}` : data?.battleYoyProportion?.data?.poor?.[0]?.yoyTnRate }}%</span>
+          </div>
+        </div>
+        <div>
+          <div class="river-water-type-item">
+            <span>达标</span>
+            <span>{{ data?.battleYoyProportion?.data?.good?.[1]?.currrentTnMon }}%</span>
+            <span :style="`color: ${data?.battleYoyProportion?.data?.good?.[1]?.yoyTnRate >= 0 ? '#0bffa2' : '#f90'}`">{{ data?.battleYoyProportion?.data?.good?.[1]?.yoyTnRate >= 0 ? `+${data?.battleYoyProportion?.data?.good?.[1]?.yoyTnRate}` : data?.battleYoyProportion?.data?.good?.[1]?.yoyTnRate }}%</span>
+          </div>
+          <div class="river-water-type-item">
+            <span>不达标</span>
+            <span>{{ data?.battleYoyProportion?.data?.poor?.[1]?.currrentTnMon }}%</span>
+            <span :style="`color: ${data?.battleYoyProportion?.data?.poor?.[1]?.yoyTnRate <= 0 ? '#0bffa2' : '#f90'}`">{{ data?.battleYoyProportion?.data?.poor?.[1]?.yoyTnRate >= 0 ? `+${data?.battleYoyProportion?.data?.poor?.[1]?.yoyTnRate}` : data?.battleYoyProportion?.data?.poor?.[1]?.yoyTnRate }}%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div v-else class="river-water-wrapper">
       <div class="river-water-title">
         <div>时间</div>
         <div>{{ data?.seaYoyProportion?.header?.[0] || data?.battleYoyProportion?.header?.[0] }}</div>

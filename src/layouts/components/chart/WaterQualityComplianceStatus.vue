@@ -47,12 +47,14 @@ export default {
             type: 'value',
             name: '%',
             max: 100,
+            min: 0,
           },
           {
             type: 'value',
             name: '%',
             max: 100,
-            min: -100,
+            min: 0,
+            show: false,
           },
         ],
         series: [
@@ -65,6 +67,7 @@ export default {
               },
             },
             data: [],
+            yAxisIndex: 1,
           },
           {
             name: '不达标',
@@ -93,6 +96,7 @@ export default {
       },
       param: {},
       loading: false,
+      waterQualityDimension: '水质',
     }
   },
   async mounted() {
@@ -102,6 +106,12 @@ export default {
     eventBus.on('filterparam', (param) => {
       this.param = param
       this.getData(param)
+    })
+    eventBus.on('waterQualityDimension', (param) => {
+      if (param && param.waterQualityDimension) {
+        this.waterQualityDimension = param.waterQualityDimension
+        this.getData(this.param)
+      }
     })
   },
   beforeUnmount() {
@@ -119,13 +129,21 @@ export default {
     async getData(param) {
       this.loading = true
       const res = await gisData.getWaterQualityTrend(param)
-      // res.data = []
-      // console.log('getWaterQualityTrend:', res)
+      this.options.xAxis[0].data = res.data.months
       if (res && res.code === 1000) {
-        this.options.xAxis[0].data = res.data.months
-        this.options.series[0].data = res.data.waterQualityYoYChanges
-        this.options.series[1].data = res.data.waterQualityNonComplianceRates
-        this.options.series[2].data = res.data.waterQualityComplianceRates
+        if (this.waterQualityDimension === '总氮') {
+          this.options.yAxis[1].min = Math.min(...res.data.totalNitrogenYoYChanges)
+          this.options.series[0].data = res.data.totalNitrogenYoYChanges
+          this.options.series[1].data = res.data.totalNitrogenNonComplianceRates
+          this.options.series[2].data = res.data.totalNitrogenComplianceRates
+        }
+        else {
+          this.options.yAxis[1].min = Math.min(...res.data.waterQualityYoYChanges)
+          this.options.series[0].data = res.data.waterQualityYoYChanges
+          this.options.series[1].data = res.data.waterQualityNonComplianceRates
+          this.options.series[2].data = res.data.waterQualityComplianceRates
+        }
+
         // this.options.series[0].data = res.data.totalNitrogenYoYChanges
         // this.options.series[1].data = res.data.totalNitrogenNonComplianceRates
         // this.options.series[2].data = res.data.totalNitrogenComplianceRates

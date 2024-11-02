@@ -119,6 +119,7 @@ export interface WaterQualityTrend {
 export interface WaterQualityDetail {
   province: string // 省份
   city: string // 城市
+  river: string
   selectCode: string // 断面code
   sectionName: string // 断面名称
   waterType: string // 水质类别
@@ -129,6 +130,11 @@ export interface WaterQualityDetail {
   lat: string // 维度
   color: string // 水质对应颜色
   targetColor: string // 目标水质颜色
+  ntolor: string
+  ntTargetColor: string
+  ntIsCompliant?: boolean
+  totalNitrogen: string
+  nTarget: string
 }
 
 /**

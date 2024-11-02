@@ -13,6 +13,7 @@ export default {
       tableData: [],
       param: {},
       riverSections: [],
+      waterQualityDimension: '水质',
     }
   },
   mounted() {
@@ -22,6 +23,12 @@ export default {
     })
     eventBus.on('riverSections', ({ riverSections }) => {
       this.riverSections = riverSections
+    })
+
+    eventBus.on('waterQualityDimension', (param) => {
+      if (param && param.waterQualityDimension) {
+        this.waterQualityDimension = param.waterQualityDimension
+      }
     })
   },
   beforeUnmount() {
@@ -49,9 +56,28 @@ export default {
 
 <template>
   <ZFrame v-loading="loading" title="断面监测数据详情">
-    <el-table :data="tableData" :height="343" style="width: 100%;" @row-click="zoomToMarkerByCode">
+    <el-table v-if="waterQualityDimension === '总氮'" :data="tableData" :height="343" style="width: 100%;" @row-click="zoomToMarkerByCode">
       <el-table-column prop="sectionName" label="断面名称" />
-      <el-table-column prop="text2" align="center" label="所属河流" />
+      <el-table-column prop="river" align="center" label="所属河流" />
+      <el-table-column prop="nTarget" align="center" label="总氮目标">
+        <template #default="scope">
+          <span v-if="scope.row.nTarget">{{ scope.row.nTarget }}</span>
+          <span v-else>未作要求</span>
+        </template>
+      </el-table-column>
+      <el-table-column prop="totalNitrogen" align="center" label="总氮" />
+      <el-table-column prop="isCompliant" align="center" label="达标状态">
+        <template #default="scope">
+          <span v-if="scope.row.ntIsCompliant === null">/</span>
+          <span v-else :style="`color: ${scope.row.ntIsCompliant ? 'rgba(0, 202, 3, 0.8)' : 'rgba(255, 53, 53, 0.8)'}`">
+            {{ scope.row.isCompliant ? '达标' : '不达标' }}
+          </span>
+        </template>
+      </el-table-column>
+    </el-table>
+    <el-table v-else :data="tableData" :height="343" style="width: 100%;" @row-click="zoomToMarkerByCode">
+      <el-table-column prop="sectionName" label="断面名称" />
+      <el-table-column prop="river" align="center" label="所属河流" />
       <el-table-column prop="waterTarget" align="center" label="水质目标">
         <template #default="scope">
           <el-tag :color="scope.row.targetColor" style="color: #fff; border: 0;">

@@ -197,6 +197,11 @@ export default {
         window.$zMap.fitBounds(_layer.getBounds(), { padding: [40, 40], duration: 5 })
       }
     },
+    sendWaterQualityDimension() {
+      eventBus.emit('waterQualityDimension', {
+        waterQualityDimension: this.radio1,
+      })
+    },
   },
 }
 </script>
@@ -232,7 +237,7 @@ export default {
           @change="sendRiverFilterParam"
         />
       </div>
-      <el-radio-group v-if="activeGraph !== 'outfall'" v-model="radio1" is-button style="margin-top: 20px;">
+      <el-radio-group v-if="activeGraph !== 'outfall'" v-model="radio1" is-button style="margin-top: 20px;" @change="() => { sendWaterQualityDimension(); }">
         <el-radio-button label="水质类别" value="水质" />
         <el-radio-button label="总氮" value="总氮" />
       </el-radio-group>
