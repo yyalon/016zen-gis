@@ -4,8 +4,6 @@ import PopupRiverSection from '../popup/RiverSection.vue'
 
 import apiData from '@/api/modules/data'
 
-import { romanToInt } from '@/utils'
-
 let _layer = null
 
 export default {
@@ -58,16 +56,23 @@ export default {
         this.riverSections.forEach((riverSection) => {
           const arr = ['Ⅰ', 'Ⅱ', 'Ⅲ']
           // const compliant = arr.includes(riverSection?.level2018)
-          let noDabiao = false
-          if (parseFloat(riverSection.N2023) > parseFloat(riverSection.N2025) || romanToInt(riverSection.W2023) > romanToInt(riverSection.W2025)) {
-            // 不达标
-            noDabiao = true
+          // let noDabiao = false
+          // if (parseFloat(riverSection.N2023) > parseFloat(riverSection.N2025) || romanToInt(riverSection.W2023) > romanToInt(riverSection.W2025)) {
+          //   // 不达标
+          //   noDabiao = true
+          // }
+          let image = 'img/marker/river.png'
+          if (riverSection.status === '1') {
+            image = 'img/marker/river_red.png'
+          }
+          else if (riverSection.status === '2') {
+            image = 'img/marker/river_red_blinking.gif'
           }
           // const compliant = this.dictWaterQuality[riverSection.code]?.compliant
           const graphic = new window.$ZMap.graphic.Marker({
             latlng: [riverSection.latitude, riverSection.longitude],
             style: {
-              image: !noDabiao ? 'img/marker/river.png' : 'img/marker/river_red.png',
+              image,
               horizontalOrigin: window.$ZMap.HorizontalOrigin.CENTER,
               verticalOrigin: window.$ZMap.VerticalOrigin.BOTTOM,
             },
