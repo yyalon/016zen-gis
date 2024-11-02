@@ -11,6 +11,8 @@ export default {
       loading: false,
       water,
       data: [],
+      activeIndex: 0, // 当前激活的轮播项索引
+      autoPlayInterval: null, // 自动播播的定时器
     }
   },
   created() {
@@ -24,6 +26,7 @@ export default {
   },
   beforeUnmount() {
     eventBus.off('refreshSeaWaterQualityChart')
+    this.stopAutoPlay() // 组件销毁前停止自动轮播
   },
   methods: {
     getData(param) {
@@ -39,7 +42,31 @@ export default {
             complianceTargetRate: item.seaWaterComplianceResult.targetComplianceRate,
           }
         })
+
+        if (this.data.length > 2) {
+          this.startAutoPlay()
+        }
       })
+    },
+    next() {
+      this.activeIndex = this.activeIndex + 2
+      if (this.activeIndex > this.data.length) {
+        this.activeIndex = 0
+      }
+    },
+    startAutoPlay() {
+      if (this.autoPlayInterval) {
+        // empty
+      }
+      else {
+        this.autoPlayInterval = setInterval(this.next, 3000) // 每3秒自动播放下一张
+      }
+    },
+    stopAutoPlay() {
+      if (this.autoPlayInterval) {
+        clearInterval(this.autoPlayInterval)
+        this.autoPlayInterval = null
+      }
     },
   },
 }
@@ -48,7 +75,7 @@ export default {
 <template>
   <ZFrame title="近岸海域水质达标考核">
     <div class="sea-water">
-      <div v-for="item in data" :key="item.province" class="river-water-wrapper">
+      <div v-for="(item, index) in data" :key="item.province" :class="(activeIndex === index || (activeIndex + 1) === index) ? 'active' : ''" class="river-water-wrapper">
         <div class="river-water-title">
           <img :src="water"><span style="margin: 0 4px;">{{ item.province }}：水质优良 (一、二类)比例</span><span :class="item.compliance === '未达标' ? 'notup' : 'up'">{{ item.compliance }}</span>
         </div>
@@ -85,18 +112,24 @@ export default {
 .sea-water {
   margin-top: 24px;
   height: 323px;
-  overflow-y: auto;
 }
 
 .river-water-wrapper {
+  display: none;
   width: 400px;
   margin: 0 auto 48px;
   background-image: url("@/assets/images/waterQualityBg.png");
   background-size: 100% 100%;
   background-repeat: no-repeat;
+  transition: display 0.1 ease-in-out;
 
   &:last-child {
     margin-bottom: 24px;
+  }
+
+  &.active {
+    display: block;
+    transition: display 1s ease-in-out;
   }
 }
 

@@ -15,7 +15,7 @@ export default {
       default: 'cockpit',
     },
   },
-  emits: ['filterparam'],
+  emits: ['filterparam', 'riverSections'],
   data() {
     const end = new Date()
     end.setDate(1)
@@ -39,7 +39,6 @@ export default {
       immediate: true,
       handler(n) {
         if (n === 'outfall') {
-          this.river = '全部'
           this.radio1 = '水质'
         }
       },
@@ -50,6 +49,7 @@ export default {
   },
   beforeUnmount() {
     eventBus.off('filterparam')
+    eventBus.off('riverSections')
   },
   methods: {
     async filterRiverSections() {
@@ -77,25 +77,23 @@ export default {
         }
       })
 
-      const code = this.selectedArea === '全部' ? '' : this.selectedAreaNode?.data?.code
       this.rivers = ['全部']
       this.filteredRiverSections.forEach((riverSection) => {
-        if (!this.rivers.includes(riverSection.name) && (!code || riverSection.code.startsWith(code))) {
+        if (!this.rivers.includes(riverSection.name)) {
           this.rivers.push(riverSection.name)
         }
       })
       this.sendRiverFilterParam()
     },
     async getData() {
-      const res = await apiData.getWaterQuality()
+      const res = await apiData.getRiverSections()
       if (res && res.code === 1000) {
         this.riverSections = res.data
       }
 
-      const allRivers = await apiData.getRiverSections()
-      if (res && res.code === 1000) {
-        this.riverSections = this.riverSections.concat(allRivers.data)
-      }
+      eventBus.emit('riverSections', {
+        riverSections: res.data,
+      })
 
       this.filterRiverSections()
     },
@@ -222,7 +220,7 @@ export default {
           @change="filterRiverSections"
         />
 
-        <el-select v-if="activeGraph !== 'outfall'" v-model="river" placeholder="请选择断面" @change="selectRiver">
+        <el-select v-model="river" placeholder="请选择断面" @change="selectRiver">
           <el-option v-for="(item, index) in rivers" :key="index" :label="item" :value="item" />
         </el-select>
         <el-date-picker

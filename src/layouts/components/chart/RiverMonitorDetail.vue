@@ -12,12 +12,16 @@ export default {
       loading: false,
       tableData: [],
       param: {},
+      riverSections: [],
     }
   },
   mounted() {
     eventBus.on('filterparam', (param) => {
       this.param = param
       this.getData(param)
+    })
+    eventBus.on('riverSections', ({ riverSections }) => {
+      this.riverSections = riverSections
     })
   },
   beforeUnmount() {
@@ -31,13 +35,21 @@ export default {
         this.tableData = data.filter((item) => item.isCompliant).concat(data.filter((item) => !item.isCompliant))
       })
     },
+    zoomToMarkerByCode(row) {
+      if (this.riverSections.length > 0) {
+        const section = this.riverSections.find((item) => item.code === row.selectCode)
+        if (section) {
+          window.$zMap.setView([section.latitude, section.longitude], window.$zMap.getZoom() + 1)
+        }
+      }
+    },
   },
 }
 </script>
 
 <template>
   <ZFrame v-loading="loading" title="断面监测数据详情">
-    <el-table :data="tableData" :height="343" style="width: 100%;">
+    <el-table :data="tableData" :height="343" style="width: 100%;" @row-click="zoomToMarkerByCode">
       <el-table-column prop="sectionName" label="断面名称" />
       <el-table-column prop="text2" align="center" label="所属河流" />
       <el-table-column prop="waterTarget" align="center" label="水质目标">
