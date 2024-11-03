@@ -22,7 +22,6 @@ export default {
     eventBus.on('filterparam', (param) => {
       this.param = param
       this.getData(param)
-      console.log('入海河流', param)
     })
   },
   beforeUnmount() {
@@ -38,7 +37,6 @@ export default {
         this.loading = false
         this.lists[0] = { ...res.data.sea, text: '东海区' }
         this.lists[1] = { ...res.data.battle, text: '攻坚战区域' }
-        console.log('getRiverOverall', this.lists)
       })
     },
   },

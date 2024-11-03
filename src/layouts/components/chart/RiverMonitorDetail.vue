@@ -28,6 +28,9 @@ export default {
     eventBus.on('waterQualityDimension', (param) => {
       if (param && param.waterQualityDimension) {
         this.waterQualityDimension = param.waterQualityDimension
+        this.$nextTick(() => {
+          this.autoScroll()
+        })
       }
     })
   },
@@ -40,7 +43,25 @@ export default {
       gisData.getWaterQualityDetail(param).then(({ data }) => {
         this.loading = false
         this.tableData = data.filter((item) => item.isCompliant).concat(data.filter((item) => !item.isCompliant))
+        this.$nextTick(() => {
+          this.autoScroll()
+        })
       })
+    },
+    autoScroll(stop) {
+      if (stop) {
+        window.clearInterval(this.timer)
+      }
+      else {
+        const tableWrapper = this.$refs.scroll_Table.layout.table.refs.bodyWrapper.firstElementChild.firstElementChild
+        this.timer = setInterval(() => {
+          tableWrapper.scrollTop += 1
+          // 判断是否滚动到底部，如果到底部了置为0（可视高度+距离顶部=整个高度）
+          if (tableWrapper.clientHeight + tableWrapper.scrollTop === tableWrapper.scrollHeight) {
+            tableWrapper.scrollTop = 0
+          }
+        }, 100)
+      }
     },
     zoomToMarkerByCode(row) {
       if (this.riverSections.length > 0) {
@@ -56,7 +77,7 @@ export default {
 
 <template>
   <ZFrame v-loading="loading" title="断面监测数据详情">
-    <el-table v-if="waterQualityDimension === '总氮'" :data="tableData" :height="343" style="width: 100%;" @row-click="zoomToMarkerByCode">
+    <el-table v-if="waterQualityDimension === '总氮'" ref="scroll_Table" :data="tableData" :height="343" style="width: 100%;" @mouseenter="autoScroll(true)" @mouseleave="autoScroll(false)" @row-click="zoomToMarkerByCode">
       <el-table-column prop="sectionName" label="断面名称" />
       <el-table-column prop="river" align="center" label="所属河流" />
       <el-table-column prop="nTarget" align="center" label="总氮目标">
@@ -75,7 +96,7 @@ export default {
         </template>
       </el-table-column>
     </el-table>
-    <el-table v-else :data="tableData" :height="343" style="width: 100%;" @row-click="zoomToMarkerByCode">
+    <el-table v-else ref="scroll_Table" :data="tableData" :height="343" style="width: 100%;" @mouseenter="autoScroll(true)" @mouseleave="autoScroll(false)" @row-click="zoomToMarkerByCode">
       <el-table-column prop="sectionName" label="断面名称" />
       <el-table-column prop="river" align="center" label="所属河流" />
       <el-table-column prop="waterTarget" align="center" label="水质目标">

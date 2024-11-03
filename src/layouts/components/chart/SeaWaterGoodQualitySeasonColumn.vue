@@ -70,17 +70,20 @@ export default {
             type: 'value',
             name: '%',
             max: 100,
+            min: 0,
           },
           {
             type: 'value',
             name: '%',
             max: 100,
-            min: -100,
+            min: 0,
+            show: false,
           },
         ],
         series: [{
           name: '环比',
           type: 'line',
+          yAxisIndex: 1,
           tooltip: {
             valueFormatter(value) {
               return typeof value !== 'number' ? '-' : `${value}%`
@@ -127,6 +130,7 @@ export default {
 
       gisData.getSeaWaterQualityTrend(param).then(({ data }) => {
         this.loading = false
+        this.options.yAxis[1].min = Math.min(...data.waterQualityQoqChanges)
         this.options.xAxis[0].data = data.seasons
         this.options.series[0].data = data.waterQualityQoqChanges
         this.options.series[1].data = data.waterQualityYoYChanges
