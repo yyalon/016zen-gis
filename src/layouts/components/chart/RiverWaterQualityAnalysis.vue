@@ -44,7 +44,7 @@ export default {
 </script>
 
 <template>
-  <ZFrame v-loading="loading" title="水质现状统计分析">
+  <ZFrame v-loading="loading" :title="`${waterQualityDimension === '总氮' ? '总氮' : '水质'}现状统计分析`">
     <div v-if="waterQualityDimension === '总氮'" class="river-water-wrapper">
       <div class="river-water-title">
         <div>时间</div>
