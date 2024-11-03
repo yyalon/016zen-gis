@@ -399,7 +399,7 @@ export default {
         <GraphSwitcher v-model:active-graph="activeGraph">
           <div class="title">
             <div class="titleBeforeLine" />
-            <img src="/breadcrumb/abbreviation.png">
+            <img src="./breadcrumb/abbreviation.png">
             <div class="titleAfterLine" />
           </div>
         </GraphSwitcher>

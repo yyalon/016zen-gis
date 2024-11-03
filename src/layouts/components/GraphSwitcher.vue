@@ -11,10 +11,10 @@ export default {
   data() {
     return {
       graphs: [
-        { text: '驾驶舱', key: 'cockpit', src: '/breadcrumb/cockpit.png', active: '/breadcrumb/cockpit-active.png' },
-        { text: '入海河流', key: 'river', src: '/breadcrumb/river.png', active: '/breadcrumb/river-active.png' },
-        { text: '入海排污口', key: 'outfall', src: '/breadcrumb/outfall.png', active: '/breadcrumb/outfall-active.png' },
-        { text: '近岸海域', key: 'ocean', src: '/breadcrumb/ocean.png', active: '/breadcrumb/ocean-active.png' },
+        { text: '驾驶舱', key: 'cockpit', src: './breadcrumb/cockpit.png', active: '/breadcrumb/cockpit-active.png' },
+        { text: '入海河流', key: 'river', src: './breadcrumb/river.png', active: '/breadcrumb/river-active.png' },
+        { text: '入海排污口', key: 'outfall', src: './breadcrumb/outfall.png', active: '/breadcrumb/outfall-active.png' },
+        { text: '近岸海域', key: 'ocean', src: './breadcrumb/ocean.png', active: '/breadcrumb/ocean-active.png' },
         // { text: '气象信息', key: 'meteorology' },
         // { text: '遥感专题', key: 'satellite' }
       ],

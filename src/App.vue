@@ -60,7 +60,7 @@ onMounted(() => {
     const store = useUserStore()
     if (!store.isLogin) {
       store.logout()
-      toAdmin('/logout')
+      toAdmin(`/login?redirect=${encodeURIComponent(import.meta.env.VITE_GIS_HOST)}`)
     }
   }, 300)
 })

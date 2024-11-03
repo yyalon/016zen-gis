@@ -33,6 +33,7 @@ export default {
     eventBus.on('filterparam', (param) => {
       this.param = param
       this.getData(param)
+      console.log('近岸海域', param)
     })
   },
   beforeUnmount() {
@@ -73,24 +74,53 @@ export default {
 <template>
   <ZFrame v-loading="loading" title="近岸海域">
     <div class="cockpit-ocean-card">
-      <div
-        v-for="(group, index) in lists" :key="index"
-        class="cockpit-ocean-item"
-      >
+      <!-- 面积 -->
+      <div class="cockpit-ocean-item">
         <div class="cockpit-ocean-left">
-          <div><span class="number">{{ group.num }}</span>{{ group.unit || '' }}</div>
-          <div>{{ group.text }}</div>
+          <div><span class="number">{{ lists[0].num }}</span>{{ lists[0].unit || '' }}</div>
+          <div>{{ lists[0].text }}</div>
         </div>
         <div class="cockpit-ocean-right">
           <div class="cockpit-ocean-percent">
             <div class="cockpit-ocean-label">
               水质优良比例
             </div>
-            <div><span class="number">{{ group.percent }}</span>%<span :class="`status ${group.diff >= 0 ? 'succes' : 'error'}`">{{ group.diff }}%</span></div>
+            <div><span class="number">{{ lists[0].percent }}</span>%<span :class="`status ${lists[0].diff >= 0 ? 'succes' : 'error'}`">{{ lists[0].diff }}%</span></div>
           </div>
           <el-divider />
           <div class="cockpit-ocean-analysis">
-            <el-table :data="group.items" :height="95" style="width: 100%;">
+            <el-table :data="lists[0].items" :height="95" style="width: 100%;">
+              <el-table-column prop="text" width="43" />
+              <el-table-column prop="goal" align="center" label="考核目标">
+                <template #default="scope">
+                  <span class="number" style="color: #f90;">{{ scope.row.goal }}</span>%
+                </template>
+              </el-table-column>
+              <el-table-column prop="diff" align="center" label="优于目标">
+                <template #default="scope">
+                  <span class="number" style="color: rgb(0 202 3 / 80%);">{{ scope.row.diff }}</span>%
+                </template>
+              </el-table-column>
+            </el-table>
+          </div>
+        </div>
+      </div>
+      <!-- 点位 -->
+      <div class="cockpit-ocean-item">
+        <div class="cockpit-ocean-left">
+          <div><span class="number">{{ lists[1].num }}</span>{{ lists[1].unit || '' }}</div>
+          <div>{{ lists[1].text }}</div>
+        </div>
+        <div class="cockpit-ocean-right">
+          <div class="cockpit-ocean-percent">
+            <div class="cockpit-ocean-label">
+              水质优良比例
+            </div>
+            <div><span class="number">{{ lists[1].percent }}</span>%<span :class="`status ${lists[1].diff >= 0 ? 'succes' : 'error'}`">{{ lists[1].diff }}%</span></div>
+          </div>
+          <el-divider />
+          <div class="cockpit-ocean-analysis">
+            <el-table :data="lists[1].items" :height="95" style="width: 100%;">
               <el-table-column prop="text" width="43" />
               <el-table-column prop="goal" align="center" label="考核目标">
                 <template #default="scope">
