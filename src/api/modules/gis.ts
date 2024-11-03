@@ -140,4 +140,11 @@ export default {
    * @returns
    */
   getSeaWaterEutrophication: (query: SeaWaterQuery): Promise<OperationResult<SeaWaterEutrophication>> => api.post('/app/data/gis-data/sea-water-e', query),
+
+  /**
+   * 获取责任主体排污口信息
+   * @param query
+   * @returns
+   */
+  getResponsiblePartyOutfallInfo: (params: any) => api.get('/app/data/gis-data/outfall-info', { params }),
 }

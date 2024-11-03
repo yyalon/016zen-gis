@@ -66,10 +66,10 @@ export default {
               className: 'custom_tooltip',
             })
 
-            graphic.on(window.$ZMap.EventType.click, (e) => {
-              this.drawerData = e.target.attr
-              this.drawerVisible = true
-            })
+            // graphic.on(window.$ZMap.EventType.click, (e) => {
+            //   this.drawerData = e.target.attr
+            //   this.drawerVisible = true
+            // })
 
             graphic.on(window.$ZMap.EventType.tooltipopen, async (e) => {
               e.target.setTooltipContent(window.$Utitls.loadComponentContent(e.target, PopupReservoir, { popupData: e.target.attr }))

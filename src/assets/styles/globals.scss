@@ -272,3 +272,55 @@ textarea {
     border-color: #007bff !important;
   }
 }
+
+.outfall-dialog {
+  background: rgb(9 94 211 / 50%);
+  padding: 0;
+
+  .el-dialog__header {
+    padding: 20px 58px 20px 22px;
+    background-image: url("@/assets/images/responsiblePartyBg.png");
+    background-repeat: no-repeat;
+  }
+
+  .el-dialog__headerbtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    top: 20px;
+    right: 22px;
+    background: rgb(13 66 155 / 90%);
+    border: 1px solid #096dd9;
+
+    .el-dialog__close {
+      color: #fff;
+    }
+  }
+
+  .el-dialog__title {
+    position: relative;
+    color: #fff;
+    font-size: 24px;
+    line-height: 24px;
+    font-weight: 700;
+    padding-left: 20px;
+
+    &::before {
+      content: "";
+      position: absolute;
+      top: 3px;
+      left: 0;
+      width: 3px;
+      height: 24px;
+      border-radius: 2px;
+      background-color: #fff;
+    }
+  }
+
+  .el-dialog__body {
+    font-size: 16px;
+    color: #fff;
+  }
+}

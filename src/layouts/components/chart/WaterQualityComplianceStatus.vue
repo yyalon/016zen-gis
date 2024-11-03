@@ -157,7 +157,7 @@ export default {
 </script>
 
 <template>
-  <ZFrame title="河流水质达标趋势分析">
+  <ZFrame :title="`河流${waterQualityDimension === '总氮' ? '总氮' : '水质'}达标趋势分析`">
     <Echart v-if="visible" v-loading="loading" :options="options" height="360px" width="410px" />
   </ZFrame>
 </template>
