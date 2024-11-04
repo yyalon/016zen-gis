@@ -9,3 +9,5 @@ src/assets/sprites/*.*
 !src/assets/sprites/.gitkeep
 public/icons
 /.idea
+src/types/auto-imports.d.ts
+src/types/components.d.ts
