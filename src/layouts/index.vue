@@ -152,6 +152,7 @@ export default {
         controlUnit: false,
       },
       riverLevel: null,
+      abbreviationImgSrc: `${import.meta.env.VITE_APP_PUBLIC_PATH}/breadcrumb/abbreviation.png`,
     }
   },
   watch: {
@@ -399,7 +400,7 @@ export default {
         <GraphSwitcher v-model:active-graph="activeGraph">
           <div class="title">
             <div class="titleBeforeLine" />
-            <img src="./breadcrumb/abbreviation.png">
+            <img :src="abbreviationImgSrc">
             <div class="titleAfterLine" />
           </div>
         </GraphSwitcher>
