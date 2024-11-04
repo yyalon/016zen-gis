@@ -61,13 +61,13 @@ export default {
             })
 
             graphic.bindTooltip(null, {
-              className: 'custom_tooltip',
+              className: 'custom_tooltp',
             })
             graphic.on(window.$ZMap.EventType.click, (e) => {
               this.drawerData = e.target.attr
               this.drawerVisible = true
             })
-            graphic.on(window.$ZMap.EventType.tooltipopen, async (e) => {
+            graphic.on(window.$ZMap.EventType.tooltipopen, (e) => {
               e.target.setTooltipContent(window.$Utitls.loadComponentContent(e.target, PopupSweageOutfall, { popupData: e.target.attr }))
             })
 

@@ -57,6 +57,7 @@ export default {
   },
   data() {
     return {
+      abbreviationSrc: './breadcrumb/abbreviation.png',
       loading: null,
       activeGraph: 'cockpit',
       settings,
@@ -152,7 +153,6 @@ export default {
         controlUnit: false,
       },
       riverLevel: null,
-      abbreviationImgSrc: `${import.meta.env.VITE_APP_PUBLIC_PATH}/breadcrumb/abbreviation.png`,
     }
   },
   watch: {
@@ -400,7 +400,7 @@ export default {
         <GraphSwitcher v-model:active-graph="activeGraph">
           <div class="title">
             <div class="titleBeforeLine" />
-            <img :src="abbreviationImgSrc">
+            <img :src="abbreviationSrc">
             <div class="titleAfterLine" />
           </div>
         </GraphSwitcher>

@@ -14,7 +14,7 @@ export default {
   data() {
     return { details: {} }
   },
-  async mounted() {
+  created() {
     this.details = this.popupData
   },
   unmounted() {},
@@ -23,8 +23,8 @@ export default {
 </script>
 
 <template>
-  <div class="popup-sewage-outfall">
-    <ElDescriptions :title="`排污口名称:${details.name || '未设置'}`" :column="1" border size="small">
+  <div class="popup-container">
+    <ElDescriptions :title="`排污口名称: ${details.name || '未设置'}`" :column="1" border size="small">
       <ElDescriptionsItem v-if="details.code" width="20" label="排口编号">
         {{ details.code }}
       </ElDescriptionsItem>
@@ -99,7 +99,7 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-.popup-sewage-outfall {
+.popup-container {
   :deep(.el-descriptions__title) {
     text-wrap: wrap;
   }

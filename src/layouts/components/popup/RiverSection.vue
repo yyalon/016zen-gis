@@ -26,7 +26,7 @@ export default {
 
 <template>
   <div class="popup-container">
-    <ElDescriptions :title="`断面名称 :${popupData.name}`" :column="1" border size="small">
+    <ElDescriptions :title="`断面名称: ${popupData.name}`" :column="1" border size="small">
       <ElDescriptionsItem v-if="popupData.code" label="断面编码">
         {{ popupData.code }}
       </ElDescriptionsItem>

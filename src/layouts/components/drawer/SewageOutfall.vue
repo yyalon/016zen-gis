@@ -72,7 +72,7 @@ export default {
             class="outfall-tabs"
             @tab-click="handleClick"
           >
-            <el-tab-pane v-for="item in [sewageOutfallDetails[0]]" :key="item.name" :label="item.name" :name="item.name">
+            <el-tab-pane v-for="item in sewageOutfallDetails" :key="item.name" :label="item.name" :name="item.name">
               <div class="outfalls-title">
                 <div class="left">
                   <img :src="direct">监测信息
@@ -228,7 +228,7 @@ export default {
   }
 
   .el-tabs__nav-next,
- .el-tabs__nav-prev {
+  .el-tabs__nav-prev {
     width: auto;
     line-height: 37px;
 
