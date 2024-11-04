@@ -15,7 +15,7 @@ export default {
       default: 'cockpit',
     },
   },
-  emits: ['filterparam', 'riverSections'],
+  emits: ['filterparam'],
   data() {
     const end = new Date()
     end.setDate(1)
@@ -49,7 +49,6 @@ export default {
   },
   beforeUnmount() {
     eventBus.off('filterparam')
-    eventBus.off('riverSections')
   },
   methods: {
     async filterRiverSections() {
@@ -90,10 +89,6 @@ export default {
       if (res && res.code === 1000) {
         this.riverSections = res.data
       }
-
-      eventBus.emit('riverSections', {
-        riverSections: res.data,
-      })
 
       this.filterRiverSections()
     },

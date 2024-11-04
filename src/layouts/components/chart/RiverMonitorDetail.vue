@@ -7,12 +7,12 @@ import eventBus from '@/utils/eventBus'
 export default {
   name: 'RiverMonitorDetail',
   components: { ZFrame },
+  emits: ['selectRiverByCode'],
   data() {
     return {
       loading: false,
       tableData: [],
       param: {},
-      riverSections: [],
       waterQualityDimension: '水质',
     }
   },
@@ -20,9 +20,6 @@ export default {
     eventBus.on('filterparam', (param) => {
       this.param = param
       this.getData(param)
-    })
-    eventBus.on('riverSections', ({ riverSections }) => {
-      this.riverSections = riverSections
     })
 
     eventBus.on('waterQualityDimension', (param) => {
@@ -35,7 +32,7 @@ export default {
     })
   },
   beforeUnmount() {
-    // eventBus.off('filterparam')
+    eventBus.off('selectRiverByCode')
   },
   methods: {
     getData(param) {
@@ -64,12 +61,9 @@ export default {
       }
     },
     zoomToMarkerByCode(row) {
-      if (this.riverSections.length > 0) {
-        const section = this.riverSections.find((item) => item.code === row.selectCode)
-        if (section) {
-          window.$zMap.setView([section.latitude, section.longitude], window.$zMap.getZoom() + 1)
-        }
-      }
+      eventBus.emit('selectRiverByCode', {
+        selectCode: row.selectCode,
+      })
     },
   },
 }

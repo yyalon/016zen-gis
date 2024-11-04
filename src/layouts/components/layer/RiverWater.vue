@@ -3,15 +3,20 @@ import DrawerRiverSection from '../drawer/RiverSection.vue'
 import PopupRiverSection from '../popup/RiverSection.vue'
 
 import apiData from '@/api/modules/data'
+import eventBus from '@/utils/eventBus'
 
 let _layer = null
 
 export default {
   components: { DrawerRiverSection },
   data() {
-    return { riverSections: [], drawerVisible: false, drawerData: {} }
+    return { riverSections: [], drawerVisible: false, drawerData: {}, markersMap: null, selectCode: null }
   },
   async mounted() {
+    eventBus.on('selectRiverByCode', ({ selectCode }) => {
+      this.zoomToMarkerByCode(selectCode)
+    })
+
     await this.showLayer()
   },
   unmounted() {
@@ -21,15 +26,9 @@ export default {
   },
   methods: {
     async getData() {
-      this.loadingRiverSections = true
-      const res = await apiData.getWaterQuality()
-      if (res && res.code === 1000) {
-        this.riverSections = res.data
-      }
-
       const allRivers = await apiData.getRiverSections()
-      if (res && res.code === 1000) {
-        this.riverSections = this.riverSections.concat(allRivers.data)
+      if (allRivers && allRivers.code === 1000) {
+        this.riverSections = allRivers.data
       }
     },
     async showLayer() {
@@ -52,6 +51,8 @@ export default {
         window.$zMap.addLayer(_layer)
 
         await this.getData()
+
+        this.markersMap = new Map()
 
         this.riverSections.forEach((riverSection) => {
           const arr = ['Ⅰ', 'Ⅱ', 'Ⅲ']
@@ -77,7 +78,11 @@ export default {
               verticalOrigin: window.$ZMap.VerticalOrigin.BOTTOM,
             },
             attr: riverSection,
+            id: riverSection.code,
           })
+
+          // 将Marker添加到Map对象中
+          this.markersMap.set(riverSection.code, graphic)
 
           graphic.bindTooltip(null, {
             className: 'custom_tooltp',
@@ -107,6 +112,24 @@ export default {
         _layer.show = true
         this.loading.close()
       }, 500)
+    },
+    zoomToMarkerByCode(selectCode) {
+      if (this.markersMap) {
+        if (this.selectCode) {
+          const selectedMarker = this.markersMap.get(this.selectCode)
+          selectedMarker.setStyle({
+            opacity: 1,
+          })
+        }
+        const selectedMarker = this.markersMap.get(selectCode)
+        if (selectedMarker) {
+          this.selectCode = selectCode
+          selectedMarker.setStyle({
+            opacity: 0.5,
+          })
+          window.$zMap.setView(selectedMarker.getLatLng(), 10)
+        }
+      }
     },
   },
 }
