@@ -39,7 +39,7 @@ export default {
       this.loading = true
       gisData.getWaterQualityDetail(param).then(({ data }) => {
         this.loading = false
-        this.tableData = data.filter((item) => item.isCompliant).concat(data.filter((item) => !item.isCompliant))
+        this.tableData = data
         this.$nextTick(() => {
           this.autoScroll()
         })

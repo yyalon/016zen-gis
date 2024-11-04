@@ -46,7 +46,7 @@ export default {
           show: false,
           chunkedLoading: true, // 间隔添加数据，以便页面不冻结。
           showCoverageOnHover: false, // 是否显示聚合标记的边界。
-          disableClusteringAtZoom: 18, // 此级别下不聚合
+          disableClusteringAtZoom: 10, // 此级别下不聚合
         })
         window.$zMap.addLayer(_layer)
 
@@ -63,16 +63,17 @@ export default {
           //   noDabiao = true
           // }
           let image = 'img/marker/river.png'
-          if (riverSection.status === '1') {
+          if (riverSection.status === 1) {
             image = 'img/marker/river_red.png'
           }
-          else if (riverSection.status === '2') {
+          else if (riverSection.status === 2) {
             image = 'img/marker/river_red_blinking.gif'
           }
           // const compliant = this.dictWaterQuality[riverSection.code]?.compliant
           const graphic = new window.$ZMap.graphic.Marker({
             latlng: [riverSection.latitude, riverSection.longitude],
             style: {
+              width: 40,
               image,
               horizontalOrigin: window.$ZMap.HorizontalOrigin.CENTER,
               verticalOrigin: window.$ZMap.VerticalOrigin.BOTTOM,
@@ -118,6 +119,7 @@ export default {
         if (this.selectCode) {
           const selectedMarker = this.markersMap.get(this.selectCode)
           selectedMarker.setStyle({
+            width: 40,
             pulse: false,
           })
         }
@@ -125,8 +127,16 @@ export default {
         if (selectedMarker) {
           this.selectCode = selectCode
 
+          let color = 'rgba(0, 117, 255, 0.8)'
+          if (selectedMarker.options.attr?.status === 1 || selectedMarker.options.attr?.status === 2) {
+            color = 'rgba(255, 53, 53, 0.8)'
+          }
+
           selectedMarker.setStyle({
+            width: 15,
             pulse: true,
+            pulseColor: color,
+            pulseShadowColor: color,
           })
           window.$zMap.setView(selectedMarker.getLatLng(), 10)
         }
