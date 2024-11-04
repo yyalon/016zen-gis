@@ -118,14 +118,15 @@ export default {
         if (this.selectCode) {
           const selectedMarker = this.markersMap.get(this.selectCode)
           selectedMarker.setStyle({
-            opacity: 1,
+            pulse: false,
           })
         }
         const selectedMarker = this.markersMap.get(selectCode)
         if (selectedMarker) {
           this.selectCode = selectCode
+
           selectedMarker.setStyle({
-            opacity: 0.5,
+            pulse: true,
           })
           window.$zMap.setView(selectedMarker.getLatLng(), 10)
         }
