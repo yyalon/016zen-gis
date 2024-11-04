@@ -57,6 +57,7 @@ export default {
   },
   data() {
     return {
+      abbreviationSrc: './breadcrumb/abbreviation.png',
       loading: null,
       activeGraph: 'cockpit',
       settings,
@@ -399,7 +400,7 @@ export default {
         <GraphSwitcher v-model:active-graph="activeGraph">
           <div class="title">
             <div class="titleBeforeLine" />
-            <img src="./breadcrumb/abbreviation.png">
+            <img :src="abbreviationSrc">
             <div class="titleAfterLine" />
           </div>
         </GraphSwitcher>
