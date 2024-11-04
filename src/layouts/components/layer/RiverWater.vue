@@ -121,6 +121,7 @@ export default {
           selectedMarker.setStyle({
             width: 40,
             pulse: false,
+            className: '',
           })
         }
         const selectedMarker = this.markersMap.get(selectCode)
@@ -137,6 +138,7 @@ export default {
             pulse: true,
             pulseColor: color,
             pulseShadowColor: color,
+            className: selectedMarker.options.attr?.status === 2 ? 'blinking-marker' : '',
           })
           window.$zMap.setView(selectedMarker.getLatLng(), 10)
         }
@@ -155,5 +157,19 @@ export default {
 <style>
 .custom_tooltip {
   width: auto;
+}
+
+@keyframes blinking {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+.blinking-marker {
+  animation: blinking 0.5s infinite alternate;
 }
 </style>
