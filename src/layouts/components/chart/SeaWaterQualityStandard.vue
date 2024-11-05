@@ -112,24 +112,27 @@ export default {
 .sea-water {
   margin-top: 24px;
   height: 323px;
+  overflow: hidden;
+  position: relative;
 }
 
 .river-water-wrapper {
-  display: none;
+  position: absolute;
+  top: 0;
+  left: 21px;
+  opacity: 0;
   width: 400px;
-  margin: 0 auto 48px;
   background-image: url("@/assets/images/waterQualityBg.png");
   background-size: 100% 100%;
   background-repeat: no-repeat;
-  transition: display 0.1 ease-in-out;
+  transition: opacity 1s ease-in-out;
 
-  &:last-child {
-    margin-bottom: 24px;
+  &:nth-child(2) {
+    top: 171px;
   }
 
   &.active {
-    display: block;
-    transition: display 1s ease-in-out;
+    opacity: 1;
   }
 }
 

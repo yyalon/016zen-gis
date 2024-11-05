@@ -28,9 +28,6 @@ export default {
       }
     })
   },
-  beforeUnmount() {
-    eventBus.off('selectRiverByCode')
-  },
   methods: {
     getData(param) {
       this.loading = true
