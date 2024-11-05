@@ -123,24 +123,27 @@ export default {
             pulse: false,
             className: '',
           })
+          this.selectCode = null
         }
-        const selectedMarker = this.markersMap.get(selectCode)
-        if (selectedMarker) {
-          this.selectCode = selectCode
+        if (selectCode) {
+          const selectedMarker = this.markersMap.get(selectCode)
+          if (selectedMarker) {
+            this.selectCode = selectCode
 
-          let color = 'rgba(0, 117, 255, 0.8)'
-          if (selectedMarker.options.attr?.status === 1 || selectedMarker.options.attr?.status === 2) {
-            color = 'rgba(255, 53, 53, 0.8)'
+            let color = 'rgba(0, 117, 255, 0.8)'
+            if (selectedMarker.options.attr?.status === 1 || selectedMarker.options.attr?.status === 2) {
+              color = 'rgba(255, 53, 53, 0.8)'
+            }
+
+            selectedMarker.setStyle({
+              width: 15,
+              pulse: true,
+              pulseColor: color,
+              pulseShadowColor: color,
+              className: selectedMarker.options.attr?.status === 2 ? 'blinking-marker' : '',
+            })
+            window.$zMap.setView(selectedMarker.getLatLng(), 10)
           }
-
-          selectedMarker.setStyle({
-            width: 15,
-            pulse: true,
-            pulseColor: color,
-            pulseShadowColor: color,
-            className: selectedMarker.options.attr?.status === 2 ? 'blinking-marker' : '',
-          })
-          window.$zMap.setView(selectedMarker.getLatLng(), 10)
         }
       }
     },
