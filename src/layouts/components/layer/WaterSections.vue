@@ -30,7 +30,7 @@ export default {
       rivers: [],
       river: '全部',
       timeSlot: end,
-      area: '东海区',
+      area: '攻坚战',
       radio1: '水质',
     }
   },
@@ -82,6 +82,7 @@ export default {
           this.rivers.push(riverSection.name)
         }
       })
+
       this.sendRiverFilterParam()
     },
     async getData() {

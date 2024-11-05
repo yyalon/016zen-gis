@@ -14,12 +14,19 @@ export default {
       water,
       data: {} as WaterQualityComplianceResult,
       param: {} as any,
+      waterQualityDimension: '水质类别',
     }
   },
   mounted() {
     eventBus.on('filterparam', (param) => {
       this.param = param
       this.getData(param)
+    })
+    eventBus.on('waterQualityDimension', (param: any) => {
+      if (param && param.waterQualityDimension) {
+        this.waterQualityDimension = param.waterQualityDimension
+        this.getData(this.param)
+      }
     })
   },
   beforeUnmount() {
@@ -28,7 +35,7 @@ export default {
   methods: {
     getData(param?: any) {
       this.loading = true
-      gisData.getWaterQualityComplianceResult(param).then(({ data }) => {
+      gisData.getWaterQualityComplianceResult({ ...param, waterQualityDimension: this.waterQualityDimension }).then(({ data }) => {
         this.loading = false
         this.data = data
       })
@@ -79,7 +86,8 @@ export default {
     </div>
     <div class="river-water-wrapper">
       <div class="river-water-title">
-        <img :src="water"><span style="margin: 0 4px;">劣V类比例</span>
+        <img :src="water"><span v-if="waterQualityDimension === '水质类别'" style="margin: 0 4px;">劣V类比例</span>
+        <span v-else style="margin: 0 4px;">总氮不达标比例</span>
         <span :class="data.poorRate <= data.poorTargetRate ? 'up' : 'notup'">
           {{ data.poorRate <= data.poorTargetRate ? '已达标' : '未达标' }}
         </span>

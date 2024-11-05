@@ -33,7 +33,6 @@ export default {
     eventBus.on('filterparam', (param) => {
       this.param = param
       this.getData(param)
-      console.log('近岸海域', param)
     })
   },
   beforeUnmount() {
@@ -89,7 +88,7 @@ export default {
           </div>
           <el-divider />
           <div class="cockpit-ocean-analysis">
-            <el-table :data="lists[0].items" :height="95" style="width: 100%;">
+            <el-table v-auto-scroll :data="lists[0].items" :height="95" style="width: 100%;">
               <el-table-column prop="text" width="43" />
               <el-table-column prop="goal" align="center" label="考核目标">
                 <template #default="scope">
@@ -120,7 +119,7 @@ export default {
           </div>
           <el-divider />
           <div class="cockpit-ocean-analysis">
-            <el-table :data="lists[1].items" :height="95" style="width: 100%;">
+            <el-table v-auto-scroll :data="lists[1].items" :height="95" style="width: 100%;">
               <el-table-column prop="text" width="43" />
               <el-table-column prop="goal" align="center" label="考核目标">
                 <template #default="scope">

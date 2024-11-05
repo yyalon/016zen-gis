@@ -22,6 +22,7 @@ export default {
   },
   beforeUnmount() {
     // eventBus.off('filterparam')
+    window.clearInterval(this.timer)
   },
   methods: {
     getData(param) {
@@ -29,26 +30,9 @@ export default {
       gisData.getMeteorology(param).then(({ data }) => {
         this.loading = false
         this.tableData = data
-        this.$nextTick(() => {
-          this.autoScroll()
-        })
       })
     },
-    autoScroll(stop) {
-      if (stop) {
-        window.clearInterval(this.timer)
-      }
-      else {
-        const tableWrapper = this.$refs.scroll_Table.layout.table.refs.bodyWrapper.firstElementChild.firstElementChild
-        this.timer = setInterval(() => {
-          tableWrapper.scrollTop += 1
-          // 判断是否滚动到底部，如果到底部了置为0（可视高度+距离顶部=整个高度）
-          if (tableWrapper.clientHeight + tableWrapper.scrollTop === tableWrapper.scrollHeight) {
-            tableWrapper.scrollTop = 0
-          }
-        }, 100)
-      }
-    },
+
   },
 }
 </script>
@@ -59,8 +43,8 @@ export default {
       监测站监测数据
     </div>
     <el-table
-      ref="scroll_Table"
-      :data="tableData" :height="313" style="width: 100%;" @mouseenter="autoScroll(true)" @mouseleave="autoScroll(false)"
+      v-auto-scroll
+      :data="tableData" :height="313" style="width: 100%;"
     >
       <el-table-column prop="stationName" label="站点" />
       <el-table-column prop="winSpeed" align="center" label="风速" />

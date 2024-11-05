@@ -16,12 +16,19 @@ export default {
       area,
       rain,
       param: {},
+      waterQualityDimension: '水质类别',
     }
   },
   async mounted() {
     eventBus.on('filterparam', (param) => {
       this.param = param
       this.getData(param)
+    })
+    eventBus.on('waterQualityDimension', (param) => {
+      if (param && param.waterQualityDimension) {
+        this.waterQualityDimension = param.waterQualityDimension
+        this.getData(this.param)
+      }
     })
   },
   beforeUnmount() {
@@ -33,7 +40,7 @@ export default {
   methods: {
     getData(param) {
       this.loading = true
-      gisData.getRiverOverall(param).then((res) => {
+      gisData.getRiverOverall({ ...param, waterQualityDimension: this.waterQualityDimension }).then((res) => {
         this.loading = false
         this.lists[0] = { ...res.data.sea, text: '东海区' }
         this.lists[1] = { ...res.data.battle, text: '攻坚战区域' }
@@ -45,12 +52,39 @@ export default {
 
 <template>
   <ZFrame v-loading="loading" title="入海河流">
-    <div class="cockpit-river-lists">
+    <div v-if="waterQualityDimension === '水质类别'" class="cockpit-river-lists">
       <div v-for="(item, index) in lists" :key="index" class="cockpit-river-item">
         <div class="cockpit-river-title">
           <div><img :src="area" style="vertical-align: middle;">{{ item.text }}</div>
           <div>
             <span class="number">{{ item.qualifyCount }}</span>条III类及以上
+          </div>
+        </div>
+        <div class="cockpit-river-content">
+          <div>{{ item.time }}，共监测{{ item.sectionCount }}个断面，其中达到考核目标水质的断面{{ item.qualifyCount }}个，达标率{{ item.qualifyRate }}%</div>
+          <div class="compliance">
+            <div class="compliance-title">
+              <div><img :src="rain" style="vertical-align: middle;">水质达标率</div>
+              <div>
+                <span class="number">{{ item.qualifyRate }}</span> %
+              </div>
+            </div>
+            <div class="compliance-progress">
+              <div class="compliance-progress-content">
+                <div class="progress-default" />
+                <div class="progress-active" :style="{ width: `${item.qualifyRate}%` }" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div v-else class="cockpit-river-lists">
+      <div v-for="(item, index) in lists" :key="index" class="cockpit-river-item">
+        <div class="cockpit-river-title">
+          <div><img :src="area" style="vertical-align: middle;">{{ item.text }}</div>
+          <div>
+            <span class="number">{{ item.qualifyCount }}</span>条总氮达标
           </div>
         </div>
         <div class="cockpit-river-content">

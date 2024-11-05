@@ -5,6 +5,7 @@ import App from './App.vue'
 import pinia from './store'
 import router from './router'
 import useSettingsStore from './store/modules/settings'
+import autoScroll from './directives/autoScroll'
 import { setupZhi } from '@/lib/Zhi'
 
 // 加载 svg 图标
@@ -30,6 +31,7 @@ setupZhi(app)
 app.use(ElementPlus)
 app.use(pinia)
 app.use(router)
+app.directive('auto-scroll', autoScroll)
 if (useSettingsStore().settings.app.iconifyOfflineUse) {
   downloadAndInstall()
 }
