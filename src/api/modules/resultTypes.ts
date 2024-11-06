@@ -243,3 +243,116 @@ export interface OperationResult<T> {
   message: string
   data: T
 }
+
+/**
+ * 主要污染企业
+ */
+export interface MainPollutingEnterprises {
+  id: number // 主键ID
+  AREANAME: string // 地区名称
+  ATTENTIONDEGREECODE: string // 关注程度
+  BANKACCOUNT: string // 银行帐号
+  BUILDSTATUS: string // BUILDSTATUS
+  CHECKSTATUS: string // CHECKSTATUS
+  COMMENT: string // 备注
+  COMMUNICATEADDR: string // 通讯地址
+  CORPORATIONCODE: string // 法人代码
+  CORPORATIONNAME: string // 法定代表人
+  DELETEFLAG: string // 删除标记
+  DISPOSETYPECODE: string // 处理厂类型编码
+  DISPOSETYPENAME: string // 处理厂类型
+  EMAIL: string // 电子邮箱
+  ENTERCODE: string // ENTERCODE
+  ENVIRONMENTMANS: string // 专职环保人员数
+  ENVIRONMENTPRINCIPAL: string // 环保负责人
+  EXCHANGEDATE: string // EXCHANGEDATE
+  FAX: string // 传真
+  IFALREADYONLINE: string // 是否已联网
+  IFTHIRTYTENTHOUSANDKILOWAT: string // 是否30万千瓦电力企业
+  INDUSTRYTYPECODE: string // 行业类别编码
+  INDUSTRYTYPENAME: string // 行业类别
+  ISMONITOR: string // ISMONITOR
+  LICENSENUM: string // 许可证编号
+  LINKMAN: string // 联系人
+  LATITUDE: number // 纬度
+  LONGITUDE: number // 经度
+  MOBILEPHONE: string // 移动电话
+  OFFICEPHONE: string // 办公电话
+  ONLINESTATUS: string // 在线状态
+  OPENACOCUNTBANK: string // 开户银行
+  PHOTO: string // PHOTO
+  POSTALCODE: string // 邮政编码
+  PROVINCECODE: string // 省份编码
+  PROVINCENAME: string // 省份
+  PSADDRESS: string // 污染源地址
+  PSALIAS: string // PSALIAS
+  PSCLASSCODE: string // 污染源类别编码
+  PSCLASSNAME: string // 污染源类别
+  PSCODE: string // 污染源编码
+  PSENVIRONMENTDEPT: string // 污染源环保部门
+  PSMONITORCATEGORYTYPECODE: string // PSMONITORCATEGORYTYPECODE
+  PSNAME: string // 污染源名称
+  PSNUMBER: string // PSNUMBER
+  PSSCALECODE: string // 污染源规模编码
+  PSSCALENAME: string // 污染源规模
+  PSWEBSITE: string // 污染源网址
+  REGIONCODE: string // 行政区划编码
+  REGIONNAME: string // 行政区划名称
+  REGISTTYPECODE: string // 注册类型编码
+  REGISTTYPENAME: string // 注册类型
+  RUNDATE: string // 投产日期
+  SPELL: string // SPELL
+  STATECONTROLLEDTYPECODE: string // STATECONTROLLEDTYPECODE
+  STATUS: string // 状态
+  STOPWASTESTATUS: string // 停废业状态
+  SUBJECTIONRELATIONCODE: string // 隶属关系编码
+  SUBJECTIONRELATIONNAME: string // 隶属关系
+  TOTALAREA: string // 总占地面积
+  TYSHXYDM: string // TYSHXYDM
+  UNITTYPECODE: string // 单位类别编码
+  UNITTYPENAME: string // 单位类别
+  UPDATEDATE: string // 更新日期
+  VALLEYCODE: string // 流域编码
+  VALLEYNAME: string // 流域
+}
+
+/**
+ * 大气站
+ */
+export interface AirConcentration {
+  id: number // 主键ID
+  NEWCODE?: string // 唯一代码
+  STATIONCODE?: string // 站点代码
+  POSITIONNAME?: string // 点位名称
+  AREA?: string // 城市名称
+  CITYCODE?: string // 城市代码
+  TIMEPOINT?: string // 监测时间
+  AQI?: number // AQI
+  PRIMARYPOLLUTANT?: string // 首要污染物
+  QUALITY?: string // 环境质量等级
+  LON: number // 经度
+  LAT: number // 纬度
+  SO2?: number // 二氧化硫
+  SO2_24H?: number // 二氧化硫24小时均值
+  SO2_IAQI?: number // 二氧化硫AQI
+  NO2?: number // 二氧化氮
+  NO2_24H?: number // 二氧化氮24小时均值
+  NO2_IAQI?: number // 二氧化氮AQI
+  O3_1H_24H?: number // 臭氧
+  O3_1H_IAQI?: number // 臭氧AQI
+  O3_8H_24H?: number // 臭氧八小时滑动均值
+  O3_8H_IAQI?: number // 臭氧八小时滑动均值AQI
+  CO?: number // 一氧化碳
+  CO_24H?: number // 一氧化碳24小时均值
+  CO_IAQI?: number // 一氧化碳AQI
+  PM10?: number // PM10
+  PM10_24H?: number // PM10 24小时均值
+  PM10_IAQI?: number // PM10 AQI
+  PM2_5?: number // PM2.5
+  PM2_5_24H?: number // PM2.5 24小时均值
+  PM2_5_IAQI?: number // PM2.5 AQI
+}
+
+export interface GisConf {
+  filterDetaulTime: string // 默认数据查询时间
+}

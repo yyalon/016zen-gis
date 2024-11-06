@@ -1,7 +1,10 @@
 import api from '../index'
 import type { GeneralQuery, RegionQuery, SeaWaterQuery } from './queryTypes'
 import type {
+  AirConcentration,
   AirStation,
+  GisConf,
+  MainPollutingEnterprises,
   Meteorology,
   OperationResult,
   OutfallGoalStats,
@@ -147,4 +150,25 @@ export default {
    * @returns
    */
   getResponsiblePartyOutfallInfo: (params: any) => api.get('/app/data/gis-data/outfall-info', { params }),
+
+  /**
+   * 获取大气监测站列表
+   * @param query
+   * @returns
+   */
+  getAirList: (params: GeneralQuery): Promise<OperationResult<AirConcentration[]>> => api.post('/app/data/gis-data/air-list', { params }),
+
+  /**
+   * 获取大气监测站列表
+   * @param query
+   * @returns
+   */
+  getMainPollutingEnterprises: (params: GeneralQuery): Promise<OperationResult<MainPollutingEnterprises[]>> => api.post('/app/data/gis-data/enterprises', { params }),
+
+  /**
+   * 获取大气监测站列表
+   * @param query
+   * @returns
+   */
+  geGisConf: (params: any): Promise<OperationResult<GisConf>> => api.post('/app/data/gis-data/enterprises', { params }),
 }
