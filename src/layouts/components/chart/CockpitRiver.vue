@@ -55,16 +55,16 @@ export default {
     <div v-if="waterQualityDimension === '水质类别'" class="cockpit-river-lists">
       <div v-for="(item, index) in lists" :key="index" class="cockpit-river-item">
         <div class="cockpit-river-title">
-          <div><img :src="area" style="vertical-align: middle;">{{ item.text }}</div>
+          <div><img :src="area" style="vertical-align: middle;" />{{ item.text }}</div>
           <div>
-            <span class="number">{{ item.qualifyCount }}</span>条III类及以上
+            <span class="number">{{ item.triadCategoryCount }}</span>条III类及以上
           </div>
         </div>
         <div class="cockpit-river-content">
-          <div>{{ item.time }}，共监测{{ item.sectionCount }}个断面，其中达到考核目标水质的断面{{ item.qualifyCount }}个，达标率{{ item.qualifyRate }}%</div>
+          <div>{{ item.time }}，共监测{{ item.sectionCount }}个断面，其中达到水质考核目标的断面{{ item.qualifyCount }}个，达标率{{ item.qualifyRate }}%</div>
           <div class="compliance">
             <div class="compliance-title">
-              <div><img :src="rain" style="vertical-align: middle;">水质达标率</div>
+              <div><img :src="rain" style="vertical-align: middle;" />水质达标率</div>
               <div>
                 <span class="number">{{ item.qualifyRate }}</span> %
               </div>
@@ -82,16 +82,17 @@ export default {
     <div v-else class="cockpit-river-lists">
       <div v-for="(item, index) in lists" :key="index" class="cockpit-river-item">
         <div class="cockpit-river-title">
-          <div><img :src="area" style="vertical-align: middle;">{{ item.text }}</div>
+          <div><img :src="area" style="vertical-align: middle;" />{{ item.text }}</div>
           <div>
-            <span class="number">{{ item.qualifyCount }}</span>条总氮达标
+            <span class="number">{{ item.triadCategoryCount }}</span
+            >条总氮达标
           </div>
         </div>
         <div class="cockpit-river-content">
           <div>{{ item.time }}，共监测{{ item.sectionCount }}个断面，其中达到考核目标水质的断面{{ item.qualifyCount }}个，达标率{{ item.qualifyRate }}%</div>
           <div class="compliance">
             <div class="compliance-title">
-              <div><img :src="rain" style="vertical-align: middle;">水质达标率</div>
+              <div><img :src="rain" style="vertical-align: middle;" />水质达标率</div>
               <div>
                 <span class="number">{{ item.qualifyRate }}</span> %
               </div>

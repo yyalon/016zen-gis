@@ -57,11 +57,11 @@ export default {
         </template>
       </el-table-column>
       <el-table-column prop="totalNitrogen" align="center" label="总氮" />
-      <el-table-column prop="isCompliant" align="center" label="达标状态">
+      <el-table-column prop="ntIsCompliant" align="center" label="达标状态">
         <template #default="scope">
           <span v-if="scope.row.ntIsCompliant === null">/</span>
           <span v-else :style="`color: ${scope.row.ntIsCompliant ? 'rgba(0, 202, 3, 0.8)' : 'rgba(255, 53, 53, 0.8)'}`">
-            {{ scope.row.isCompliant ? '达标' : '不达标' }}
+            {{ scope.row.ntIsCompliant ? '达标' : '不达标' }}
           </span>
         </template>
       </el-table-column>
@@ -85,8 +85,11 @@ export default {
       </el-table-column>
       <el-table-column prop="isCompliant" align="center" label="达标状态">
         <template #default="scope">
-          <span :style="`color: ${scope.row.isCompliant ? 'rgba(0, 202, 3, 0.8)' : 'rgba(255, 53, 53, 0.8)'}`">
+          <span v-if="scope.row.isCompliant !== null" :style="`color: ${scope.row.isCompliant ? 'rgba(0, 202, 3, 0.8)' : 'rgba(255, 53, 53, 0.8)'}`">
             {{ scope.row.isCompliant ? '达标' : '不达标' }}
+          </span>
+          <span v-else>
+            /
           </span>
         </template>
       </el-table-column>

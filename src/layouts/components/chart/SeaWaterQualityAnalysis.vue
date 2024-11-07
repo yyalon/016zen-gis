@@ -78,7 +78,7 @@ export default {
           <div class="river-water-type-item">
             <span>劣IV类</span>
             <span>{{ data.area.currentSeasonAboveClass4Rate }}%</span>
-            <span :style="{ color: data.area.aboveClass4SeasonDifference <= 0 ? '#0bffa2' : '#f90' }">{{ data.area.aboveClass4SeasonDifference }}个</span>
+            <span :style="{ color: data.area.aboveClass4SeasonDifference <= 0 ? '#0bffa2' : '#f90' }">{{ data.area.aboveClass4SeasonDifference }}%</span>
           </div>
         </div>
         <div>
@@ -105,7 +105,7 @@ export default {
           <div class="river-water-type-item">
             <span>劣IV类</span>
             <span>{{ data.area.currentSeasonAboveClass4Rate }}%</span>
-            <span :style="{ color: data.point.aboveClass4SeasonDifference <= 0 ? '#0bffa2' : '#f90' }">{{ data.point.aboveClass4SeasonDifference }}个</span>
+            <span :style="{ color: data.point.aboveClass4SeasonDifference <= 0 ? '#0bffa2' : '#f90' }">{{ data.point.aboveClass4SeasonDifference }}%</span>
           </div>
         </div>
         <div>
