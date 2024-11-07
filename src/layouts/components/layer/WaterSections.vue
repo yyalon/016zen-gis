@@ -28,12 +28,11 @@ export default {
       selectedArea: '全部',
       selectedAreaNode: null,
       riverSections: [],
-      filteredRiverSections: [],
       rivers: [],
       river: '全部',
       timeSlot: end,
       area: '东海区',
-      radio1: '水质',
+      waterQualityDimension: '水质',
     }
   },
   watch: {
@@ -45,7 +44,12 @@ export default {
     },
   },
   async created() {
-    await this.getData()
+    const res = await gisData.geGisConf()
+    if (res && res.code === 1000) {
+      this.timeSlot = res.data.filterDetaulTime
+    }
+
+    await this.sendRiverFilterParam()
   },
   beforeUnmount() {
     this.setLayerVisible(areaLayer, false)
@@ -65,59 +69,25 @@ export default {
       }
 
       if (activeGraph === 'outfall') {
-        this.radio1 = '水质'
+        this.waterQualityDimension = '水质'
 
         this.sendWaterQualityDimension()
       }
     },
-    async filterRiverSections() {
-      this.filteredRiverSections = []
-
-      let city = ''
-      let province = ''
-      if (this.selectedAreaNode?.level === 1) {
-        city = ''
-        province = this.selectedArea === '全部' ? '' : this.selectedArea
-      }
-      else if (this.selectedAreaNode?.level === 2) {
-        city = this.selectedArea
-        province = this.selectedAreaNode.data.label
-      }
-      this.riverSections.forEach((section) => {
-        let _qualitied = true
-        if ((province && province !== section.atProvince)
-          || (city && city !== section.atCity)
-        ) {
-          _qualitied = false
-        }
-        if (_qualitied) {
-          this.filteredRiverSections.push(section)
-        }
-      })
-
-      this.rivers = [{ name: '全部' }]
-      this.filteredRiverSections.forEach((riverSection) => {
-        if (!this.rivers.find((o) => o.name === riverSection.name)) {
-          this.rivers.push(riverSection)
-        }
-      })
-
-      this.sendRiverFilterParam()
-    },
-    async getData() {
-      const res = await gisData.geGisConf()
-      if (res && res.code === 1000) {
-        console.log('geGisConf', res)
-      }
-
-      const rivers = await apiData.getRiverSections()
+    async getData(params) {
+      const rivers = await apiData.getRiverSections(params)
       if (rivers && rivers.code === 1000) {
         this.riverSections = rivers.data
       }
 
-      this.filterRiverSections()
+      this.rivers = [{ name: '全部' }]
+      this.riverSections.forEach((riverSection) => {
+        if (!this.rivers.find((o) => o.name === riverSection.name)) {
+          this.rivers.push(riverSection)
+        }
+      })
     },
-    sendRiverFilterParam() {
+    async sendRiverFilterParam(isDimension) {
       let city = ''
       let province = ''
       if (this.selectedAreaNode?.level === 1) {
@@ -129,12 +99,18 @@ export default {
         province = this.selectedAreaNode.data.label
       }
       const area = this.area === '东海区' ? '' : this.area
-      eventBus.emit('filterparam', {
+
+      const params = {
         area,
         city,
         province,
         time: dayjs(this.timeSlot).format('YYYY-MM-DD'),
-      })
+      }
+      if (!isDimension) {
+        eventBus.emit('filterparam', params)
+      }
+
+      await this.getData({ ...params, waterQualityDimension: this.waterQualityDimension })
     },
     disabledDate(time) {
       const end = new Date()
@@ -171,7 +147,7 @@ export default {
         this.areas = areas.filter((zone) => ['全部', '上海市', '浙江省', '江苏省', '福建省'].includes(zone.label))
       }
 
-      this.filterRiverSections()
+      this.sendRiverFilterParam()
 
       this.showAreaLayer()
     },
@@ -279,12 +255,13 @@ export default {
       eventBus.emit('selectRiverByCode', {
         selectCode: this.river === '全部' ? null : this.rivers.find((o) => o.name === this.river)?.code,
       })
-      this.sendRiverFilterParam()
     },
     sendWaterQualityDimension() {
       eventBus.emit('waterQualityDimension', {
-        waterQualityDimension: this.radio1,
+        waterQualityDimension: this.waterQualityDimension,
       })
+
+      this.sendRiverFilterParam(true)
     },
   },
 }
@@ -306,7 +283,7 @@ export default {
           node-key="label"
           check-strictly
           @node-click="handleAreasClick"
-          @change="filterRiverSections"
+          @change="sendRiverFilterParam"
         />
 
         <el-select v-model="river" placeholder="请选择断面" @change="showRiverLayer">
@@ -321,7 +298,7 @@ export default {
           @change="sendRiverFilterParam"
         />
       </div>
-      <el-radio-group v-if="activeGraph !== 'outfall'" v-model="radio1" is-button style="margin-top: 20px;" @change="() => { sendWaterQualityDimension(); }">
+      <el-radio-group v-if="activeGraph !== 'outfall'" v-model="waterQualityDimension" is-button style="margin-top: 20px;" @change="() => { sendWaterQualityDimension(); }">
         <el-radio-button label="水质类别" value="水质" />
         <el-radio-button label="总氮" value="总氮" />
       </el-radio-group>
