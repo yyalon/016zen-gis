@@ -13,6 +13,10 @@ export default {
     return { riverSections: [], drawerVisible: false, drawerData: {}, markersMap: null, selectCode: null }
   },
   async mounted() {
+    eventBus.on('filterparam', async (params) => {
+      await this.getData(params)
+    })
+
     eventBus.on('selectRiverByCode', ({ selectCode }) => {
       this.zoomToMarkerByCode(selectCode)
     })
@@ -25,11 +29,68 @@ export default {
     }
   },
   methods: {
-    async getData() {
-      const allRivers = await apiData.getRiverSections()
+    async getData(params) {
+      const allRivers = await apiData.getRiverSections(params)
       if (allRivers && allRivers.code === 1000) {
         this.riverSections = allRivers.data
       }
+
+      _layer.eachGraphic((graphic) => {
+        _layer.removeGraphic(graphic)
+      })
+
+      this.markersMap = new Map()
+
+      this.riverSections.forEach((riverSection) => {
+        const arr = ['Ⅰ', 'Ⅱ', 'Ⅲ']
+        // const compliant = arr.includes(riverSection?.level2018)
+        // let noDabiao = false
+        // if (parseFloat(riverSection.N2023) > parseFloat(riverSection.N2025) || romanToInt(riverSection.W2023) > romanToInt(riverSection.W2025)) {
+        //   // 不达标
+        //   noDabiao = true
+        // }
+        let image = 'img/marker/river.png'
+        if (riverSection.status === 1) {
+          image = 'img/marker/river_red.png'
+        }
+        else if (riverSection.status === 2) {
+          image = 'img/marker/river_red_blinking.gif'
+        }
+        // const compliant = this.dictWaterQuality[riverSection.code]?.compliant
+        const graphic = new window.$ZMap.graphic.Marker({
+          latlng: [riverSection.latitude, riverSection.longitude],
+          style: {
+            width: 40,
+            image,
+            horizontalOrigin: window.$ZMap.HorizontalOrigin.CENTER,
+            verticalOrigin: window.$ZMap.VerticalOrigin.BOTTOM,
+          },
+          attr: riverSection,
+          id: riverSection.code,
+        })
+
+        // 将Marker添加到Map对象中
+        this.markersMap.set(riverSection.code, graphic)
+
+        graphic.bindTooltip(null, {
+          className: 'custom_tooltp',
+        })
+
+        graphic.on(window.$ZMap.EventType.click, (e) => {
+          this.drawerData = e.target.attr
+          this.drawerVisible = true
+        })
+
+        graphic.on(window.$ZMap.EventType.tooltipopen, (e) => {
+          e.target.setTooltipContent(window.$Utitls.loadComponentContent(e.target, PopupRiverSection, { popupData: e.target.attr }))
+        })
+
+        graphic.on(window.$ZMap.EventType.tooltipclose, (e) => {
+          window.$Utitls.unloadComponentContent(e.target)
+        })
+
+        _layer.addGraphic(graphic)
+      })
     },
     async showLayer() {
       this.loading = this.$loading({
@@ -51,65 +112,13 @@ export default {
         window.$zMap.addLayer(_layer)
 
         await this.getData()
-
-        this.markersMap = new Map()
-
-        this.riverSections.forEach((riverSection) => {
-          const arr = ['Ⅰ', 'Ⅱ', 'Ⅲ']
-          // const compliant = arr.includes(riverSection?.level2018)
-          // let noDabiao = false
-          // if (parseFloat(riverSection.N2023) > parseFloat(riverSection.N2025) || romanToInt(riverSection.W2023) > romanToInt(riverSection.W2025)) {
-          //   // 不达标
-          //   noDabiao = true
-          // }
-          let image = 'img/marker/river.png'
-          if (riverSection.status === 1) {
-            image = 'img/marker/river_red.png'
-          }
-          else if (riverSection.status === 2) {
-            image = 'img/marker/river_red_blinking.gif'
-          }
-          // const compliant = this.dictWaterQuality[riverSection.code]?.compliant
-          const graphic = new window.$ZMap.graphic.Marker({
-            latlng: [riverSection.latitude, riverSection.longitude],
-            style: {
-              width: 40,
-              image,
-              horizontalOrigin: window.$ZMap.HorizontalOrigin.CENTER,
-              verticalOrigin: window.$ZMap.VerticalOrigin.BOTTOM,
-            },
-            attr: riverSection,
-            id: riverSection.code,
-          })
-
-          // 将Marker添加到Map对象中
-          this.markersMap.set(riverSection.code, graphic)
-
-          graphic.bindTooltip(null, {
-            className: 'custom_tooltp',
-          })
-
-          graphic.on(window.$ZMap.EventType.click, (e) => {
-            this.drawerData = e.target.attr
-            this.drawerVisible = true
-          })
-
-          graphic.on(window.$ZMap.EventType.tooltipopen, (e) => {
-            e.target.setTooltipContent(window.$Utitls.loadComponentContent(e.target, PopupRiverSection, { popupData: e.target.attr }))
-          })
-
-          graphic.on(window.$ZMap.EventType.tooltipclose, (e) => {
-            window.$Utitls.unloadComponentContent(e.target)
-          })
-
-          _layer.addGraphic(graphic)
-        })
-        if (this.riverSections.length > 0) {
-          window.$zMap.fitBounds(_layer.getBounds(), { padding: [80, 80], duration: 5 })
-        }
       }
 
       setTimeout(() => {
+        if (this.riverSections.length > 0) {
+          window.$zMap.fitBounds(_layer.getBounds(), { padding: [80, 80], duration: 5 })
+        }
+
         _layer.show = true
         this.loading.close()
       }, 500)

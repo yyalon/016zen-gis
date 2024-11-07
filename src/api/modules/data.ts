@@ -1,4 +1,5 @@
 import api from '../index'
+import type { GeneralQuery } from './queryTypes'
 
 export default {
   // 获取并计算生成海水水质等级面积数据
@@ -9,7 +10,7 @@ export default {
 
   // 获取河流断面
   // getRiverSections: () => api.post('/admin/data/river-section/list'),
-  getRiverSections: () => api.post('/app/data/gis-data/selection-list'),
+  getRiverSections: (params: GeneralQuery) => api.post('/app/data/gis-data/selection-list', { params }),
 
   // 获取河流断面详细信息
   getRiverSectionInfo: (params: any) => api.get('/app/data/river-section/info', { params }),
@@ -29,7 +30,7 @@ export default {
   getPollutionConcentrationTrend: (data: any) => api.post('/admin/data/river-section/concentrationTrend', data),
 
   // 获取排污口列表
-  getSewageOutfalls: () => api.post('/app/data/sewage-outfall/list'),
+  getSewageOutfalls: (params: GeneralQuery) => api.post('/app/data/sewage-outfall/list', { params }),
 
   // 获取海水水质监测站列表
   getSeaWaterStation: () => api.post('/app/data/sea-water-station/list'),
