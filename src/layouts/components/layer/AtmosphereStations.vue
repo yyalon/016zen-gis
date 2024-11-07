@@ -2,15 +2,25 @@
 import drawerSewageOutfall from '../drawer/SewageOutfall.vue'
 import PopupAtmosphereStation from '../popup/AtmosphereStation.vue'
 import gisData from '@/api/modules/gis'
+import eventBus from '@/utils/eventBus'
 
 let _layer = null
 
 export default {
   components: { DrawerSewageOutfall: drawerSewageOutfall },
   data() {
-    return { airStations: [], drawerVisible: false, drawerData: {} }
+    return {
+      airStations: [],
+      drawerVisible: false,
+      drawerData: {},
+      selectedMarker: null,
+      code: null,
+    }
   },
   async mounted() {
+    eventBus.on('selectAir', ({ code }) => {
+      this.zoomToMarker(code)
+    })
     await this.showLayer()
   },
   unmounted() {
@@ -36,6 +46,7 @@ export default {
         _layer.show = true
       }
       else {
+        this.markersMap = new Map()
         _layer = new window.$ZMap.layer.ClusterLayer({
           show: false,
           chunkedLoading: true, // 间隔添加数据，以便页面不冻结。
@@ -82,6 +93,8 @@ export default {
             })
 
             _layer.addGraphic(graphic)
+            // 将Marker添加到Map对象中
+            this.markersMap.set(item.STATIONCODE, graphic)
           }
         }
       }
@@ -90,6 +103,42 @@ export default {
         _layer.show = true
         loading.close()
       }, 500)
+    },
+
+    zoomToMarker(code) {
+      if (this.markersMap) {
+        if (this.code) {
+          const selectedMarker = this.markersMap.get(this.code)
+          selectedMarker.setStyle({
+            pixelSize: 3,
+            color: '#0075ff',
+            opacity: 0.6,
+            outline: true,
+            outlineWidth: 1,
+            outlineColor: '#0075ff',
+            outlineOpacity: 1.0,
+          })
+          this.code = null
+        }
+        if (code) {
+          const selectedMarker = this.markersMap.get(code)
+          console.log('zoomToMarker', code, selectedMarker)
+          if (selectedMarker) {
+            this.code = code
+            const color = 'rgba(255, 53, 53, 0.8)'
+            selectedMarker.setStyle({
+              pixelSize: 10,
+              color: '#0075ff',
+              opacity: 0.6,
+              outline: true,
+              outlineWidth: 1,
+              outlineColor: color,
+              outlineOpacity: 1.0,
+            })
+            window.$zMap.setView(selectedMarker.getLatLng(), 10)
+          }
+        }
+      }
     },
   },
 }

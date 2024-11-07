@@ -283,7 +283,7 @@ export default {
           node-key="label"
           check-strictly
           @node-click="handleAreasClick"
-          @change="sendRiverFilterParam"
+          @change="() => { sendRiverFilterParam(); }"
         />
 
         <el-select v-model="river" placeholder="请选择断面" @change="showRiverLayer">
@@ -295,7 +295,7 @@ export default {
           type="month"
           :clearable="false"
           :disabled-date="disabledDate"
-          @change="sendRiverFilterParam"
+          @change="() => { sendRiverFilterParam(); }"
         />
       </div>
       <el-radio-group v-if="activeGraph !== 'outfall'" v-model="waterQualityDimension" is-button style="margin-top: 20px;" @change="() => { sendWaterQualityDimension(); }">

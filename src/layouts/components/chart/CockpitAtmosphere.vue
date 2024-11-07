@@ -31,6 +31,11 @@ export default {
         this.tableData = data
       })
     },
+    zoomToMarkerByCode(row) {
+      eventBus.emit('selectAir', {
+        code: row.code,
+      })
+    },
   },
 }
 </script>
@@ -40,7 +45,7 @@ export default {
     <div class="subtitle">
       监测站监测数据
     </div>
-    <el-table v-auto-scroll :data="tableData" :height="313" style="width: 100%;">
+    <el-table v-auto-scroll :data="tableData" :height="313" style="width: 100%;" @row-click="zoomToMarkerByCode">
       <el-table-column prop="stationName" label="站点" />
       <el-table-column prop="AQI" align="center" label="AQI" />
       <el-table-column prop="quality" align="center" label="空气质量等级">
