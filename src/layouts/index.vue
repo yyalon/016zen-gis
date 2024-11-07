@@ -12,7 +12,9 @@ import LayerSeaZhejiang from './components/layer/SeaZhejiang.vue'
 import LayerLandJiangsu from './components/layer/LandJiangsu.vue'
 import LayerLandShanghai from './components/layer/LandShanghai.vue'
 import LayerLandZhejiang from './components/layer/LandZhejiang.vue'
-import LayergetMeteorologyStations from './components/layer/MeteorologyStations.vue'
+import LayergerMeteorologyStations from './components/layer/MeteorologyStations.vue'
+import LayergerAtmosphereStations from './components/layer/AtmosphereStations.vue'
+import LayergerEnterprises from './components/layer/Enterprises.vue'
 import LayerReservoirs from './components/layer/Reservoirs.vue'
 import LayerRiverChannels from './components/layer/RiverChannels.vue'
 
@@ -47,7 +49,9 @@ export default {
     LayerLandJiangsu,
     LayerLandShanghai,
     LayerLandZhejiang,
-    LayergetMeteorologyStations,
+    LayergerMeteorologyStations,
+    LayergerAtmosphereStations,
+    LayergerEnterprises,
     LayerReservoirs,
     LayerRiverChannels,
     LayerRivers,
@@ -82,6 +86,20 @@ export default {
           command: 'toggleLayer',
           visibility: false,
           icon: 'meteorology-station',
+        },
+        {
+          name: '大气站',
+          value: 'layerAtmosphereStations',
+          command: 'toggleLayer',
+          visibility: false,
+          icon: 'ep:mostly-cloudy',
+        },
+        {
+          name: '污染企业',
+          value: 'layerEnterprises',
+          command: 'toggleLayer',
+          visibility: false,
+          icon: 'ep:management',
         },
         {
           name: '控制单元',
@@ -149,6 +167,8 @@ export default {
         layerReservoirs: false,
         layerRiverChannels: false,
         layerMeteorologyStations: false,
+        layerAtmosphereStations: false,
+        layerEnterprises: false,
         layerRiver: false,
         controlUnit: false,
       },
@@ -389,7 +409,9 @@ export default {
     <LayerLandJiangsu v-if="visibilities.land" />
     <LayerLandShanghai v-if="visibilities.land" />
     <LayerLandZhejiang v-if="visibilities.land" />
-    <LayergetMeteorologyStations v-if="visibilities.layerMeteorologyStations" />
+    <LayergerMeteorologyStations v-if="visibilities.layerMeteorologyStations" />
+    <LayergerAtmosphereStations v-if="visibilities.layerAtmosphereStations" />
+    <LayergerEnterprises v-if="visibilities.layerEnterprises" />
     <LayerReservoirs v-if="visibilities.layerReservoirs" />
     <LayerRiverChannels v-if="visibilities.layerRiverChannels" />
     <LayerRivers v-if="visibilities.layerRiver" :river-level="riverLevel" />

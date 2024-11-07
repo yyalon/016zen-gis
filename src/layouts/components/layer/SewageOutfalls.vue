@@ -2,6 +2,7 @@
 import drawerSewageOutfall from '../drawer/SewageOutfall.vue'
 import PopupSweageOutfall from '../popup/SweageOutfall.vue'
 import apiData from '@/api/modules/data'
+import eventBus from '@/utils/eventBus'
 
 let _layer = null
 
@@ -11,6 +12,10 @@ export default {
     return { sewageOutfalls: [], drawerVisible: false, drawerData: {} }
   },
   async mounted() {
+    eventBus.on('filterparam', async (params) => {
+      await this.getData(params)
+    })
+
     await this.showLayer()
   },
   unmounted() {
@@ -19,32 +24,14 @@ export default {
     }
   },
   methods: {
-    async getData() {
-      const { code, data } = await apiData.getSewageOutfalls()
+    async getData(params) {
+      const { code, data } = await apiData.getSewageOutfalls(params)
       if (code === 1000) {
         this.sewageOutfalls = data
-      }
-    },
-    async showLayer() {
-      const loading = this.$loading({
-        lock: true,
-        text: '正在加载地图数据...',
-        spinner: 'el-icon-loading',
-        background: '#100d17e3',
-      })
-      if (_layer) {
-        _layer.show = true
-      }
-      else {
-        _layer = new window.$ZMap.layer.ClusterLayer({
-          show: false,
-          chunkedLoading: true, // 间隔添加数据，以便页面不冻结。
-          showCoverageOnHover: false, // 是否显示聚合标记的边界。
-          disableClusteringAtZoom: 18, // 此级别下不聚合
-        })
-        window.$zMap.addLayer(_layer)
 
-        await this.getData()
+        _layer.eachGraphic((graphic) => {
+          _layer.removeGraphic(graphic)
+        })
 
         for (let i = 0, len = this.sewageOutfalls.length; i < len; i++) {
           const item = this.sewageOutfalls[i]
@@ -78,6 +65,28 @@ export default {
             _layer.addGraphic(graphic)
           }
         }
+      }
+    },
+    async showLayer() {
+      const loading = this.$loading({
+        lock: true,
+        text: '正在加载地图数据...',
+        spinner: 'el-icon-loading',
+        background: '#100d17e3',
+      })
+      if (_layer) {
+        _layer.show = true
+      }
+      else {
+        _layer = new window.$ZMap.layer.ClusterLayer({
+          show: false,
+          chunkedLoading: true, // 间隔添加数据，以便页面不冻结。
+          showCoverageOnHover: false, // 是否显示聚合标记的边界。
+          disableClusteringAtZoom: 18, // 此级别下不聚合
+        })
+        window.$zMap.addLayer(_layer)
+
+        await this.getData()
       }
 
       setTimeout(() => {

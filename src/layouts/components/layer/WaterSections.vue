@@ -3,6 +3,7 @@ import dayjs from 'dayjs'
 import RiverWater from './RiverWater.vue'
 import eventBus from '@/utils/eventBus'
 import apiData from '@/api/modules/data'
+import gisData from '@/api/modules/gis'
 import areas from '@/utils/area.json'
 
 let areaLayer = null
@@ -31,7 +32,7 @@ export default {
       rivers: [],
       river: '全部',
       timeSlot: end,
-      area: '攻坚战',
+      area: '东海区',
       radio1: '水质',
     }
   },
@@ -104,9 +105,14 @@ export default {
       this.sendRiverFilterParam()
     },
     async getData() {
-      const res = await apiData.getRiverSections()
+      const res = await gisData.geGisConf()
       if (res && res.code === 1000) {
-        this.riverSections = res.data
+        console.log('geGisConf', res)
+      }
+
+      const rivers = await apiData.getRiverSections()
+      if (rivers && rivers.code === 1000) {
+        this.riverSections = rivers.data
       }
 
       this.filterRiverSections()
@@ -123,10 +129,8 @@ export default {
         province = this.selectedAreaNode.data.label
       }
       const area = this.area === '东海区' ? '' : this.area
-      const river = this.river === '全部' ? '' : this.river
       eventBus.emit('filterparam', {
         area,
-        dm_name: river,
         city,
         province,
         time: dayjs(this.timeSlot).format('YYYY-MM-DD'),
@@ -172,60 +176,52 @@ export default {
       this.showAreaLayer()
     },
     showAreaLayer() {
+      this.setLayerVisible(areaLayer, false)
       this.setLayerVisible(selectedAreaLayer, false)
       eventBus.emit('selectRiverByCode', {
         selectCode: null,
       })
 
-      if (this.area === '攻坚战') {
-        let _layer = window.$zMap.getLayerById('all_battle')
-        if (!areaLayer) {
-          _layer = new window.$ZMap.layer.GeoJsonLayer({
-            id: 'all_battle',
-            zIndex: 2000,
-            name: '攻坚战',
-            url: '/file/json/universe.json',
-            symbol: {
-              styleOptions: {
-                fillColor: '#3388ff',
-                fillOpacity: 0.2,
-                outline: true,
-                outlineColor: '#3388ff',
-                outlineOpacity: 0.5,
-                outlineWidth: 2,
-              },
+      const label = this.area === '攻坚战' ? 'battle' : 'universe'
+      let _layer = window.$zMap.getLayerById(`all_${label}`)
+
+      if (!_layer) {
+        _layer = new window.$ZMap.layer.GeoJsonLayer({
+          id: `all_${label}`,
+          zIndex: 2000,
+          name: this.area,
+          url: `/file/json/${label}.json`,
+          symbol: {
+            styleOptions: {
+              fillColor: '#3388ff',
+              fillOpacity: 0.2,
+              outline: true,
+              outlineColor: '#3388ff',
+              outlineOpacity: 0.5,
+              outlineWidth: 2,
             },
-          })
+          },
+        })
 
-          window.$zMap.addLayer(_layer)
+        window.$zMap.addLayer(_layer)
 
-          _layer.on(window.$ZMap.EventType.load, () => {
-            const bounds = _layer.getBounds()
-            if (bounds) {
-              window.$zMap.fitBounds(bounds, { padding: [40, 40], duration: 5 })
-            }
-          })
-        }
-        else {
-          window.$zMap.fitBounds(areaLayer.getBounds(), { padding: [40, 40], duration: 5 })
-
-          this.setLayerVisible(areaLayer, true)
-        }
-
-        areaLayer = _layer
+        _layer.on(window.$ZMap.EventType.load, () => {
+          const bounds = _layer.getBounds()
+          if (bounds) {
+            window.$zMap.fitBounds(bounds, { padding: [40, 40], duration: 5 })
+          }
+        })
       }
       else {
-        window.$zMap.flyHome()
+        window.$zMap.fitBounds(areaLayer.getBounds(), { padding: [40, 40], duration: 5 })
 
-        if (areaLayer) {
-          this.setLayerVisible(areaLayer, false)
-        }
+        this.setLayerVisible(_layer, true)
       }
+
+      areaLayer = _layer
     },
     showAreasLayer(code) {
-      if (selectedAreaLayer) {
-        this.setLayerVisible(selectedAreaLayer, false)
-      }
+      this.setLayerVisible(selectedAreaLayer, false)
       this.setLayerVisible(areaLayer, false)
       eventBus.emit('selectRiverByCode', {
         selectCode: null,

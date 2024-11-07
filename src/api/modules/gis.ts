@@ -170,5 +170,5 @@ export default {
    * @param query
    * @returns
    */
-  geGisConf: (params: any): Promise<OperationResult<GisConf>> => api.post('/app/data/gis-data/enterprises', { params }),
+  geGisConf: (params: any): Promise<OperationResult<GisConf>> => api.post('/app/data/gis-data/gis-conf', { params }),
 }
