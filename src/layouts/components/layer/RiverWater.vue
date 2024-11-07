@@ -10,11 +10,25 @@ let _layer = null
 export default {
   components: { DrawerRiverSection },
   data() {
-    return { riverSections: [], drawerVisible: false, drawerData: {}, markersMap: null, selectCode: null }
+    return {
+      riverSections: [],
+      drawerVisible: false,
+      drawerData: {},
+      markersMap: null,
+      selectCode: null,
+      waterQualityDimension: '水质',
+    }
   },
   async mounted() {
     eventBus.on('filterparam', async (params) => {
       await this.getData(params)
+    })
+
+    eventBus.on('waterQualityDimension', (param) => {
+      if (param && param.waterQualityDimension) {
+        this.waterQualityDimension = param.waterQualityDimension
+        this.getData(this.param)
+      }
     })
 
     eventBus.on('selectRiverByCode', ({ selectCode }) => {
@@ -30,7 +44,7 @@ export default {
   },
   methods: {
     async getData(params) {
-      const allRivers = await apiData.getRiverSections(params)
+      const allRivers = await apiData.getRiverSections({ ...params, waterQualityDimension: this.waterQualityDimension })
       if (allRivers && allRivers.code === 1000) {
         this.riverSections = allRivers.data
       }
@@ -107,7 +121,7 @@ export default {
           show: false,
           chunkedLoading: true, // 间隔添加数据，以便页面不冻结。
           showCoverageOnHover: false, // 是否显示聚合标记的边界。
-          disableClusteringAtZoom: 10, // 此级别下不聚合
+          disableClusteringAtZoom: 8, // 此级别下不聚合
         })
         window.$zMap.addLayer(_layer)
 

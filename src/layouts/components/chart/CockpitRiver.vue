@@ -16,7 +16,7 @@ export default {
       area,
       rain,
       param: {},
-      waterQualityDimension: '水质类别',
+      waterQualityDimension: '水质',
     }
   },
   async mounted() {
@@ -52,7 +52,7 @@ export default {
 
 <template>
   <ZFrame v-loading="loading" title="入海河流">
-    <div v-if="waterQualityDimension === '水质类别'" class="cockpit-river-lists">
+    <div v-if="waterQualityDimension === '水质'" class="cockpit-river-lists">
       <div v-for="(item, index) in lists" :key="index" class="cockpit-river-item">
         <div class="cockpit-river-title">
           <div><img :src="area" style="vertical-align: middle;">{{ item.text }}</div>
@@ -88,10 +88,10 @@ export default {
           </div>
         </div>
         <div class="cockpit-river-content">
-          <div>{{ item.time }}，共监测{{ item.sectionCount }}个断面，其中达到考核目标水质的断面{{ item.qualifyCount }}个，达标率{{ item.qualifyRate }}%</div>
+          <div>{{ item.time }}，共监测{{ item.sectionCount }}个断面，其中达到总氮考核目标的断面{{ item.qualifyCount }}个，达标率{{ item.qualifyRate }}%</div>
           <div class="compliance">
             <div class="compliance-title">
-              <div><img :src="rain" style="vertical-align: middle;">水质达标率</div>
+              <div><img :src="rain" style="vertical-align: middle;">总氮达标率</div>
               <div>
                 <span class="number">{{ item.qualifyRate }}</span> %
               </div>

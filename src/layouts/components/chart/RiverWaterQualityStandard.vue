@@ -14,7 +14,7 @@ export default {
       water,
       data: {} as WaterQualityComplianceResult,
       param: {} as any,
-      waterQualityDimension: '水质类别',
+      waterQualityDimension: '水质',
     }
   },
   mounted() {
@@ -86,7 +86,7 @@ export default {
     </div>
     <div class="river-water-wrapper">
       <div class="river-water-title">
-        <img :src="water"><span v-if="waterQualityDimension === '水质类别'" style="margin: 0 4px;">劣V类比例</span>
+        <img :src="water"><span v-if="waterQualityDimension === '水质'" style="margin: 0 4px;">劣V类比例</span>
         <span v-else style="margin: 0 4px;">总氮不达标比例</span>
         <span :class="data.poorRate <= data.poorTargetRate ? 'up' : 'notup'">
           {{ data.poorRate <= data.poorTargetRate ? '已达标' : '未达标' }}
