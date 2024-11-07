@@ -17,17 +17,19 @@ export default {
       markersMap: null,
       selectCode: null,
       waterQualityDimension: '水质',
+      param: {},
     }
   },
   async mounted() {
     eventBus.on('filterparam', async (params) => {
+      this.param = params
       await this.getData(params)
     })
 
-    eventBus.on('waterQualityDimension', (param) => {
+    eventBus.on('waterQualityDimension', async (param) => {
       if (param && param.waterQualityDimension) {
         this.waterQualityDimension = param.waterQualityDimension
-        this.getData(this.param)
+        await this.getData(this.param)
       }
     })
 
@@ -45,10 +47,10 @@ export default {
   methods: {
     async getData(params) {
       const allRivers = await apiData.getRiverSections({ ...params, waterQualityDimension: this.waterQualityDimension })
+
       if (allRivers && allRivers.code === 1000) {
         this.riverSections = allRivers.data
       }
-
       _layer.eachGraphic((graphic) => {
         _layer.removeGraphic(graphic)
       })
