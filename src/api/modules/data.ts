@@ -10,7 +10,7 @@ export default {
 
   // 获取河流断面
   // getRiverSections: () => api.post('/admin/data/river-section/list'),
-  getRiverSections: (params: GeneralQuery) => api.post('/app/data/gis-data/selection-list', { params }),
+  getRiverSections: (params: GeneralQuery) => api.post('/app/data/gis-data/selection-list', params),
 
   // 获取河流断面详细信息
   getRiverSectionInfo: (params: any) => api.get('/app/data/river-section/info', { params }),

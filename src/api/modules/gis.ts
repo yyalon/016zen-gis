@@ -159,14 +159,14 @@ export default {
   getAirList: (params: GeneralQuery): Promise<OperationResult<AirConcentration[]>> => api.post('/app/data/gis-data/air-list', { params }),
 
   /**
-   * 获取大气监测站列表
+   * 获取污染企业列表
    * @param query
    * @returns
    */
   getMainPollutingEnterprises: (params: GeneralQuery): Promise<OperationResult<MainPollutingEnterprises[]>> => api.post('/app/data/gis-data/enterprises', { params }),
 
   /**
-   * 获取大气监测站列表
+   * 获取gis前端配置数据
    * @param query
    * @returns
    */

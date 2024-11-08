@@ -32,7 +32,11 @@ export default {
         this.tableData = data
       })
     },
-
+    zoomToMarkerByCode(row) {
+      eventBus.emit('selecMeteorolog', {
+        code: row.stationName,
+      })
+    },
   },
 }
 </script>
@@ -44,7 +48,8 @@ export default {
     </div>
     <el-table
       v-auto-scroll
-      :data="tableData" :height="313" style="width: 100%;"
+      :data="tableData"
+      :height="313" style="width: 100%;" @row-click="zoomToMarkerByCode"
     >
       <el-table-column prop="stationName" label="站点" />
       <el-table-column prop="winSpeed" align="center" label="风速" />
