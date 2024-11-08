@@ -105,7 +105,7 @@ export default {
       timeSlot: end,
       trendVisible: false,
       area: '东海区',
-      radio1: '水质',
+      radio1: '水质类别',
     }
   },
   watch: {},

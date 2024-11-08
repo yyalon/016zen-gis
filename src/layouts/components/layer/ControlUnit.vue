@@ -47,7 +47,6 @@ export default {
           setTimeout(() => {
             const names = []
             e.graphics.forEach((graphic) => {
-              console.log(graphic)
               graphic.bindTooltip(null, {
                 className: 'custom_tooltip',
               })

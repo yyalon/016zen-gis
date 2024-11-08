@@ -16,7 +16,7 @@ export default {
       area,
       rain,
       param: {},
-      waterQualityDimension: '水质',
+      waterQualityDimension: '水质类别',
     }
   },
   async mounted() {
@@ -52,7 +52,7 @@ export default {
 
 <template>
   <ZFrame v-loading="loading" title="入海河流">
-    <div v-if="waterQualityDimension === '水质'" class="cockpit-river-lists">
+    <div v-if="waterQualityDimension === '水质类别'" class="cockpit-river-lists">
       <div v-for="(item, index) in lists" :key="index" class="cockpit-river-item">
         <div class="cockpit-river-title">
           <div><img :src="area" style="vertical-align: middle;">{{ item.text }}</div>

@@ -13,7 +13,7 @@ export default {
       loading: false,
       data: {},
       param: {},
-      waterQualityDimension: '水质',
+      waterQualityDimension: '水质类别',
     }
   },
   mounted() {

@@ -96,7 +96,7 @@ export default {
       },
       param: {},
       loading: false,
-      waterQualityDimension: '水质',
+      waterQualityDimension: '水质类别',
     }
   },
   async mounted() {

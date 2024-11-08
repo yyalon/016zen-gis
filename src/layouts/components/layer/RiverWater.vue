@@ -16,7 +16,7 @@ export default {
       drawerData: {},
       markersMap: null,
       selectCode: null,
-      waterQualityDimension: '水质',
+      waterQualityDimension: '水质类别',
       param: {},
     }
   },

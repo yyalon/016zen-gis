@@ -14,7 +14,7 @@ export default {
       water,
       data: {} as WaterQualityComplianceResult,
       param: {} as any,
-      waterQualityDimension: '水质',
+      waterQualityDimension: '水质类别',
     }
   },
   mounted() {
@@ -48,7 +48,9 @@ export default {
   <ZFrame v-loading="loading" title="河流水质达标考核">
     <div class="river-water-wrapper">
       <div class="river-water-title">
-        <img :src="water"><span style="margin: 0 4px;">达到{{ param?.area }}水质要求</span>
+        <img :src="water"><span style="margin: 0 4px;">达到{{ param?.area }}<span v-if="waterQualityDimension === '水质类别'" style="margin: 0 4px;">水质要求</span>
+          <span v-else style="margin: 0 4px;">总氮要求</span>
+        </span>
         <span :class="data.complianceRate >= data.complianceTargetRate ? 'up' : 'notup'">
           {{ data.complianceRate >= data.complianceTargetRate ? '已达标' : '未达标' }}
         </span>
@@ -86,7 +88,7 @@ export default {
     </div>
     <div class="river-water-wrapper">
       <div class="river-water-title">
-        <img :src="water"><span v-if="waterQualityDimension === '水质'" style="margin: 0 4px;">劣V类比例</span>
+        <img :src="water"><span v-if="waterQualityDimension === '水质类别'" style="margin: 0 4px;">劣V类比例</span>
         <span v-else style="margin: 0 4px;">总氮不达标比例</span>
         <span :class="data.poorRate <= data.poorTargetRate ? 'up' : 'notup'">
           {{ data.poorRate <= data.poorTargetRate ? '已达标' : '未达标' }}

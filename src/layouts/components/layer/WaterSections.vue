@@ -32,7 +32,7 @@ export default {
       river: '全部',
       timeSlot: end,
       area: '攻坚战',
-      waterQualityDimension: '水质',
+      waterQualityDimension: '水质类别',
     }
   },
   watch: {
@@ -69,7 +69,7 @@ export default {
       }
 
       if (activeGraph === 'outfall') {
-        this.waterQualityDimension = '水质'
+        this.waterQualityDimension = '水质类别'
 
         this.sendWaterQualityDimension()
       }
