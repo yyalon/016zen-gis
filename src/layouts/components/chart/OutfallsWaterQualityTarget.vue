@@ -40,7 +40,7 @@ export default {
 
 <template>
   <ZFrame v-loading="loading" title="受纳水体水质目标统计">
-    <div class="outfalls-lists">
+    <div v-auto-scroll-general class="outfalls-lists">
       <div
         v-for="(group, index) in lists" :key="index"
         class="outfalls-group"
