@@ -31,7 +31,7 @@ export default {
       rivers: [],
       river: '全部',
       timeSlot: end,
-      area: '东海区',
+      area: '攻坚战',
       waterQualityDimension: '水质',
     }
   },
