@@ -12,6 +12,7 @@ import LayerSeaZhejiang from './components/layer/SeaZhejiang.vue'
 import LayerLandJiangsu from './components/layer/LandJiangsu.vue'
 import LayerLandShanghai from './components/layer/LandShanghai.vue'
 import LayerLandZhejiang from './components/layer/LandZhejiang.vue'
+import LayerLandFujian from './components/layer/LandFujian.vue'
 import LayergerMeteorologyStations from './components/layer/MeteorologyStations.vue'
 import LayergerAtmosphereStations from './components/layer/AtmosphereStations.vue'
 import LayergerEnterprises from './components/layer/Enterprises.vue'
@@ -49,6 +50,7 @@ export default {
     LayerLandJiangsu,
     LayerLandShanghai,
     LayerLandZhejiang,
+    LayerLandFujian,
     LayergerMeteorologyStations,
     LayergerAtmosphereStations,
     LayergerEnterprises,
@@ -409,6 +411,7 @@ export default {
     <LayerLandJiangsu v-if="visibilities.land" />
     <LayerLandShanghai v-if="visibilities.land" />
     <LayerLandZhejiang v-if="visibilities.land" />
+    <LayerLandFujian v-if="visibilities.land" />
     <LayergerMeteorologyStations v-if="visibilities.layerMeteorologyStations" />
     <LayergerAtmosphereStations v-if="visibilities.layerAtmosphereStations" />
     <LayergerEnterprises v-if="visibilities.layerEnterprises" />
