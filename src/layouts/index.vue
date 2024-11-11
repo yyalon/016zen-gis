@@ -212,7 +212,7 @@ export default {
     //   const tileLayer = new window.$ZMap.layer.WmsLayer({
     //     name: layer.name,
     //     type: 'wms',
-    //     url: 'http://10.103.10.80/geoserver/sea/wms',
+    //     url: 'http://10.245.183.33/geoserver/sea/wms',
     //     layers: `sea:${layer.name}`,
     //     parameters: {
     //       service: 'WMS',
@@ -329,7 +329,7 @@ export default {
             zhejiang: [],
           }
           const queryMapServer = new window.$ZMap.query.QueryGeoServer({
-            url: 'http://10.103.10.80/geoserver/sea/ows',
+            url: 'http://10.245.183.33/geoserver/sea/ows',
             layer: `sea:${layer.name}`,
           })
 

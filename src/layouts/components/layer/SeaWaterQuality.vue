@@ -662,7 +662,7 @@ export default {
         })
         let queryMapServer = null
         queryMapServer = new window.$ZMap.query.QueryGeoServer({
-          url: 'http://10.103.10.80/geoserver/sea/ows',
+          url: 'http://10.245.183.33/geoserver/sea/ows',
           layer: `sea:${name}`,
         })
         queryMapServer.query({
