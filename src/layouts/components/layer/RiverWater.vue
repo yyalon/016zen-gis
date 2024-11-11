@@ -43,6 +43,9 @@ export default {
     if (_layer) {
       _layer.show = false
     }
+    eventBus.off('filterparam')
+    eventBus.off('waterQualityDimension')
+    eventBus.off('selectRiverByCode')
   },
   methods: {
     async getData(params) {
