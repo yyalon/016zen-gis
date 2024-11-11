@@ -22,6 +22,7 @@ export default {
     if (_layer) {
       _layer.show = false
     }
+    eventBus.off('filterparam')
   },
   methods: {
     async getData(params) {

@@ -35,14 +35,6 @@ export default {
       waterQualityDimension: '水质类别',
     }
   },
-  watch: {
-    activeGraph: {
-      immediate: true,
-      handler(n) {
-        this.initSelect(n)
-      },
-    },
-  },
   async created() {
     const res = await gisData.geGisConf()
     if (res && res.code === 1000) {
@@ -62,18 +54,6 @@ export default {
     eventBus.off('selectRiverByCode')
   },
   methods: {
-    initSelect(activeGraph) {
-      if (activeGraph === 'river' && this.area !== '攻坚战') {
-        this.area = '攻坚战'
-        this.handleAreaClick()
-      }
-
-      if (activeGraph === 'outfall') {
-        this.waterQualityDimension = '水质类别'
-
-        this.sendWaterQualityDimension()
-      }
-    },
     async getData(params) {
       const rivers = await apiData.getRiverSections(params)
       if (rivers && rivers.code === 1000) {
@@ -299,7 +279,7 @@ export default {
         />
       </div>
       <el-radio-group v-if="activeGraph !== 'outfall'" v-model="waterQualityDimension" is-button style="margin-top: 20px;" @change="() => { sendWaterQualityDimension(); }">
-        <el-radio-button label="水质类别" value="水质" />
+        <el-radio-button label="水质类别" value="水质类别" />
         <el-radio-button label="总氮" value="总氮" />
       </el-radio-group>
     </div>
