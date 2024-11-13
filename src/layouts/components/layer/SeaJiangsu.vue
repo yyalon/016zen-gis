@@ -28,7 +28,8 @@ export default {
               fillOpacity: 0.2,
               outline: true,
               outlineColor: '#3388ff',
-              outlineWidth: 2,
+              outlineOpacity: 1,
+              outlineWidth: 1,
             },
           },
         })

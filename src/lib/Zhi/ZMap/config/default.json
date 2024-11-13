@@ -1,11 +1,11 @@
 ﻿{
   "map3d": {
-    "zoom": 7,
+    "zoom": 6,
     "center": {
       "lng": 121.174848,
       "lat": 31.680271
     },
-    "minZoom": 7,
+    "minZoom": 6,
     "maxZoom": 18,
     "control": {
       "scale": true,

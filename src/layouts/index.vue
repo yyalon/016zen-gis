@@ -9,6 +9,7 @@ import LayerControlUnit from './components/layer/ControlUnit.vue'
 import LayerSeaShanghai from './components/layer/SeaShanghai.vue'
 import LayerSeaJiangsu from './components/layer/SeaJiangsu.vue'
 import LayerSeaZhejiang from './components/layer/SeaZhejiang.vue'
+import LayerSeaFujian from './components/layer/SeaFujian.vue'
 import LayerLandJiangsu from './components/layer/LandJiangsu.vue'
 import LayerLandShanghai from './components/layer/LandShanghai.vue'
 import LayerLandZhejiang from './components/layer/LandZhejiang.vue'
@@ -47,6 +48,7 @@ export default {
     LayerSeaShanghai,
     LayerSeaJiangsu,
     LayerSeaZhejiang,
+    LayerSeaFujian,
     LayerLandJiangsu,
     LayerLandShanghai,
     LayerLandZhejiang,
@@ -233,7 +235,16 @@ export default {
     // })
 
     this.activeGraph = 'cockpit'
-
+    // setTimeout(() => {
+    //   const bounds1 = window.$zMap.getLayerById(2000).getBounds()
+    //   const bounds2 = window.$zMap.getLayerById(2001).getBounds()
+    //   const bounds3 = window.$zMap.getLayerById(2002).getBounds()
+    //   const bounds4 = window.$zMap.getLayerById(2003).getBounds()
+    //   bounds1.extend(bounds2)
+    //   bounds1.extend(bounds3)
+    //   bounds1.extend(bounds4)
+    //   window.$zMap.fitBounds(bounds1, { padding: [0, 0] })
+    // }, 1000)
     // setTimeout(async () => {
     //   await this.initSeaWaterQualityAreas()
     // }, 3000)
@@ -304,6 +315,7 @@ export default {
         shanghai: window.$zMap.getLayerById(2000),
         jiangsu: window.$zMap.getLayerById(2001),
         zhejiang: window.$zMap.getLayerById(2002),
+        fujian: window.$zMap.getLayerById(2003),
       }
 
       const { data } = await geoApi.getGeoSerevrLayers()
@@ -327,6 +339,7 @@ export default {
             shanghai: [],
             jiangsu: [],
             zhejiang: [],
+            fujian: [],
           }
           const queryMapServer = new window.$ZMap.query.QueryGeoServer({
             url: 'http://10.245.183.33/geoserver/sea/ows',
@@ -408,6 +421,7 @@ export default {
     <LayerSeaShanghai v-if="visibilities.sea" />
     <LayerSeaZhejiang v-if="visibilities.sea" />
     <LayerSeaJiangsu v-if="visibilities.sea" />
+    <LayerSeaFujian v-if="visibilities.sea" />
     <LayerLandJiangsu v-if="visibilities.land" />
     <LayerLandShanghai v-if="visibilities.land" />
     <LayerLandZhejiang v-if="visibilities.land" />
