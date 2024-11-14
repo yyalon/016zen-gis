@@ -14,12 +14,14 @@ const layers = {}
 let shanghai = null
 let jiangsu = null
 let zhejiang = null
+let fujian = null
 
 const seas = [
   { value: 'all', label: '所有海域', name: '所有海域', short: '所有' },
   { value: 'shanghai', label: '上海海域', name: '上海市', short: '上海' },
   { value: 'jiangsu', label: '江苏海域', name: '江苏省', short: '江苏' },
   { value: 'zhejiang', label: '浙江海域', name: '浙江省', short: '浙江' },
+  { value: 'fujian', label: '福建海域', name: '福建省', short: '福建' },
 ]
 
 const legendWQ = {
@@ -301,16 +303,26 @@ export default {
         this.setOpacity(shanghai, 0.01)
         this.setOpacity(jiangsu, 0.8)
         this.setOpacity(zhejiang, 0.8)
+        this.setOpacity(fujian, 0.8)
       }
       else if (this.sea === 'zhejiang') {
         window.$zMap.fitBounds(zhejiang.getBounds(), { padding: [40, 40], duration: 5 })
         this.setOpacity(zhejiang, 0.01)
         this.setOpacity(shanghai, 0.8)
         this.setOpacity(jiangsu, 0.8)
+        this.setOpacity(fujian, 0.8)
       }
       else if (this.sea === 'jiangsu') {
         window.$zMap.fitBounds(jiangsu.getBounds(), { padding: [40, 40], duration: 5 })
         this.setOpacity(jiangsu, 0.01)
+        this.setOpacity(shanghai, 0.8)
+        this.setOpacity(zhejiang, 0.8)
+        this.setOpacity(fujian, 0.8)
+      }
+      else if (this.sea === 'fujian') {
+        window.$zMap.fitBounds(fujian.getBounds(), { padding: [40, 40], duration: 5 })
+        this.setOpacity(fujian, 0.01)
+        this.setOpacity(jiangsu, 0.8)
         this.setOpacity(shanghai, 0.8)
         this.setOpacity(zhejiang, 0.8)
       }
@@ -322,6 +334,7 @@ export default {
     shanghai = window.$zMap.getLayerById(2000)
     jiangsu = window.$zMap.getLayerById(2001)
     zhejiang = window.$zMap.getLayerById(2002)
+    fujian = window.$zMap.getLayerById(2003)
     this.sea = 'all'
     this.showStationLayer()
     this.showLayer()
@@ -334,6 +347,7 @@ export default {
     this.setOpacity(shanghai, 0.2)
     this.setOpacity(jiangsu, 0.2)
     this.setOpacity(zhejiang, 0.2)
+    this.setOpacity(fujian, 0.2)
   },
   methods: {
     showCharts() {
