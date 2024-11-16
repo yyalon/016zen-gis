@@ -47,6 +47,7 @@ export default {
   methods: {
     async getData() {
       this.loading = true
+      console.log(this.drawerData, this.drawerData)
       const [result1, result2] = await Promise.all([apiData.getWaterQualityBySectionCode({ code: this.drawerData.code }), apiData.getRiverSectionInfo({ id: this.drawerData.id })])
       if (result1.code === 1000 && result1.data) {
         this.waterQualityData = result1.data
@@ -54,6 +55,7 @@ export default {
       if (result2.code === 1000 && result2.data) {
         this.riverSectionInfo = result2.data
       }
+
       this.loading = false
     },
     async getReservoirs() {

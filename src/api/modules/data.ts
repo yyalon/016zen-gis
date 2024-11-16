@@ -13,7 +13,7 @@ export default {
   getRiverSections: (params: GeneralQuery) => api.post('/app/data/gis-data/selection-list', params),
 
   // 获取河流断面详细信息
-  getRiverSectionInfo: (params: any) => api.get('/app/data/river-section/info', { params }),
+  getRiverSectionInfo: (params: any) => api.get('/app/data/river-section-all/info', { params }),
 
   // 通过断面编码获取单个断面水质信息
   getWaterQualityBySectionCode: (data: any) => api.post('/app/data/river-water-quality-monthly/list', data),
