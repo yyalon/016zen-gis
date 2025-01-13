@@ -7,6 +7,7 @@ import DrawerSeaWaterCharts from '../drawer/SeaWaterCharts.vue'
 import PopupSeaWaterStation from '../popup/SeaWaterStation.vue'
 import ZFrame from '../ZFrame.vue'
 import apiData from '@/api/modules/data'
+import eventBus from '@/utils/eventBus'
 
 let stationlayer = null
 const layers = {}
@@ -65,6 +66,8 @@ const years = [
   { value: 2021, label: 2021 },
   { value: 2022, label: 2022 },
   { value: 2023, label: 2023 },
+  { value: 2024, label: 2024 },
+  { value: 2025, label: 2025 },
 ]
 
 const seasons = [
@@ -211,7 +214,7 @@ const columns = [
           effect: 'dark',
           color: legendWQ[rowData.wqLevel].color,
         },
-        { default: () => cellData }
+        { default: () => cellData },
       )
     },
   },
@@ -228,6 +231,38 @@ const columns = [
     },
   },
 ]
+function getYearAndSeason() {
+  return { year: 2023, season: 'spring' }
+  /* const now = new Date()
+  const year = now.getFullYear()
+  const month = now.getMonth() + 1 // getMonth() 返回 0-11，需要加 1
+
+  let season = ''
+
+  if ([3, 4, 5].includes(month)) {
+    season = 'spring' // 春季: 3月、4月、5月
+  }
+  else if ([6, 7, 8].includes(month)) {
+    season = 'summer' // 夏季: 6月、7月、8月
+  }
+  else if ([9, 10, 11].includes(month)) {
+    season = 'autumn' // 秋季: 9月、10月、11月
+  }
+  else {
+    season = 'average' // 冬季: 12月、1月、2月
+    if (month === 12) {
+      // 冬季的12月，属于当前年份
+      return { year, season }
+    }
+    else {
+      // 冬季的1月和2月，属于上一年
+      return { year: year - 1, season }
+    }
+  }
+
+  return { year, season } */
+}
+
 /*
 <el-table-column label="季节" width="80">
   <template #default="scope">
@@ -238,6 +273,7 @@ export default {
   components: { DrawerSeaWaterStation, DrawerSeaWaterCharts, ZFrame },
   emits: ['refreshSeaWaterQualityChart'],
   data() {
+    const { year, season } = getYearAndSeason()
     return {
       seas,
       legendOther,
@@ -248,8 +284,8 @@ export default {
       objSeasons,
       objTypes,
       types,
-      year: 2022,
-      season: 'spring',
+      year,
+      season,
       type: 'wq',
       sea: 'all',
       seaWaterStations: [],
@@ -298,25 +334,29 @@ export default {
         this.setOpacity(jiangsu, 0)
         this.setOpacity(zhejiang, 0)
         this.setOpacity(fujian, 0)
-      } else if (this.sea === 'shanghai') {
+      }
+      else if (this.sea === 'shanghai') {
         window.$zMap.fitBounds(shanghai.getBounds(), { padding: [40, 40], duration: 5 })
         this.setOpacity(shanghai, 0.01)
         this.setOpacity(jiangsu, 0.8)
         this.setOpacity(zhejiang, 0.8)
         this.setOpacity(fujian, 0.8)
-      } else if (this.sea === 'zhejiang') {
+      }
+      else if (this.sea === 'zhejiang') {
         window.$zMap.fitBounds(zhejiang.getBounds(), { padding: [40, 40], duration: 5 })
         this.setOpacity(zhejiang, 0.01)
         this.setOpacity(shanghai, 0.8)
         this.setOpacity(jiangsu, 0.8)
         this.setOpacity(fujian, 0.8)
-      } else if (this.sea === 'jiangsu') {
+      }
+      else if (this.sea === 'jiangsu') {
         window.$zMap.fitBounds(jiangsu.getBounds(), { padding: [40, 40], duration: 5 })
         this.setOpacity(jiangsu, 0.01)
         this.setOpacity(shanghai, 0.8)
         this.setOpacity(zhejiang, 0.8)
         this.setOpacity(fujian, 0.8)
-      } else if (this.sea === 'fujian') {
+      }
+      else if (this.sea === 'fujian') {
         window.$zMap.fitBounds(fujian.getBounds(), { padding: [40, 40], duration: 5 })
         this.setOpacity(jiangsu, 0.8)
         this.setOpacity(shanghai, 0.8)
@@ -346,6 +386,9 @@ export default {
     this.setOpacity(zhejiang, 0.2)
     this.setOpacity(fujian, 0.2)
   },
+  created() {
+    this.sendRiverFilterParam()
+  },
   methods: {
     showCharts() {
       this.drawerSeaWaterChartsVisible = true
@@ -374,7 +417,8 @@ export default {
                 value: item.l,
                 area: parseFloat(item.a),
               })
-            } else {
+            }
+            else {
               areas[name][item.p] = [
                 {
                   value: item.l,
@@ -382,7 +426,8 @@ export default {
                 },
               ]
             }
-          } else {
+          }
+          else {
             areas[name] = {}
             areas[name][item.p] = [
               {
@@ -425,7 +470,8 @@ export default {
           this.seaWaterQualites.forEach((item) => {
             if (objSeaWaterQualites[item.site]) {
               objSeaWaterQualites[item.site].push(item)
-            } else {
+            }
+            else {
               objSeaWaterQualites[item.site] = [item]
             }
           })
@@ -478,7 +524,8 @@ export default {
 
             this.filteredSeaWaterQualites.push(objYearQualites)
           }
-        } else {
+        }
+        else {
           this.filteredSeaWaterQualites = this.seaWaterQualites.filter((item) => item.year === this.year && item.season === this.season)
         }
       }
@@ -493,7 +540,8 @@ export default {
       if (stationlayer) {
         stationlayer.show = this.showStations
         loading.close()
-      } else {
+      }
+      else {
         stationlayer = new window.$ZMap.layer.ClusterLayer({
           show: false,
           maxClusterRadius: 70,
@@ -557,9 +605,11 @@ export default {
           let fillColor = ''
           if (this.type === 'wq') {
             fillColor = legendWQ[value]?.checked ? legendWQ[value].color : '#00000000'
-          } else if (this.type === 'e') {
+          }
+          else if (this.type === 'e') {
             fillColor = legendE[value]?.checked ? legendE[value].color : '#00000000'
-          } else {
+          }
+          else {
             fillColor = legendOther[value]?.checked ? legendOther[value].color : '#00000000'
           }
           graphic.setStyle({ fillColor })
@@ -575,9 +625,11 @@ export default {
       })
       if (this.type === 'wq') {
         this.legendWQ[value].checked = !this.legendWQ[value].checked
-      } else if (this.type === 'e') {
+      }
+      else if (this.type === 'e') {
         this.legendE[value].checked = !this.legendE[value].checked
-      } else {
+      }
+      else {
         this.legendOther[value].checked = !this.legendOther[value].checked
       }
       this.resetLayerStyle()
@@ -625,9 +677,11 @@ export default {
             let fillColor = ''
             if (this.type === 'wq') {
               fillColor = legendWQ[attr.Value]?.checked ? legendWQ[attr.Value].color : '#00000000'
-            } else if (this.type === 'e') {
+            }
+            else if (this.type === 'e') {
               fillColor = legendE[attr.Value]?.checked ? legendE[attr.Value].color : '#00000000'
-            } else {
+            }
+            else {
               fillColor = legendOther[attr.Value]?.checked ? legendOther[attr.Value].color : '#00000000'
             }
             return {
@@ -652,7 +706,8 @@ export default {
         this.resetLayerStyle()
         layers[name].show = true
         layers[name].bringToBack()
-      } else {
+      }
+      else {
         const loading = this.$loading({
           lock: true,
           text: '正在加载地图数据...',
@@ -672,7 +727,8 @@ export default {
               window.$zMap.addLayer(layers[name])
               layers[name].load({ data: geojson })
               layers[name].show = true
-            } else {
+            }
+            else {
               ElMessage({
                 message: `没有${this.year}${this.objSeasons[this.season]} ${this.objTypes[this.type]}的数据`,
               })
@@ -684,6 +740,9 @@ export default {
           },
         })
       }
+    },
+    async sendRiverFilterParam() {
+      eventBus.emit('refreshSeaWaterQualityChart', { year: this.year, season: this.season })
     },
   },
 }
@@ -746,10 +805,10 @@ export default {
       <el-select v-model="sea" placeholder="请选择海域">
         <el-option v-for="item in seas" :key="item.value" :label="item.label" :value="item.value" />
       </el-select>
-      <el-select v-model="year" placeholder="请选择年份">
+      <el-select v-model="year" placeholder="请选择年份" @change="() => { sendRiverFilterParam() }">
         <el-option v-for="item in years" :key="item.value" :label="item.label" :value="item.value" />
       </el-select>
-      <el-select v-model="season" placeholder="请选择季节">
+      <el-select v-model="season" placeholder="请选择季节" @change="() => { sendRiverFilterParam() }">
         <el-option v-for="item in seasons" :key="item.value" :label="item.label" :value="item.value" />
       </el-select>
       <el-select v-model="type" placeholder="请选择类型">

@@ -36,13 +36,14 @@ export default {
     }
   },
   mounted() {
+
     eventBus.on('filterparam', (param) => {
+      console.log('入海排污口统计', param)
       this.param = param
       this.getData(param)
     })
   },
   beforeUnmount() {
-    // eventBus.off('filterparam')
   },
   methods: {
     getData(param) {

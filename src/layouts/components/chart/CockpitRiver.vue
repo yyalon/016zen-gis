@@ -61,7 +61,12 @@ export default {
           </div>
         </div>
         <div class="cockpit-river-content">
-          <div>{{ item.time }}，共监测{{ item.sectionCount }}个断面，其中达到水质考核目标的断面{{ item.qualifyCount }}个，达标率{{ item.qualifyRate }}%</div>
+          <div>
+            {{ item.time }}，共监测{{ item.sectionCount }}个断面，其中达到水质考核目标的断面{{ item.qualifyCount }}个，达标率{{ item.qualifyRate }}%
+            <template v-if="item.noRequireCount > 0">
+              ,未作要求{{ item.noRequireCount }}个
+            </template>
+          </div>
           <div class="compliance">
             <div class="compliance-title">
               <div><img :src="rain" style="vertical-align: middle;">水质达标率</div>
@@ -88,7 +93,12 @@ export default {
           </div>
         </div>
         <div class="cockpit-river-content">
-          <div>{{ item.time }}，共监测{{ item.sectionCount }}个断面，其中达到总氮考核目标的断面{{ item.qualifyCount }}个，达标率{{ item.qualifyRate }}%</div>
+          <div>
+            {{ item.time }}，共监测{{ item.sectionCount }}个断面，其中达到总氮考核目标的断面{{ item.qualifyCount }}个，达标率{{ item.qualifyRate }}%
+            <template v-if="item.noRequireCount > 0">
+              ,未作要求{{ item.noRequireCount }}个
+            </template>
+          </div>
           <div class="compliance">
             <div class="compliance-title">
               <div><img :src="rain" style="vertical-align: middle;">总氮达标率</div>

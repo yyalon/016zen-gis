@@ -22,6 +22,7 @@ export interface OverallWaterQualityStats {
   sectionCount: number // 监测断面数量
   qualifyCount: number // 达标断面数量
   qualifyRate: number // 断面达标率
+  noRequireCount: number // 未作要求数量
   triadCategoryCount: number // 三类以上数量
 }
 
@@ -356,3 +357,4 @@ export interface AirConcentration {
 export interface GisConf {
   filterDetaulTime: string // 默认数据查询时间
 }
+

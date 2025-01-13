@@ -16,11 +16,12 @@ export default {
     }
   },
   created() {
-    this.getData()
+    // this.getData()
   },
   async mounted() {
     eventBus.on('refreshSeaWaterQualityChart', (param) => {
       this.param = param
+      console.log('refreshSeaWaterQualityChart',param)
       this.getData(param)
     })
   },

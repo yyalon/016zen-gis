@@ -78,7 +78,9 @@ export default {
         city = this.selectedArea
         province = this.selectedAreaNode.data.label
       }
-      const area = this.area === '东海区' ? '' : this.area
+
+      // const area = this.area === '东海区' ? '' : this.area
+      const area = this.area
 
       const params = {
         area,
@@ -132,49 +134,54 @@ export default {
       this.showAreaLayer()
     },
     showAreaLayer() {
-      this.setLayerVisible(areaLayer, false)
-      this.setLayerVisible(selectedAreaLayer, false)
-      eventBus.emit('selectRiverByCode', {
-        selectCode: null,
-      })
+      try {
+        this.setLayerVisible(areaLayer, false)
+        this.setLayerVisible(selectedAreaLayer, false)
+        eventBus.emit('selectRiverByCode', {
+          selectCode: null,
+        })
 
-      const label = this.area === '攻坚战' ? 'battle' : 'universe'
-      let _layer = window.$zMap.getLayerById(`all_${label}`)
+        const label = this.area === '攻坚战' ? 'battle' : 'universe'
+        let _layer = window.$zMap.getLayerById(`all_${label}`)
 
-      if (!_layer) {
-        _layer = new window.$ZMap.layer.GeoJsonLayer({
-          id: `all_${label}`,
-          zIndex: 2000,
-          name: this.area,
-          url: `/file/json/${label}.json`,
-          symbol: {
-            styleOptions: {
-              fillColor: '#3388ff',
-              fillOpacity: 0.2,
-              outline: true,
-              outlineColor: '#3388ff',
-              outlineOpacity: 0.5,
-              outlineWidth: 2,
+        if (!_layer) {
+          _layer = new window.$ZMap.layer.GeoJsonLayer({
+            id: `all_${label}`,
+            zIndex: 2000,
+            name: this.area,
+            url: `/file/json/${label}.json`,
+            symbol: {
+              styleOptions: {
+                fillColor: '#3388ff',
+                fillOpacity: 0.2,
+                outline: true,
+                outlineColor: '#3388ff',
+                outlineOpacity: 0.5,
+                outlineWidth: 2,
+              },
             },
-          },
-        })
+          })
 
-        window.$zMap.addLayer(_layer)
+          window.$zMap.addLayer(_layer)
 
-        _layer.on(window.$ZMap.EventType.load, () => {
-          const bounds = _layer.getBounds()
-          if (bounds) {
-            window.$zMap.fitBounds(bounds, { padding: [40, 40], duration: 5 })
-          }
-        })
+          _layer.on(window.$ZMap.EventType.load, () => {
+            const bounds = _layer.getBounds()
+            if (bounds) {
+              window.$zMap.fitBounds(bounds, { padding: [40, 40], duration: 5 })
+            }
+          })
+        }
+        else {
+          window.$zMap.fitBounds(areaLayer.getBounds(), { padding: [40, 40], duration: 5 })
+
+          this.setLayerVisible(_layer, true)
+        }
+
+        areaLayer = _layer
       }
-      else {
-        window.$zMap.fitBounds(areaLayer.getBounds(), { padding: [40, 40], duration: 5 })
+      catch (e) {
 
-        this.setLayerVisible(_layer, true)
       }
-
-      areaLayer = _layer
     },
     showAreasLayer(code) {
       this.setLayerVisible(selectedAreaLayer, false)

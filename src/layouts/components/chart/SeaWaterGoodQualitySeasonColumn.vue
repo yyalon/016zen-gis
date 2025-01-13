@@ -93,6 +93,7 @@ export default {
         }, {
           name: '上年同期',
           type: 'bar',
+          barWidth: 15,
           tooltip: {
             valueFormatter(value) {
               return typeof value !== 'number' ? '-' : `${value}%`
@@ -102,6 +103,7 @@ export default {
         }, {
           name: '本年度',
           type: 'bar',
+          barWidth: 15,
           tooltip: {
             valueFormatter(value) {
               return typeof value !== 'number' ? '-' : `${value}%`
@@ -110,6 +112,15 @@ export default {
           data: [],
         }],
         color: ['#36FF00', '#FFF200', '#00C8FF'],
+        dataZoom: [
+          {
+            show: true,
+            realtime: true,
+            start: 50,
+            end: 100,
+            xAxisIndex: [0, 1],
+          },
+        ],
       },
     }
   },

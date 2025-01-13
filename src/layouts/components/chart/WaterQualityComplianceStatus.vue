@@ -21,14 +21,6 @@ export default {
           left: 'center',
           top: 'top',
         },
-        dataZoom: [
-          {
-            show: true,
-            realtime: true,
-            start: 65,
-            end: 85,
-          },
-        ],
         grid: {
           left: '10px',
           top: '35px',
@@ -93,16 +85,22 @@ export default {
           },
         ],
         color: ['#36FF00', '#FFF200', '#00C8FF'],
+        dataZoom: [
+          {
+            show: true,
+            realtime: true,
+            start: 90,
+            end: 100,
+            xAxisIndex: [0, 1],
+          },
+        ],
       },
       param: {},
       loading: false,
       waterQualityDimension: '水质类别',
     }
   },
-  async mounted() {
-    await this.delay(1000)
-    await this.getData()
-
+  mounted() {
     eventBus.on('filterparam', (param) => {
       this.param = param
       this.getData(param)
@@ -128,7 +126,8 @@ export default {
     },
     async getData(param) {
       this.loading = true
-      const res = await gisData.getWaterQualityTrend(param)
+      console.log('param', param, 'this.waterQualityDimension', this.waterQualityDimension)
+      const res = await gisData.getWaterQualityTrend({ ...param, waterQualityDimension: this.waterQualityDimension })
       this.options.xAxis[0].data = res.data.months
       if (res && res.code === 1000) {
         if (this.waterQualityDimension === '总氮') {

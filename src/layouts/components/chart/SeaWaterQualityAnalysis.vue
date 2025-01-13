@@ -37,7 +37,7 @@ export default {
     }
   },
   created() {
-    this.getData()
+    // this.getData()
   },
   async mounted() {
     eventBus.on('refreshSeaWaterQualityChart', (param) => {
@@ -104,19 +104,19 @@ export default {
           </div>
           <div class="river-water-type-item">
             <span>劣IV类</span>
-            <span>{{ data.area.currentSeasonAboveClass4Rate }}%</span>
+            <span>{{ data.point.currentSeasonAboveClass4Rate }}%</span>
             <span :style="{ color: data.point.aboveClass4SeasonDifference <= 0 ? '#0bffa2' : '#f90' }">{{ data.point.aboveClass4SeasonDifference }}%</span>
           </div>
         </div>
         <div>
           <div class="river-water-type-item">
             <span>I-II类</span>
-            <span>{{ data.area.currentYearClass1And2Rate }}%</span>
+            <span>{{ data.point.currentYearClass1And2Rate }}%</span>
             <span :style="{ color: data.point.class1And2YearDifference >= 0 ? '#0bffa2' : '#f90' }">{{ data.point.class1And2YearDifference }}%</span>
           </div>
           <div class="river-water-type-item">
             <span>劣IV类</span>
-            <span>{{ data.area.currentYearAboveClass4Rate }}%</span>
+            <span>{{ data.point.currentYearAboveClass4Rate }}%</span>
             <span :style="{ color: data.point.aboveClass4YearDifference <= 0 ? '#0bffa2' : '#f90' }">{{ data.point.aboveClass4YearDifference }}%</span>
           </div>
         </div>
