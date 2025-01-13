@@ -173,7 +173,7 @@ export default {
   geGisConf: (params: any): Promise<OperationResult<GisConf>> => api.get('/app/data/gis-data/gis-conf', { params }),
 
   /**
-   * 获取打起战详情
+   * 获取大气战详情
    * @param query
    * @returns
    */
