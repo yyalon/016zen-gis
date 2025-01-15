@@ -54,7 +54,7 @@ export interface SeaWaterOverallStats {
 /**
  * 驾驶舱-气象实况
  */
-export interface Meteorology {
+export interface MeteorologyStats {
   stationName: string // 站点
   winDirection: string // 风速
   winSpeed: string // 风向
@@ -351,6 +351,106 @@ export interface AirConcentration {
   PM2_5?: number // PM2.5
   PM2_5_24H?: number // PM2.5 24小时均值
   PM2_5_IAQI?: number // PM2.5 AQI
+}
+
+/**
+ * 气象站
+ */
+export interface Meteorology {
+  id: number // 主键ID
+  DATEVAL_S: string // 时间
+  STATION_NAME: string // 站名
+  COUNTRY: string // 国家
+  PROVINCE: string // 省份
+  CITY: string // 地市
+  CNTY: string // 区县
+  DATEVAL: string // 监测时间
+  TOWN: string // 乡镇
+  STATION_ID_C: string // 区站号(字符)
+  STATION_ID_D: string // 区站号(数字)
+  STATION_TYPE: string // 测站类型
+  STATION_LEVL: string // 测站级别
+  ADMIN_CODE_CHN: string // 行政区代码
+  YEAR: string // 年(年)
+  MON: string // 月(月)
+  DAY: string // 日(日)
+  HOUR: string // 时(时)
+  PRS_MAX_OTIME: string // 最高气压出现时间
+  PRS_MIN_OTIME: string // 最低气压出现时间
+  TEM_MAX_OTIME: string // 最高气温出现时间
+  TEM_MIN_OTIME: string // 最低气温出现时间
+  RHU_MIN_OTIME: string // 最小相对湿度出现时间
+  PRE_ARTI_ENC_CYC: string // 人工加密观测降水量描述周期(小时)
+  WIN_S_MAX_OTIME: string // 最大风速出现时间
+  WIN_S_INST_MAX_OTIME: string // 极大风速出现时间
+  GST_MAX_OTIME: string // 最高地面温度出现时间(格式：HHMM)
+  GST_MIN_OTIME: string // 最低地面温度出现时间
+  LGST_MAX_OTIME: string // 草面(雪面)最高温度出现时间
+  LGST_MIN_OTIME: string // 草面(雪面)最低温度出现时间
+  WEP_NOW: string // 现在天气
+  UPDATETIME_O: string // 原始的更新时间
+  LAT: number // 纬度(度)
+  LON: number // 经度(度)
+  ALTI: number // 测站高度(米)
+  PRS_SENSOR_ALTI: number // 气压传感器海拔高度(米)
+  WIN_S_SENSOR_HEIGH: number // 风速传感器距地面高度(米)
+  PRS: number // 气压(百帕)
+  PRS_SEA: number // 海平面气压(百帕)
+  PRS_CHANGE_3H: number // 3小时变压(百帕)
+  PRS_CHANGE_24H: number // 24小时变压(百帕)
+  PRS_MAX: number // 最高气压(百帕)
+  PRS_MIN: number // 最低气压(百帕)
+  TEM: number // 温度 / 气温(摄氏度(℃))
+  TEM_MAX: number // 最高气温(摄氏度(℃))
+  TEM_MIN: number // 最低气温(摄氏度(℃))
+  TEM_CHANGE_24H: number // 过去24小时变温(摄氏度(℃))
+  TEM_MAX_24H: number // 过去24小时最高气温(摄氏度(℃))
+  TEM_MIN_24H: number // 过去24小时最低气温(摄氏度(℃))
+  DPT: number // 露点温度(摄氏度(℃))
+  RHU: number // 相对湿度(百分率)
+  RHU_MIN: number // 最小相对湿度(百分率)
+  VAP: number // 水汽压(百帕)
+  PRE_1H: number // 过去1小时降水量(毫米)
+  PRE_3H: number // 过去3小时降水量(毫米)
+  PRE_6H: number // 过去6小时降水量(毫米)
+  PRE_12H: number // 过去12小时降水量(毫米)
+  PRE_24H: number // 过去24小时降水量(毫米)
+  PRE: number // 人工加密观测降水量(毫米)
+  EVP_BIG: number // 蒸发(大型)(毫米)
+  WIN_D_AVG_2MI: number // 2分钟平均风向(度)
+  WIN_S_AVG_2MI: number // 2分钟平均风速(米 / 秒)
+  WIN_D_AVG_10MI: number // 10分钟平均风向(度)
+  WIN_S_AVG_10MI: number // 10分钟平均风速(米 / 秒)
+  WIN_D_S_MAX: number // 最大风速的风向(度)
+  WIN_S_MAX: number // 最大风速(米 / 秒)
+  WIN_D_INST: number // 瞬时风向(度)
+  WIN_S_INST: number // 瞬时风速(米 / 秒)
+  WIN_D_INST_MAX: number // 极大风速的风向(度)
+  WIN_S_INST_MAX: number // 极大风速(米 / 秒)
+  WIN_D_INST_MAX_6H: number // 过去6小时极大瞬时风向(度)
+  WIN_S_INST_MAX_6H: number // 过去6小时极大瞬时风速(米 / 秒)
+  WIN_D_INST_MAX_12H: number // 过去12小时极大瞬时风向(度)
+  WIN_S_INST_MAX_12H: number // 过去12小时极大瞬时风速(米 / 秒)
+  GST: number // 地面温度(摄氏度(℃))
+  GST_MAX: number // 最高地面温度(摄氏度(℃))
+  GST_MIN: number // 最低地面温度(摄氏度(℃))
+  GST_MIN_12H: number // 过去12小时地面最低温度(摄氏度(℃))
+  GST_5CM: number // 5cm地温(摄氏度(℃))
+  GST_10CM: number // 10cm地温(摄氏度(℃))
+  GST_15CM: number // 15cm地温(摄氏度(℃))
+  GST_20CM: number // 20cm地温(摄氏度(℃))
+  GST_40CM: number // 40cm地温(摄氏度(℃))
+  GST_80CM: number // 80cm地温(摄氏度(℃))
+  GST_160CM: number // 160cm地温(摄氏度(℃))
+  GST_320CM: number // 320cm地温(摄氏度(℃))
+  LGST: number // 草面(雪面)温度(摄氏度(℃))
+  LGST_MAX: number // 草面(雪面)最高温度(摄氏度(℃))
+  LGST_MIN: number // 草面(雪面)最低温度(摄氏度(℃))
+  VIS: number // 水平能见度(人工)(米)
+  CLO_COV: number // 总云量(百分率)
+  CLO_COV_LOW: number // 低云量(百分率)
+  CLO_COV_LM: number // 云量(低云或中云)(百分率)
+  CLO_HEIGHT_LOM: number // 低云或中云的云高(百分率)
 }
 
 export interface GisConf {

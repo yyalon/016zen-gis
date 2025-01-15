@@ -1,11 +1,12 @@
 import api from '../index'
-import type { GeneralQuery, RegionQuery, SeaWaterQuery } from './queryTypes'
+import type { GeneralQuery, InfoQuery, RegionQuery, SeaWaterQuery } from './queryTypes'
 import type {
   AirConcentration,
   AirStation,
   GisConf,
   MainPollutingEnterprises,
   Meteorology,
+  MeteorologyStats,
   OperationResult,
   OutfallGoalStats,
   OutfallOverallStats,
@@ -65,7 +66,7 @@ export default {
    * @param query
    * @returns
    */
-  getMeteorology: (query: GeneralQuery): Promise<OperationResult<Meteorology[]>> => api.post('/app/data/gis-data/meteorology', query),
+  getMeteorology: (query: GeneralQuery): Promise<OperationResult<MeteorologyStats[]>> => api.post('/app/data/gis-data/meteorology', query),
 
   /**
    * 入海河流-河流水质达标考核(左上)
@@ -157,6 +158,26 @@ export default {
    * @returns
    */
   getAirList: (params: GeneralQuery): Promise<OperationResult<AirConcentration[]>> => api.post('/app/data/gis-data/air-list', { params }),
+
+  /**
+   * 获取大气站详情
+   * @param query
+   * @returns
+   */
+  getAirStationData: (params: InfoQuery): Promise<OperationResult<{
+    maxPage: number
+    list: AirConcentration[]
+  }>> => api.post('/app/data/gis-data/air-info', { params }),
+
+  /**
+   * 获取气象站详情
+   * @param query
+   * @returns
+   */
+  getMeteorologyStationData: (params: InfoQuery): Promise<OperationResult<{
+    maxPage: number
+    list: Meteorology[]
+  }>> => api.post('/app/data/gis-data/meteorology-info', { params }),
 
   /**
    * 获取污染企业列表
