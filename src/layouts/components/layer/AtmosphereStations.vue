@@ -1,5 +1,5 @@
 <script>
-import drawerSewageOutfall from '../drawer/SewageOutfall.vue'
+import drawerAtmosphereStation from '../drawer/AtmosphereStation.vue'
 import PopupAtmosphereStation from '../popup/AtmosphereStation.vue'
 import gisData from '@/api/modules/gis'
 import eventBus from '@/utils/eventBus'
@@ -7,7 +7,7 @@ import eventBus from '@/utils/eventBus'
 let _layer = null
 
 export default {
-  components: { DrawerSewageOutfall: drawerSewageOutfall },
+  components: { DrawerAtmosphereStation: drawerAtmosphereStation },
   data() {
     return {
       airStations: [],
@@ -79,10 +79,10 @@ export default {
               className: 'custom_tooltip',
             })
 
-            // graphic.on(window.$ZMap.EventType.click, (e) => {
-            //   this.drawerData = e.target.attr
-            //   this.drawerVisible = true
-            // })
+            graphic.on(window.$ZMap.EventType.click, (e) => {
+              this.drawerData = e.target.attr
+              this.drawerVisible = true
+            })
 
             graphic.on(window.$ZMap.EventType.tooltipopen, async (e) => {
               e.target.setTooltipContent(window.$Utitls.loadComponentContent(e.target, PopupAtmosphereStation, { popupData: e.target.attr }))
@@ -146,7 +146,7 @@ export default {
 
 <template>
   <div>
-    <DrawerSewageOutfall :drawer-data="drawerData" :visible="drawerVisible" @close="drawerVisible = false" />
+    <DrawerAtmosphereStation :drawer-data="drawerData" :visible="drawerVisible" @close="drawerVisible = false" />
   </div>
 </template>
 

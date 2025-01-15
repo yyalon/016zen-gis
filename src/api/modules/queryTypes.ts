@@ -23,3 +23,11 @@ export interface SeaWaterQuery {
   year?: string// 年份
   season: string// 季节
 }
+
+/**
+ * 单元详情查询对象
+ */
+export interface InfoQuery {
+  stationCode?: string // code
+  page?: number// 分页
+}

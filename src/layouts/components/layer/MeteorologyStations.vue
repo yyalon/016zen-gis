@@ -1,5 +1,5 @@
 <script>
-import drawerSewageOutfall from '../drawer/SewageOutfall.vue'
+import drawerMeteorologyStation from '../drawer/MeteorologyStation.vue'
 import PopupMeteorologyStation from '../popup/MeteorologyStation.vue'
 import apiData from '@/api/modules/data'
 import eventBus from '@/utils/eventBus'
@@ -7,7 +7,7 @@ import eventBus from '@/utils/eventBus'
 let _layer = null
 
 export default {
-  components: { DrawerSewageOutfall: drawerSewageOutfall },
+  components: { DrawerMeteorologyStation: drawerMeteorologyStation },
   data() {
     return {
       meteorologyStations: [],
@@ -79,10 +79,10 @@ export default {
               className: 'custom_tooltip',
             })
 
-            // graphic.on(window.$ZMap.EventType.click, (e) => {
-            //   this.drawerData = e.target.attr
-            //   this.drawerVisible = true
-            // })
+            graphic.on(window.$ZMap.EventType.click, (e) => {
+              this.drawerData = e.target.attr
+              this.drawerVisible = true
+            })
 
             graphic.on(window.$ZMap.EventType.tooltipopen, async (e) => {
               e.target.setTooltipContent(window.$Utitls.loadComponentContent(e.target, PopupMeteorologyStation, { popupData: e.target.attr }))
@@ -144,7 +144,7 @@ export default {
 
 <template>
   <div>
-    <DrawerSewageOutfall :drawer-data="drawerData" :visible="drawerVisible" @close="drawerVisible = false" />
+    <DrawerMeteorologyStation :drawer-data="drawerData" :visible="drawerVisible" @close="drawerVisible = false" />
   </div>
 </template>
 
