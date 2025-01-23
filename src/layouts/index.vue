@@ -176,7 +176,9 @@ export default {
         layerRiver: false,
         controlUnit: false,
       },
+      riverLevels: [],
       riverLevel: null,
+      riverLevelShow: false,
     }
   },
   watch: {
@@ -273,14 +275,15 @@ export default {
       }
     },
     switchRiverLayer(riverLevel: any) {
-      if (riverLevel !== this.riverLevel) {
-        this.riverLevel = riverLevel
+      this.riverLevel = riverLevel
+      if (!this.riverLevels.includes(riverLevel)) {
+        this.riverLevels.push(riverLevel)
+        this.riverLevelShow = true
         this.visibilities.layerRiver = true
         this.buttons.forEach((button) => {
           if (button.value === 'layerRiver') {
             button.visibility = true
             button.subButtons?.forEach((subButton) => {
-              subButton.active = false
               if (subButton.value === riverLevel) {
                 subButton.active = true
               }
@@ -289,13 +292,16 @@ export default {
         })
       }
       else {
-        this.riverLevel = null
-        this.visibilities.layerRiver = false
+        this.riverLevelShow = false
+        this.riverLevels = this.riverLevels.filter(item => item !== riverLevel)
+        this.visibilities.layerRiver = !!this.riverLevels.length
         this.buttons.forEach((button) => {
           if (button.value === 'layerRiver') {
-            button.visibility = false
+            button.visibility = !!this.riverLevels.length
             button.subButtons?.forEach((subButton) => {
-              subButton.active = false
+              if (subButton.value === riverLevel) {
+                subButton.active = false
+              }
             })
           }
         })
@@ -433,7 +439,7 @@ export default {
         <LayergerEnterprises v-if="visibilities.layerEnterprises" />
         <LayerReservoirs v-if="visibilities.layerReservoirs" />
         <LayerRiverChannels v-if="visibilities.layerRiverChannels" />
-        <LayerRivers v-if="visibilities.layerRiver" :river-level="riverLevel" />
+        <LayerRivers v-if="visibilities.layerRiver" :river-level="riverLevel" :river-level-show="riverLevelShow" />
         <Toolbar :buttons="buttons" @excute-command="excuteCommand" />
         <!-- <LayerAllBorderMask /> -->
         <div class="layout-container">

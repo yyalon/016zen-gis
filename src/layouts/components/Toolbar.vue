@@ -81,8 +81,8 @@ export default {
             </div>
           </div>
           <div v-if="button.showSubButtons" class="sub-buttons">
-            <div v-for="(sb, sIndex) in button.subButtons" :key="sIndex" class="sub-button" :class="sb.active ? 'active' : ''" @click.stop="excuteCommand(sb.command, sb.value)">
-              <div class="name">
+            <div v-for="(sb, sIndex) in button.subButtons" :key="sIndex" class="sub-button" :class="sb.active ? 'active' : ''">
+              <div class="name" @click.stop="excuteCommand(sb.command, sb.value)">
                 {{ sb.name }}
               </div>
             </div>
@@ -164,6 +164,11 @@ export default {
     &:hover {
       background-color: rgb(63 158 255 / 100%);
       color: white;
+    }
+
+    > .button {
+      background-color: inherit;
+      color: inherit;
     }
 
     .sub-buttons {
