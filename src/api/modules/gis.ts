@@ -198,18 +198,8 @@ export default {
    * @param query
    * @returns
    */
-  getAirStationData: (stationCode: string, page: number): Promise<OperationResult<{
+  getAirStationDataInfo: (stationCode: string, page: number): Promise<OperationResult<{
     maxPage: number
     list: AirConcentration[]
   }>> => api.post('/app/data/gis-data/air-info', { stationCode, page }),
-
-  /**
-   * 获取气象站详情
-   * @param query
-   * @returns
-   */
-  getMeteorologStationInfo: (stationCode: string, page: number): Promise<OperationResult<{
-    maxPage: number
-    list: Meteorology[]
-  }>> => api.post('/app/data/gis-data/meteorology-info', { stationCode, page }),
 }

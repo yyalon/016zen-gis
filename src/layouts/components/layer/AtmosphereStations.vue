@@ -64,7 +64,7 @@ export default {
             const graphic = new window.$ZMap.graphic.Point({
               latlng: [item.LAT, item.LON],
               style: {
-                pixelSize: 3,
+                pixelSize: 6,
                 color: '#0075ff',
                 opacity: 0.6,
                 outline: true,

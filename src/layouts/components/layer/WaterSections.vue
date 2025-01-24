@@ -49,7 +49,6 @@ export default {
     eventBus.emit('selectRiverByCode', {
       selectCode: null,
     })
-
     eventBus.off('filterparam')
     eventBus.off('selectRiverByCode')
   },
@@ -90,6 +89,7 @@ export default {
       }
       if (!isDimension) {
         eventBus.emit('filterparam', params)
+        eventBus.emit('filterparam1', params)
       }
 
       await this.getData({ ...params, waterQualityDimension: this.waterQualityDimension })

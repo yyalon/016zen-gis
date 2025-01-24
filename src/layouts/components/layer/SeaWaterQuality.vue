@@ -596,6 +596,9 @@ export default {
     },
     resetLayerStyle() {
       const name = this.type + this.year + this.season
+      if (!layers[name]) {
+        return
+      }
       const graphics = layers[name].getGraphics()
       if (layers[name]) {
         for (let i = 0; i < graphics.length; i++) {

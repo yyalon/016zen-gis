@@ -18,7 +18,7 @@ export default {
     }
   },
   mounted() {
-    eventBus.on('filterparam', (param) => {
+    eventBus.on('filterparam1', (param) => {
       this.param = param
       this.getData(param)
     })

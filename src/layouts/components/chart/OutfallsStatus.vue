@@ -36,9 +36,8 @@ export default {
     }
   },
   mounted() {
-
-    eventBus.on('filterparam', (param) => {
-      console.log('入海排污口统计', param)
+    eventBus.on('filterparam1', (param) => {
+      console.log('入海排污口统计filterparam1', param)
       this.param = param
       this.getData(param)
     })

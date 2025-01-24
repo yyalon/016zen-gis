@@ -19,11 +19,12 @@ export default {
   data() {
     return {
       drawerVisible: false,
-      tableHeight: '600',
+      tableHeight: '700',
       atmosphereStations: [],
       loading: false,
       maxPage: 1,
       currentPage: 1,
+      activeName: 'atmosphereStation',
     }
   },
   watch: {
@@ -41,8 +42,8 @@ export default {
     async getData(currentPage) {
       this.loading = true
       this.currentPage = currentPage
-      console.log(this.drawerData, this.drawerData)
-      const { code, data } = await gisData.getAirStationData({ stationCode: this.drawerData.STATIONCODE, page: currentPage })
+      const { code, data } = await gisData.getAirStationDataInfo(this.drawerData.STATIONCODE, currentPage)
+
       if (code === 1000 && data) {
         this.maxPage = data.maxPage
         this.atmosphereStations = data.list
@@ -92,7 +93,7 @@ export default {
             </el-descriptions>
           </div>
           <br>
-          <el-tabs class="demo-tabs">
+          <el-tabs v-model="activeName" class="demo-tabs">
             <el-tab-pane label="大气站数据" name="atmosphereStation">
               <el-table :data="atmosphereStations" :height="tableHeight" size="small">
                 <el-table-column label="监测时间" fixed>
