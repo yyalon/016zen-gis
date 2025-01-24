@@ -271,6 +271,7 @@ export default {
         </el-select>
         <el-date-picker
           v-model="timeSlot"
+          :append-to-body="false"
           style="background-color: rgb(0 117 255 / 80%); border: 1px solid rgb(0 117 255 / 80%); color: #fff; box-shadow: none;"
           type="month"
           :clearable="false"
