@@ -11,9 +11,18 @@ export default {
         return '4'
       },
     },
+    riverLevelShow: {
+      type: Boolean,
+      default() {
+        return false
+      },
+    },
   },
   watch: {
     riverLevel() {
+      this.showLayer()
+    },
+    riverLevelShow() {
       this.showLayer()
     },
   },
@@ -31,9 +40,13 @@ export default {
   methods: {
     showLayer() {
       const name = `river${this.riverLevel}`
-      for (const key in _layers) {
-        _layers[key].show = false
-        _nameLayers[key].show = false
+      if (!this.riverLevelShow) {
+        if (_layers[name]) {
+          _layers[name].show = false
+          _nameLayers[name].show = false
+        }
+
+        return null
       }
       if (_layers[name]) {
         _layers[name].show = true

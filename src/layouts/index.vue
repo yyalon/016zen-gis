@@ -176,7 +176,9 @@ export default {
         layerRiver: false,
         controlUnit: false,
       },
+      riverLevels: [],
       riverLevel: null,
+      riverLevelShow: false,
     }
   },
   watch: {
@@ -191,7 +193,7 @@ export default {
   },
   async mounted() {
     autofit.init({
-      el: '.layout',
+      el: '.layout-wrapper',
       dw: 1920,
       dh: 1080,
       resize: true,
@@ -273,14 +275,15 @@ export default {
       }
     },
     switchRiverLayer(riverLevel: any) {
-      if (riverLevel !== this.riverLevel) {
-        this.riverLevel = riverLevel
+      this.riverLevel = riverLevel
+      if (!this.riverLevels.includes(riverLevel)) {
+        this.riverLevels.push(riverLevel)
+        this.riverLevelShow = true
         this.visibilities.layerRiver = true
         this.buttons.forEach((button) => {
           if (button.value === 'layerRiver') {
             button.visibility = true
             button.subButtons?.forEach((subButton) => {
-              subButton.active = false
               if (subButton.value === riverLevel) {
                 subButton.active = true
               }
@@ -289,13 +292,16 @@ export default {
         })
       }
       else {
-        this.riverLevel = null
-        this.visibilities.layerRiver = false
+        this.riverLevelShow = false
+        this.riverLevels = this.riverLevels.filter(item => item !== riverLevel)
+        this.visibilities.layerRiver = !!this.riverLevels.length
         this.buttons.forEach((button) => {
           if (button.value === 'layerRiver') {
-            button.visibility = false
+            button.visibility = !!this.riverLevels.length
             button.subButtons?.forEach((subButton) => {
-              subButton.active = false
+              if (subButton.value === riverLevel) {
+                subButton.active = false
+              }
             })
           }
         })
@@ -414,44 +420,48 @@ export default {
 </script>
 
 <template>
-  <div class="layout">
-    <div class="layout-background" />
-    <ZMap @map-loaded="mapLoaded" />
-    <LayerControlUnit v-if="visibilities.controlUnit" />
-    <LayerSeaShanghai v-if="visibilities.sea" />
-    <LayerSeaZhejiang v-if="visibilities.sea" />
-    <LayerSeaJiangsu v-if="visibilities.sea" />
-    <LayerSeaFujian v-if="visibilities.sea" />
-    <LayerLandJiangsu v-if="visibilities.land" />
-    <LayerLandShanghai v-if="visibilities.land" />
-    <LayerLandZhejiang v-if="visibilities.land" />
-    <LayerLandFujian v-if="visibilities.land" />
-    <LayergerMeteorologyStations v-if="visibilities.layerMeteorologyStations" />
-    <LayergerAtmosphereStations v-if="visibilities.layerAtmosphereStations" />
-    <LayergerEnterprises v-if="visibilities.layerEnterprises" />
-    <LayerReservoirs v-if="visibilities.layerReservoirs" />
-    <LayerRiverChannels v-if="visibilities.layerRiverChannels" />
-    <LayerRivers v-if="visibilities.layerRiver" :river-level="riverLevel" />
-    <Toolbar :buttons="buttons" @excute-command="excuteCommand" />
-    <!-- <LayerAllBorderMask /> -->
-    <div class="layout-container">
-      <div class="header">
-        <GraphSwitcher v-model:active-graph="activeGraph">
-          <div class="title">
-            <div class="titleBeforeLine" />
-            <img :src="abbreviationSrc">
-            <div class="titleAfterLine" />
+  <div class="container">
+    <div class="layout-wrapper">
+      <div class="layout">
+        <div class="layout-background" />
+        <ZMap @map-loaded="mapLoaded" />
+        <LayerControlUnit v-if="visibilities.controlUnit" />
+        <LayerSeaShanghai v-if="visibilities.sea" />
+        <LayerSeaZhejiang v-if="visibilities.sea" />
+        <LayerSeaJiangsu v-if="visibilities.sea" />
+        <LayerSeaFujian v-if="visibilities.sea" />
+        <LayerLandJiangsu v-if="visibilities.land" />
+        <LayerLandShanghai v-if="visibilities.land" />
+        <LayerLandZhejiang v-if="visibilities.land" />
+        <LayerLandFujian v-if="visibilities.land" />
+        <LayergerMeteorologyStations v-if="visibilities.layerMeteorologyStations" />
+        <LayergerAtmosphereStations v-if="visibilities.layerAtmosphereStations" />
+        <LayergerEnterprises v-if="visibilities.layerEnterprises" />
+        <LayerReservoirs v-if="visibilities.layerReservoirs" />
+        <LayerRiverChannels v-if="visibilities.layerRiverChannels" />
+        <LayerRivers v-if="visibilities.layerRiver" :river-level="riverLevel" :river-level-show="riverLevelShow" />
+        <Toolbar :buttons="buttons" @excute-command="excuteCommand" />
+        <!-- <LayerAllBorderMask /> -->
+        <div class="layout-container">
+          <div class="header">
+            <GraphSwitcher v-model:active-graph="activeGraph">
+              <div class="title">
+                <div class="titleBeforeLine" />
+                <img :src="abbreviationSrc">
+                <div class="titleAfterLine" />
+              </div>
+            </GraphSwitcher>
           </div>
-        </GraphSwitcher>
-      </div>
-      <div class="layout-body">
-        <LayerWaterSections v-if="activeGraph !== 'ocean'" :active-graph="activeGraph" />
-        <GraphCockpit :visible="activeGraph === 'cockpit'" />
-        <GraphRiver :visible="activeGraph === 'river'" />
-        <GraphOutfall :visible="activeGraph === 'outfall'" />
-        <GraphOcean :visible="activeGraph === 'ocean'" />
-        <GraphBiology :visible="activeGraph === 'biology'" />
-        <GraphMeteorology :visible="activeGraph === 'meteorology'" />
+          <div class="layout-body">
+            <LayerWaterSections v-if="activeGraph !== 'ocean'" :active-graph="activeGraph" />
+            <GraphCockpit :visible="activeGraph === 'cockpit'" />
+            <GraphRiver :visible="activeGraph === 'river'" />
+            <GraphOutfall :visible="activeGraph === 'outfall'" />
+            <GraphOcean :visible="activeGraph === 'ocean'" />
+            <GraphBiology :visible="activeGraph === 'biology'" />
+            <GraphMeteorology :visible="activeGraph === 'meteorology'" />
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -464,12 +474,23 @@ export default {
 </style>
 
 <style lang="scss" scoped>
-.layout {
+.container {
   position: relative;
   width: 100%;
   height: 100%;
   color: white;
   overflow: hidden;
+}
+
+.layout-wrapper {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+.layout {
+  width: 1920px;
+  height: 1080px;
 
   &-background {
     position: absolute;
