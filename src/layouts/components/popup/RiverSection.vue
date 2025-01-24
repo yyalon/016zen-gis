@@ -117,7 +117,10 @@ export default {
 
     .el-descriptions__content {
       min-width: 300px;
-      text-wrap: wrap;
+      white-space: normal;
+      word-break: break-all;
+      overflow-wrap: break-word;
+      word-wrap: break-word; /* 旧版浏览器兜底 */
     }
   }
 }

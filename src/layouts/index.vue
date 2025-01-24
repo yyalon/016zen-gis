@@ -276,8 +276,8 @@ export default {
     },
     switchRiverLayer(riverLevel: any) {
       this.riverLevel = riverLevel
-      if (!this.riverLevels.includes(riverLevel)) {
-        this.riverLevels.push(riverLevel)
+      if (!this.riverLevels.includes(riverLevel as never)) {
+        this.riverLevels.push(riverLevel as never)
         this.riverLevelShow = true
         this.visibilities.layerRiver = true
         this.buttons.forEach((button) => {
