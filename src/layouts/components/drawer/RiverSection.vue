@@ -260,7 +260,7 @@ export default {
                     {{ scope.row.W20115 }}
                   </template>
                 </el-table-column>
-                <el-table-column label="叶绿素(mg/L)" :width="100">
+                <el-table-column label="六价铬(ug/l)" :width="100">
                   <template #default="scope">
                     {{ scope.row.W20117 }}
                   </template>
