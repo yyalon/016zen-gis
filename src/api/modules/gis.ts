@@ -202,4 +202,10 @@ export default {
     maxPage: number
     list: AirConcentration[]
   }>> => api.post('/app/data/gis-data/air-info', { stationCode, page }),
+
+  /**
+   * 获取排污口类型列表
+   * @returns
+   */
+  getOutfallTypes: () => api.post('/app/data/gis-data/sewage_outfall/types'),
 }

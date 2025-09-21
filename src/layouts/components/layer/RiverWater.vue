@@ -28,7 +28,7 @@ export default {
 
     eventBus.on('waterQualityDimension', async (param) => {
       if (param && param.waterQualityDimension) {
-        if( this.waterQualityDimension !== param.waterQualityDimension){
+        if (this.waterQualityDimension !== param.waterQualityDimension) {
           this.waterQualityDimension = param.waterQualityDimension
           await this.getData(this.param)
         }
@@ -51,7 +51,6 @@ export default {
   },
   methods: {
     async getData(params) {
-
       const allRivers = await apiData.getRiverSections({ ...params, waterQualityDimension: this.waterQualityDimension })
 
       if (allRivers && allRivers.code === 1000) {
@@ -133,7 +132,7 @@ export default {
         })
         window.$zMap.addLayer(_layer)
 
-        //await this.getData()
+        // await this.getData()
       }
 
       setTimeout(() => {
@@ -173,7 +172,7 @@ export default {
               pulseShadowColor: color,
               className: selectedMarker.options.attr?.status === 2 ? 'blinking-marker' : '',
             })
-            window.$zMap.setView(selectedMarker.getLatLng(), 10)
+            window.$zMap.setView(selectedMarker.getLatLng(), 12)
           }
         }
       }

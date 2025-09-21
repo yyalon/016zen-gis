@@ -9,11 +9,21 @@ let _layer = null
 export default {
   components: { DrawerSewageOutfall: drawerSewageOutfall },
   data() {
-    return { sewageOutfalls: [], drawerVisible: false, drawerData: {} }
+    return {
+      sewageOutfalls: [],
+      drawerVisible: false,
+      drawerData: {},
+      markersMap: null,
+      selectCode: null,
+    }
   },
   async mounted() {
     eventBus.on('filterparam', async (params) => {
       await this.getData(params)
+    })
+
+    eventBus.on('selectOutfallByCode', ({ selectCode }) => {
+      this.zoomToMarkerByCode(selectCode)
     })
 
     await this.showLayer()
@@ -23,6 +33,7 @@ export default {
       _layer.show = false
     }
     eventBus.off('filterparam')
+    eventBus.off('selectOutfallByCode')
   },
   methods: {
     async getData(params) {
@@ -33,6 +44,8 @@ export default {
         _layer.eachGraphic((graphic) => {
           _layer.removeGraphic(graphic)
         })
+
+        this.markersMap = new Map()
 
         for (let i = 0, len = this.sewageOutfalls.length; i < len; i++) {
           const item = this.sewageOutfalls[i]
@@ -46,7 +59,11 @@ export default {
                 verticalOrigin: window.$ZMap.VerticalOrigin.BOTTOM,
               },
               attr: item,
+              id: item.code,
             })
+
+            // 将Marker添加到Map对象中
+            this.markersMap.set(item.code, graphic)
 
             graphic.bindTooltip(null, {
               className: 'custom_tooltp',
@@ -94,6 +111,36 @@ export default {
         _layer.show = true
         loading.close()
       }, 500)
+    },
+    zoomToMarkerByCode(selectCode) {
+      if (this.markersMap) {
+        if (this.selectCode) {
+          const selectedMarker = this.markersMap.get(this.selectCode)
+          selectedMarker.setStyle({
+            width: 40,
+            pulse: false,
+            className: '',
+          })
+          this.selectCode = null
+        }
+        if (selectCode) {
+          const selectedMarker = this.markersMap.get(selectCode)
+          if (selectedMarker) {
+            this.selectCode = selectCode
+
+            const color = 'rgba(255, 53, 53, 0.8)'
+
+            selectedMarker.setStyle({
+              width: 15,
+              pulse: true,
+              pulseColor: color,
+              pulseShadowColor: color,
+              className: selectedMarker.options.attr?.status === 2 ? 'blinking-marker' : '',
+            })
+            window.$zMap.setView(selectedMarker.getLatLng(), 12)
+          }
+        }
+      }
     },
   },
 }

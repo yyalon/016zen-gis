@@ -17,7 +17,7 @@ export default {
       default: 'cockpit',
     },
   },
-  emits: ['filterparam', 'selectRiverByCode'],
+  emits: ['filterparam', 'selectRiverByCode', 'selectOutfallByCode'],
   data() {
     const end = new Date()
     end.setDate(1)
@@ -33,7 +33,32 @@ export default {
       timeSlot: end,
       area: '攻坚战',
       waterQualityDimension: '水质类别',
+      outfallType: '全部',
+      outfallTypes: [],
+      selectCode: '',
+      sewageOutfalls: [],
+      oldActiveGraph: '',
     }
+  },
+  computed: {
+    codeSecetions() {
+      return this.activeGraph === 'outfall' ? this.sewageOutfalls : this.riverSections
+    },
+  },
+  watch: {
+    activeGraph: {
+      handler(n) {
+        if ((n === 'outfall' || this.oldActiveGraph === 'outfall') && n !== this.oldActiveGraph) {
+          this.selectCode = ''
+        }
+
+        if (n === 'outfall' && n !== this.oldActiveGraph) {
+          this.getOutfallData()
+        }
+
+        this.oldActiveGraph = n
+      },
+    },
   },
   async created() {
     const res = await gisData.geGisConf()
@@ -49,8 +74,12 @@ export default {
     eventBus.emit('selectRiverByCode', {
       selectCode: null,
     })
+    eventBus.emit('selectOutfallByCode', {
+      selectCode: null,
+    })
     eventBus.off('filterparam')
     eventBus.off('selectRiverByCode')
+    eventBus.off('selectOutfallByCode')
   },
   methods: {
     async getData(params) {
@@ -59,12 +88,19 @@ export default {
         this.riverSections = rivers.data
       }
 
-      this.rivers = [{ name: '全部' }]
+      this.rivers = []
       this.riverSections.forEach((riverSection) => {
         if (!this.rivers.find((o) => o.name === riverSection.name)) {
           this.rivers.push(riverSection)
         }
       })
+
+      if (this.activeGraph === 'outfall') {
+        const res = await apiData.getSewageOutfalls(params)
+        if (res.code === 1000) {
+          this.sewageOutfalls = res.data
+        }
+      }
     },
     async sendRiverFilterParam(isDimension) {
       let city = ''
@@ -86,6 +122,9 @@ export default {
         city,
         province,
         time: dayjs(this.timeSlot).format('YYYY-MM-DD'),
+      }
+      if (this.activeGraph === 'outfall') {
+        params.type = this.outfallType === '全部' ? '' : this.outfallType
       }
       if (!isDimension) {
         eventBus.emit('filterparam', params)
@@ -250,6 +289,19 @@ export default {
 
       this.sendRiverFilterParam(true)
     },
+    async getOutfallData() {
+      const res = await gisData.getOutfallTypes()
+      if (res && res.code === 1000) {
+        this.outfallTypes = res.data
+      }
+
+      this.sendRiverFilterParam(true)
+    },
+    zoomToMarkerByCode() {
+      eventBus.emit(`select${this.activeGraph === 'outfall' ? 'Outfall' : 'River'}ByCode`, {
+        selectCode: this.selectCode,
+      })
+    },
   },
 }
 </script>
@@ -274,6 +326,7 @@ export default {
         />
 
         <el-select v-model="river" placeholder="请选择断面" @change="showRiverLayer">
+          <el-option label="全部" value="全部" />
           <el-option v-for="(item, index) in rivers" :key="index" :label="item.name" :value="item.name" />
         </el-select>
         <el-date-picker
@@ -286,10 +339,31 @@ export default {
           @change="() => { sendRiverFilterParam(); }"
         />
       </div>
-      <el-radio-group v-if="activeGraph !== 'outfall'" v-model="waterQualityDimension" is-button style="margin-top: 20px;" @change="() => { sendWaterQualityDimension(); }">
-        <el-radio-button label="水质类别" value="水质类别" />
-        <el-radio-button label="总氮" value="总氮" />
-      </el-radio-group>
+      <div style="display: flex; margin-top: 20px;">
+        <el-radio-group v-if="activeGraph !== 'outfall'" v-model="waterQualityDimension" is-button @change="() => { sendWaterQualityDimension(); }">
+          <el-radio-button label="水质类别" value="水质类别" />
+          <el-radio-button label="总氮" value="总氮" />
+        </el-radio-group>
+        <el-select v-if="activeGraph === 'outfall'" v-model="outfallType" @change="() => { sendRiverFilterParam(); }">
+          <el-option label="全部" value="全部" />
+          <el-option v-for="(item, index) in outfallTypes" :key="index" :label="item.type" :value="item.type" />
+        </el-select>
+        <el-select
+          v-model="selectCode"
+          filterable
+          placeholder="搜索点位"
+          clearable
+          style="margin-left: 8px;"
+          @change="zoomToMarkerByCode"
+        >
+          <el-option
+            v-for="item in codeSecetions"
+            :key="item.code"
+            :label="item.name"
+            :value="item.code"
+          />
+        </el-select>
+      </div>
     </div>
     <RiverWater v-if="activeGraph !== 'outfall'" />
   </div>
