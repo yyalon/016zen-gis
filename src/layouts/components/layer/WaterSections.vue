@@ -5,6 +5,8 @@ import eventBus from '@/utils/eventBus'
 import apiData from '@/api/modules/data'
 import gisData from '@/api/modules/gis'
 import areas from '@/utils/area.json'
+import pgif from '@/assets/images/P.gif'
+import ngif from '@/assets/images/N.gif'
 
 let areaLayer = null
 let selectedAreaLayer = null
@@ -38,6 +40,10 @@ export default {
       selectCode: '',
       sewageOutfalls: [],
       oldActiveGraph: '',
+      nShow: false,
+      pShow: false,
+      ngif,
+      pgif
     }
   },
   computed: {
@@ -108,8 +114,7 @@ export default {
       if (this.selectedAreaNode?.level === 1) {
         city = ''
         province = this.selectedArea === '全部' ? '' : this.selectedArea
-      }
-      else if (this.selectedAreaNode?.level === 2) {
+      } else if (this.selectedAreaNode?.level === 2) {
         city = this.selectedArea
         province = this.selectedAreaNode.data.label
       }
@@ -151,8 +156,7 @@ export default {
       const code = node.code.replace(/^0+$/, '')
       if (code) {
         this.showAreasLayer(code)
-      }
-      else {
+      } else {
         this.showAreaLayer()
       }
     },
@@ -163,8 +167,7 @@ export default {
 
       if (this.area === '攻坚战') {
         this.areas = areas.filter((zone) => ['全部', '上海市', '浙江省', '江苏省'].includes(zone.label))
-      }
-      else {
+      } else {
         this.areas = areas.filter((zone) => ['全部', '上海市', '浙江省', '江苏省', '福建省'].includes(zone.label))
       }
 
@@ -209,18 +212,14 @@ export default {
               window.$zMap.fitBounds(bounds, { padding: [40, 40], duration: 5 })
             }
           })
-        }
-        else {
+        } else {
           window.$zMap.fitBounds(areaLayer.getBounds(), { padding: [40, 40], duration: 5 })
 
           this.setLayerVisible(_layer, true)
         }
 
         areaLayer = _layer
-      }
-      catch (e) {
-
-      }
+      } catch (e) {}
     },
     showAreasLayer(code) {
       this.setLayerVisible(selectedAreaLayer, false)
@@ -256,8 +255,7 @@ export default {
             window.$zMap.fitBounds(bounds, { padding: [40, 40], duration: 5 })
           }
         })
-      }
-      else {
+      } else {
         window.$zMap.fitBounds(_layer.getBounds(), { padding: [40, 40], duration: 5 })
 
         this.setLayerVisible(_layer, true)
@@ -269,12 +267,10 @@ export default {
       if (this.river === '全部') {
         if (selectedAreaLayer) {
           this.setLayerVisible(selectedAreaLayer, true)
-        }
-        else {
+        } else {
           this.showAreaLayer()
         }
-      }
-      else {
+      } else {
         this.setLayerVisible(selectedAreaLayer, false)
         this.setLayerVisible(areaLayer, false)
       }
@@ -322,7 +318,11 @@ export default {
           node-key="label"
           check-strictly
           @node-click="handleAreasClick"
-          @change="() => { sendRiverFilterParam(); }"
+          @change="
+            () => {
+              sendRiverFilterParam()
+            }
+          "
         />
 
         <el-select v-model="river" placeholder="请选择断面" @change="showRiverLayer">
@@ -336,36 +336,66 @@ export default {
           type="month"
           :clearable="false"
           :disabled-date="disabledDate"
-          @change="() => { sendRiverFilterParam(); }"
+          @change="
+            () => {
+              sendRiverFilterParam()
+            }
+          "
         />
+        <el-button type="primary" @click="()=>{pShow=false;nShow=!nShow;}" style="margin-left: 6px; background-color: rgb(0 117 255 / 80%); border: 1px solid rgb(0 117 255 / 80%); color: #fff; box-shadow: none;"
+          >水质模拟
+        </el-button>
+        <el-button type="primary" @click="()=>{nShow=false;pShow=!pShow}" style="margin-left: 6px; background-color: rgb(0 117 255 / 80%); border: 1px solid rgb(0 117 255 / 80%); color: #fff; box-shadow: none;"
+          >水动力
+        </el-button>
       </div>
       <div style="display: flex; margin-top: 20px;">
-        <el-radio-group v-if="activeGraph !== 'outfall'" v-model="waterQualityDimension" is-button @change="() => { sendWaterQualityDimension(); }">
+        <el-radio-group
+          v-if="activeGraph !== 'outfall'"
+          v-model="waterQualityDimension"
+          is-button
+          @change="
+            () => {
+              sendWaterQualityDimension()
+            }
+          "
+        >
           <el-radio-button label="水质类别" value="水质类别" />
           <el-radio-button label="总氮" value="总氮" />
         </el-radio-group>
-        <el-select v-if="activeGraph === 'outfall'" v-model="outfallType" @change="() => { sendRiverFilterParam(); }">
+        <el-select
+          v-if="activeGraph === 'outfall'"
+          v-model="outfallType"
+          @change="
+            () => {
+              sendRiverFilterParam()
+            }
+          "
+        >
           <el-option label="全部" value="全部" />
           <el-option v-for="(item, index) in outfallTypes" :key="index" :label="item.type" :value="item.type" />
         </el-select>
-        <el-select
-          v-model="selectCode"
-          filterable
-          placeholder="搜索点位"
-          clearable
-          style="margin-left: 8px;"
-          @change="zoomToMarkerByCode"
-        >
-          <el-option
-            v-for="item in codeSecetions"
-            :key="item.code"
-            :label="item.name"
-            :value="item.code"
-          />
+        <el-select v-model="selectCode" filterable placeholder="搜索点位" clearable style="margin-left: 8px;" @change="zoomToMarkerByCode">
+          <el-option v-for="item in codeSecetions" :key="item.code" :label="item.name" :value="item.code" />
         </el-select>
       </div>
     </div>
     <RiverWater v-if="activeGraph !== 'outfall'" />
+    <div style="height: 100vh;z-index: 999999;position: absolute;margin-top: 100px;" v-if="nShow">
+      <!-- <img src="" style="width: 100%;height: 100vh;margin-left: 80px;"/> -->
+        <el-image style="width: 100%;height: 100vh;margin-left: 80px;" :src="ngif">
+          <div slot="placeholder" class="image-slot">
+            加载中<span class="dot">...</span>
+          </div>
+        </el-image>
+    </div>
+    <div style="height: 100vh;z-index: 999999;position: absolute;margin-top: 100px;" v-if="pShow">
+      <el-image style="width: 100%;height: 100vh;margin-left: 80px;" :src="pgif">
+          <div slot="placeholder" class="image-slot">
+            加载中<span class="dot">...</span>
+          </div>
+      </el-image>
+    </div>
   </div>
 </template>
 

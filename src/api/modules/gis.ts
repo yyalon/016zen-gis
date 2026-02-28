@@ -208,4 +208,10 @@ export default {
    * @returns
    */
   getOutfallTypes: () => api.post('/app/data/gis-data/sewage_outfall/types'),
+
+  /**
+   * 获取近岸海域默认时间
+   * @returns
+   */
+  getSeaWaterPointConf: () => api.post('/app/data/gis-data/sea-water-point/conf'),
 }

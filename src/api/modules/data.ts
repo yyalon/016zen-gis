@@ -30,7 +30,8 @@ export default {
   getPollutionConcentrationTrend: (data: any) => api.post('/admin/data/river-section/concentrationTrend', data),
 
   // 获取排污口列表
-  getSewageOutfalls: (params: GeneralQuery) => api.post('/app/data/sewage-outfall/list', { params }),
+  getSewageOutfalls: (params: GeneralQuery) => api.post('/app/data/gis-data/sewage_outfall/list', { params }),
+  // getSewageOutfalls: (params: GeneralQuery) => api.post('/app/data/sewage-outfall/list', { params }),
 
   // 获取海水水质监测站列表
   getSeaWaterStation: () => api.post('/app/data/sea-water-station/list'),

@@ -8,6 +8,7 @@ import PopupSeaWaterStation from '../popup/SeaWaterStation.vue'
 import ZFrame from '../ZFrame.vue'
 import apiData from '@/api/modules/data'
 import eventBus from '@/utils/eventBus'
+import gisData from '@/api/modules/gis'
 
 let stationlayer = null
 const layers = {}
@@ -375,6 +376,9 @@ export default {
     this.sea = 'all'
     this.showStationLayer()
     this.showLayer()
+    gisData.getSeaWaterPointConf().then(res => {
+      this.year = res.data.year
+    })
   },
   unmounted() {
     for (const key in layers) {

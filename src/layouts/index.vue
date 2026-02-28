@@ -446,9 +446,11 @@ export default {
           <div class="header">
             <GraphSwitcher v-model:active-graph="activeGraph">
               <div class="title">
-                <div class="titleBeforeLine" />
-                <img :src="abbreviationSrc">
-                <div class="titleAfterLine" />
+                <!-- <div class="titleBeforeLine" /> -->
+                <div class="titleCenter">
+                  近岸海域陆海气协同防治可视化智慧决策支持平台
+                </div>
+                <!-- <div class="titleAfterLine" /> -->
               </div>
             </GraphSwitcher>
           </div>
@@ -523,13 +525,14 @@ export default {
       .title {
         position: relative;
         flex-shrink: 0;
-        width: 690px;
+        width: 926px;
         height: 100%;
         padding: 15px 0;
         text-align: center;
         margin-left: -57px;
         margin-right: -37px;
         z-index: 1;
+        display: flex;
 
         .titleBeforeLine {
           width: 60px;
@@ -539,6 +542,23 @@ export default {
           left: -16px;
           background-image: url("@/assets/images/header/union.png");
           transform: rotateY(180deg);
+        }
+
+        .titleCenter {
+          height: 123px;
+          top: 3px;
+          background-image: url("@/assets/images/header/abbreviation.png");
+          flex: 1;
+          background-size: 100% 90px;
+          margin-left: 18px;
+          margin-right: 0;
+          font-family: YouSheBiaoTiHei;
+          font-size: 34px;
+          font-weight: normal;
+          line-height: 44px;
+          text-align: center;
+          letter-spacing: 1.32px;
+          color: #fff;
         }
 
         .titleAfterLine {

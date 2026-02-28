@@ -49,13 +49,15 @@
             "type": "tdt",
             "layer": "img_d"
           }
-        ]
+        ],
+        "show": true
       },
       {
         "name": "蓝色地图",
         "type": "arcgis",
         "url": "http://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineStreetPurplishBlue/MapServer",
-        "chinaCRS": "GCJ02"
+        "chinaCRS": "GCJ02",
+        "show": false
       },
       {
         "name": "灰色地图",
@@ -68,7 +70,7 @@
         "type": "arcgis",
         "chinaCRS": "GCJ02",
         "url": "https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer",
-        "show": true
+        "show": false
       },
       {
         "name": "高德地图",
