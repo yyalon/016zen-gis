@@ -43,7 +43,7 @@ export default {
       nShow: false,
       pShow: false,
       ngif,
-      pgif
+      pgif,
     }
   },
   computed: {
@@ -114,7 +114,8 @@ export default {
       if (this.selectedAreaNode?.level === 1) {
         city = ''
         province = this.selectedArea === '全部' ? '' : this.selectedArea
-      } else if (this.selectedAreaNode?.level === 2) {
+      }
+      else if (this.selectedAreaNode?.level === 2) {
         city = this.selectedArea
         province = this.selectedAreaNode.data.label
       }
@@ -156,7 +157,8 @@ export default {
       const code = node.code.replace(/^0+$/, '')
       if (code) {
         this.showAreasLayer(code)
-      } else {
+      }
+      else {
         this.showAreaLayer()
       }
     },
@@ -167,7 +169,8 @@ export default {
 
       if (this.area === '攻坚战') {
         this.areas = areas.filter((zone) => ['全部', '上海市', '浙江省', '江苏省'].includes(zone.label))
-      } else {
+      }
+      else {
         this.areas = areas.filter((zone) => ['全部', '上海市', '浙江省', '江苏省', '福建省'].includes(zone.label))
       }
 
@@ -212,14 +215,16 @@ export default {
               window.$zMap.fitBounds(bounds, { padding: [40, 40], duration: 5 })
             }
           })
-        } else {
+        }
+        else {
           window.$zMap.fitBounds(areaLayer.getBounds(), { padding: [40, 40], duration: 5 })
 
           this.setLayerVisible(_layer, true)
         }
 
         areaLayer = _layer
-      } catch (e) {}
+      }
+      catch (e) {}
     },
     showAreasLayer(code) {
       this.setLayerVisible(selectedAreaLayer, false)
@@ -255,7 +260,8 @@ export default {
             window.$zMap.fitBounds(bounds, { padding: [40, 40], duration: 5 })
           }
         })
-      } else {
+      }
+      else {
         window.$zMap.fitBounds(_layer.getBounds(), { padding: [40, 40], duration: 5 })
 
         this.setLayerVisible(_layer, true)
@@ -267,10 +273,12 @@ export default {
       if (this.river === '全部') {
         if (selectedAreaLayer) {
           this.setLayerVisible(selectedAreaLayer, true)
-        } else {
+        }
+        else {
           this.showAreaLayer()
         }
-      } else {
+      }
+      else {
         this.setLayerVisible(selectedAreaLayer, false)
         this.setLayerVisible(areaLayer, false)
       }
@@ -342,11 +350,11 @@ export default {
             }
           "
         />
-        <el-button type="primary" @click="()=>{pShow=false;nShow=!nShow;}" style="margin-left: 6px; background-color: rgb(0 117 255 / 80%); border: 1px solid rgb(0 117 255 / 80%); color: #fff; box-shadow: none;"
-          >水质模拟
+        <el-button type="primary" style="margin-left: 6px; background-color: rgb(0 117 255 / 80%); border: 1px solid rgb(0 117 255 / 80%); color: #fff; box-shadow: none;" @click="() => { pShow = false;nShow = !nShow; }">
+          水质模拟
         </el-button>
-        <el-button type="primary" @click="()=>{nShow=false;pShow=!pShow}" style="margin-left: 6px; background-color: rgb(0 117 255 / 80%); border: 1px solid rgb(0 117 255 / 80%); color: #fff; box-shadow: none;"
-          >水动力
+        <el-button type="primary" style="margin-left: 6px; background-color: rgb(0 117 255 / 80%); border: 1px solid rgb(0 117 255 / 80%); color: #fff; box-shadow: none;" @click="() => { nShow = false;pShow = !pShow }">
+          水动力
         </el-button>
       </div>
       <div style="display: flex; margin-top: 20px;">
@@ -381,21 +389,24 @@ export default {
       </div>
     </div>
     <RiverWater v-if="activeGraph !== 'outfall'" />
-    <div style="height: 100vh;z-index: 999999;position: absolute;margin-top: 100px;" v-if="nShow">
-      <!-- <img src="" style="width: 100%;height: 100vh;margin-left: 80px;"/> -->
-        <el-image style="width: 100%;height: 100vh;margin-left: 80px;" :src="ngif">
-          <div slot="placeholder" class="image-slot">
-            加载中<span class="dot">...</span>
-          </div>
-        </el-image>
-    </div>
-    <div style="height: 100vh;z-index: 999999;position: absolute;margin-top: 100px;" v-if="pShow">
-      <el-image style="width: 100%;height: 100vh;margin-left: 80px;" :src="pgif">
-          <div slot="placeholder" class="image-slot">
-            加载中<span class="dot">...</span>
-          </div>
-      </el-image>
-    </div>
+  </div>
+  <div v-if="nShow" class="image-wrapper">
+    <el-image class="image-element" :src="ngif">
+      <template #placeholder>
+        <div class="image-slot">
+          加载中<span class="dot">...</span>
+        </div>
+      </template>
+    </el-image>
+  </div>
+  <div v-if="pShow" class="image-wrapper">
+    <el-image class="image-element" :src="pgif">
+      <template #placeholder>
+        <div class="image-slot">
+          加载中<span class="dot">...</span>
+        </div>
+      </template>
+    </el-image>
   </div>
 </template>
 
@@ -417,6 +428,36 @@ export default {
 
   .filters {
     pointer-events: all;
+  }
+}
+
+.image-wrapper {
+  z-index: 999999;
+  position: absolute;
+  top: 112px;
+  left: 512px;
+  width: calc(100% - 1024px);
+  height: calc(100% - 118px);
+
+  .image-element {
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    background: #fff;
+
+    :deep .el-image__inner {
+      object-fit: contain;
+    }
+
+    :deep .image-slot {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      height: 100%;
+      color: #909399;
+      font-size: 30px;
+    }
   }
 }
 </style>
