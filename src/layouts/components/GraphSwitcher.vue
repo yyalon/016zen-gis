@@ -15,6 +15,7 @@ export default {
         { text: '入海河流', key: 'river', src: './breadcrumb/river.png', active: '/breadcrumb/river-active.png' },
         { text: '入海排污口', key: 'outfall', src: './breadcrumb/outfall.png', active: '/breadcrumb/outfall-active.png' },
         { text: '近岸海域', key: 'ocean', src: './breadcrumb/ocean.png', active: '/breadcrumb/ocean-active.png' },
+        { text: '污染源', key: 'pollutant', src: './breadcrumb/pollutant.png', active: '/breadcrumb/pollutant-active.png' },
         // { text: '气象信息', key: 'meteorology' },
         // { text: '遥感专题', key: 'satellite' }
       ],
@@ -36,7 +37,7 @@ export default {
   <div class="graph-switcher">
     <div class="graph-left">
       <div
-        v-for="(item, index) in graphs.slice(0, graphs.length / 2)" :key="index" class="button" :class="item.key === activeGraph ? 'active' : ''"
+        v-for="(item, index) in graphs.slice(0, parseInt(graphs.length / 2))" :key="index" class="button" :class="item.key === activeGraph ? 'active' : ''"
         @click="handleClick(item.key)"
       >
         <img :src="item.key === activeGraph ? item.active : item.src">
@@ -45,7 +46,7 @@ export default {
     <slot />
     <div class="graph-right">
       <div
-        v-for="(item, index) in graphs.slice(-(graphs.length / 2))" :key="index" class="button" :class="item.key === activeGraph ? 'active' : ''"
+        v-for="(item, index) in graphs.slice(parseInt(graphs.length / 2))" :key="index" class="button" :class="item.key === activeGraph ? 'active' : ''"
         @click="handleClick(item.key)"
       >
         <img :src="item.key === activeGraph ? item.active : item.src">
