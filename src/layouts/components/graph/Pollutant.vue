@@ -1,6 +1,5 @@
 <script>
-// import LandPollutant from '../layer/LandPollutant.vue'
-// import AirPollutant from '../layer/AirPollutant.vue'
+import PollutantSections from '../layer/PollutantSections.vue'
 import LeftDrawer from '../LeftDrawer.vue'
 import RightDrawer from '../RightDrawer.vue'
 import ChartPollutantCityQuarterly from '../chart/PollutantCityQuarterly.vue'
@@ -9,7 +8,7 @@ import ChartPollutantSeaFlux from '../chart/PollutantSeaFlux.vue'
 import ChartPollutantEstuaryBay from '../chart/PollutantEstuaryBay.vue'
 
 export default {
-  components: { LeftDrawer, RightDrawer, ChartPollutantCityQuarterly, ChartPollutantCityPie, ChartPollutantSeaFlux, ChartPollutantEstuaryBay },
+  components: { PollutantSections, LeftDrawer, RightDrawer, ChartPollutantCityQuarterly, ChartPollutantCityPie, ChartPollutantSeaFlux, ChartPollutantEstuaryBay },
   props: {
     visible: {
       type: Boolean,
@@ -25,8 +24,7 @@ export default {
 
 <template>
   <div>
-    <!-- <LandPollutant v-if="visible && type === 'land'" />
-    <AirPollutant v-if="visible && type !== 'land'" /> -->
+    <PollutantSections v-if="visible" />
     <LeftDrawer :drawer-visible="visible">
       <ChartPollutantCityQuarterly />
       <ChartPollutantCityPie />

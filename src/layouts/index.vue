@@ -457,7 +457,7 @@ export default {
             </GraphSwitcher>
           </div>
           <div class="layout-body">
-            <LayerWaterSections v-if="activeGraph !== 'ocean'" :active-graph="activeGraph" />
+            <LayerWaterSections v-if="activeGraph !== 'ocean' && activeGraph !== 'pollutant'" :active-graph="activeGraph" />
             <GraphCockpit :visible="activeGraph === 'cockpit'" />
             <GraphRiver :visible="activeGraph === 'river'" />
             <GraphOutfall :visible="activeGraph === 'outfall'" />
