@@ -25,6 +25,7 @@ import GraphCockpit from './components/graph/Cockpit.vue'
 import GraphOutfall from './components/graph/Outfall.vue'
 import GraphRiver from './components/graph/River.vue'
 import GraphOcean from './components/graph/Ocean.vue'
+import GraphPollutant from './components/graph/Pollutant.vue'
 import GraphBiology from './components/graph/Biology.vue'
 import GraphMeteorology from './components/graph/Meteorology.vue'
 
@@ -44,6 +45,7 @@ export default {
     GraphOutfall,
     GraphRiver,
     GraphOcean,
+    GraphPollutant,
     GraphBiology,
     LayerSeaShanghai,
     LayerSeaJiangsu,
@@ -455,11 +457,12 @@ export default {
             </GraphSwitcher>
           </div>
           <div class="layout-body">
-            <LayerWaterSections v-if="activeGraph !== 'ocean'" :active-graph="activeGraph" />
+            <LayerWaterSections v-if="activeGraph !== 'ocean' && activeGraph !== 'pollutant'" :active-graph="activeGraph" />
             <GraphCockpit :visible="activeGraph === 'cockpit'" />
             <GraphRiver :visible="activeGraph === 'river'" />
             <GraphOutfall :visible="activeGraph === 'outfall'" />
             <GraphOcean :visible="activeGraph === 'ocean'" />
+            <GraphPollutant :visible="activeGraph === 'pollutant'" />
             <GraphBiology :visible="activeGraph === 'biology'" />
             <GraphMeteorology :visible="activeGraph === 'meteorology'" />
           </div>

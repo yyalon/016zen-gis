@@ -15,3 +15,6 @@ src/types/components.d.ts
 src/types/auto-imports.d.ts
 src/types/components.d.ts
 src/types/auto-imports.d.ts
+
+# 大气污染物 CSV 单文件超 100MB，不纳入 Git，部署时自行放置或使用 Git LFS
+public/file/pollutant/air/*.csv

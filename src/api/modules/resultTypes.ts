@@ -457,4 +457,3 @@ export interface Meteorology {
 export interface GisConf {
   filterDetaulTime: string // 默认数据查询时间
 }
-
