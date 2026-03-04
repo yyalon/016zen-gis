@@ -21,7 +21,7 @@ export default {
   async mounted() {
     eventBus.on('refreshSeaWaterQualityChart', (param) => {
       this.param = param
-      console.log('refreshSeaWaterQualityChart',param)
+      console.log('refreshSeaWaterQualityChart', param)
       this.getData(param)
     })
   },
