@@ -400,7 +400,7 @@ export default {
     </el-image>
   </div>
   <div v-if="pShow" class="image-wrapper">
-    <el-image class="image-element" :src="pgif">
+    <el-image class="image-element" style="margin-top: 10px;" :src="pgif">
       <template #placeholder>
         <div class="image-slot">
           加载中<span class="dot">...</span>
