@@ -6,6 +6,7 @@ import { area, intersect } from '@turf/turf'
 import LayerWaterSections from './components/layer/WaterSections.vue'
 import LayerRivers from './components/layer/Rivers.vue'
 import LayerControlUnit from './components/layer/ControlUnit.vue'
+import LayerThreeLevelAreas from './components/layer/ThreeLevelAreas.vue'
 import LayerSeaShanghai from './components/layer/SeaShanghai.vue'
 import LayerSeaJiangsu from './components/layer/SeaJiangsu.vue'
 import LayerSeaZhejiang from './components/layer/SeaZhejiang.vue'
@@ -18,6 +19,8 @@ import LayergerMeteorologyStations from './components/layer/MeteorologyStations.
 import LayergerAtmosphereStations from './components/layer/AtmosphereStations.vue'
 import LayergerEnterprises from './components/layer/Enterprises.vue'
 import LayerReservoirs from './components/layer/Reservoirs.vue'
+import LayerCellAbundance from './components/layer/CellAbundance.vue'
+import LayerWaterQualityModel from './components/layer/WaterQualityModel.vue'
 import LayerRiverChannels from './components/layer/RiverChannels.vue'
 
 import GraphSwitcher from './components/GraphSwitcher.vue'
@@ -40,6 +43,7 @@ import apiData from '@/api/modules/data'
 export default {
   components: {
     LayerControlUnit,
+    LayerThreeLevelAreas,
     GraphSwitcher,
     GraphCockpit,
     GraphOutfall,
@@ -59,6 +63,8 @@ export default {
     LayergerAtmosphereStations,
     LayergerEnterprises,
     LayerReservoirs,
+    LayerCellAbundance,
+    LayerWaterQualityModel,
     LayerRiverChannels,
     LayerRivers,
     GraphMeteorology,
@@ -72,6 +78,20 @@ export default {
       activeGraph: 'cockpit',
       settings,
       buttons: [
+        {
+          name: '细胞丰度',
+          value: 'layerCellAbundance',
+          command: 'toggleLayer',
+          visibility: false,
+          icon: 'reservoir',
+        },
+        // {
+        //   name: '四类污染物',
+        //   value: 'layerReservoirs',
+        //   command: 'toggleLayer',
+        //   visibility: false,
+        //   icon: 'reservoir',
+        // },
         {
           name: '水库监测',
           value: 'layerReservoirs',
@@ -101,6 +121,13 @@ export default {
           icon: 'ep:mostly-cloudy',
         },
         {
+          name: '水质模型',
+          value: 'layerWaterQualityModel',
+          command: 'toggleLayer',
+          visibility: false,
+          icon: 'ep:monitor',
+        },
+        {
           name: '污染企业',
           value: 'layerEnterprises',
           command: 'toggleLayer',
@@ -110,6 +137,13 @@ export default {
         {
           name: '控制单元',
           value: 'controlUnit',
+          command: 'toggleLayer',
+          visibility: false,
+          icon: 'river',
+        },
+        {
+          name: '三级分区',
+          value: 'threeLevelAreas',
           command: 'toggleLayer',
           visibility: false,
           icon: 'river',
@@ -177,6 +211,9 @@ export default {
         layerEnterprises: false,
         layerRiver: false,
         controlUnit: false,
+        threeLevelAreas: false,
+        layerCellAbundance: false,
+        layerWaterQualityModel: false,
       },
       riverLevels: [],
       riverLevel: null,
@@ -428,6 +465,7 @@ export default {
         <div class="layout-background" />
         <ZMap @map-loaded="mapLoaded" />
         <LayerControlUnit v-if="visibilities.controlUnit" />
+        <LayerThreeLevelAreas v-if="visibilities.threeLevelAreas" />
         <LayerSeaShanghai v-if="visibilities.sea" />
         <LayerSeaZhejiang v-if="visibilities.sea" />
         <LayerSeaJiangsu v-if="visibilities.sea" />
@@ -440,6 +478,8 @@ export default {
         <LayergerAtmosphereStations v-if="visibilities.layerAtmosphereStations" />
         <LayergerEnterprises v-if="visibilities.layerEnterprises" />
         <LayerReservoirs v-if="visibilities.layerReservoirs" />
+        <LayerCellAbundance :visible="visibilities.layerCellAbundance" />
+        <LayerWaterQualityModel v-if="visibilities.layerWaterQualityModel" />
         <LayerRiverChannels v-if="visibilities.layerRiverChannels" />
         <LayerRivers v-if="visibilities.layerRiver" :river-level="riverLevel" :river-level-show="riverLevelShow" />
         <Toolbar :buttons="buttons" @excute-command="excuteCommand" />
