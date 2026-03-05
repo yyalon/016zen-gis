@@ -441,7 +441,7 @@ export default {
         <LayergerEnterprises v-if="visibilities.layerEnterprises" />
         <LayerReservoirs v-if="visibilities.layerReservoirs" />
         <LayerRiverChannels v-if="visibilities.layerRiverChannels" />
-        <LayerRivers v-if="visibilities.layerRiver" :river-level="riverLevel" :river-level-show="riverLevelShow" />
+        <LayerRivers v-if="visibilities.layerRiver" :river-level="riverLevel ?? undefined" :river-level-show="riverLevelShow" />
         <Toolbar :buttons="buttons" @excute-command="excuteCommand" />
         <!-- <LayerAllBorderMask /> -->
         <div class="layout-container">
