@@ -1,0 +1,51 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- 按钮背景圆 -->
+  <circle cx="100" cy="100" r="95" fill="none" stroke="#000000" stroke-width="3"/>
+  
+  <!-- 通用模型图标 -->
+  <g fill="none" stroke="#000000" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+    <!-- 3D立方体框架 -->
+    <!-- 前面 -->
+    <rect x="60" y="70" width="50" height="50"/>
+    <!-- 后面 -->
+    <rect x="80" y="50" width="50" height="50"/>
+    
+    <!-- 连接线 -->
+    <line x1="60" y1="70" x2="80" y2="50"/>
+    <line x1="110" y1="70" x2="130" y2="50"/>
+    <line x1="60" y1="120" x2="80" y2="100"/>
+    <line x1="110" y1="120" x2="130" y2="100"/>
+    
+    <!-- 内部数据结构 -->
+    <!-- 网格线 - 前面 -->
+    <line x1="85" y1="70" x2="85" y2="120"/>
+    <line x1="60" y1="95" x2="110" y2="95"/>
+    
+    <!-- 网格线 - 后面 -->
+    <line x1="105" y1="50" x2="105" y2="100"/>
+    <line x1="80" y1="75" x2="130" y2="75"/>
+    
+    <!-- 数据点 -->
+    <circle cx="85" cy="95" r="4" fill="#000000"/>
+    <circle cx="105" cy="75" r="4" fill="#000000"/>
+    
+    <!-- 连接数据点 -->
+    <line x1="85" y1="95" x2="105" y2="75" stroke-dasharray="5,3"/>
+    
+    <!-- 数据流箭头 -->
+    <path d="M140 60 L155 60"/>
+    <path d="M150 55 L155 60 L150 65"/>
+    
+    <path d="M140 140 L155 140"/>
+    <path d="M150 135 L155 140 L150 145"/>
+    
+    <path d="M45 60 L30 60"/>
+    <path d="M35 55 L30 60 L35 65"/>
+    
+    <path d="M45 140 L30 140"/>
+    <path d="M35 135 L30 140 L35 145"/>
+    
+    <!-- 算法符号 -->
+    <text x="90" y="165" font-size="12" font-family="Arial" fill="#000000" text-anchor="middle">MODEL</text>
+  </g>
+</svg>
