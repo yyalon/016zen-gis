@@ -59,10 +59,27 @@ export default {
       airKind: 'NH3',
       types,
       airType: 'Industry',
+      airMonth: 1,
       airLayer: null,
       airLoading: false,
-      airProgress: '', // 解析中 / 插值中，用于大文件时提示
+      airProgress: '',
     }
+  },
+  computed: {
+    /** 1-3→Mon1，4-6→Mon4，7-9→Mon7，10-12→Mon10 */
+    airMonFolder() {
+      const m = this.airMonth
+      if (m >= 1 && m <= 3) {
+        return 'Mon1'
+      }
+      if (m >= 4 && m <= 6) {
+        return 'Mon4'
+      }
+      if (m >= 7 && m <= 9) {
+        return 'Mon7'
+      }
+      return 'Mon10'
+    },
   },
   watch: {
     landType() {
@@ -77,6 +94,11 @@ export default {
       }
     },
     airType() {
+      if (this.type === 'air' && window.$zMap) {
+        this.loadAirRaster()
+      }
+    },
+    airMonth() {
       if (this.type === 'air' && window.$zMap) {
         this.loadAirRaster()
       }
@@ -152,9 +174,9 @@ export default {
       ctx.putImageData(imgData, 0, 0)
       return canvas.toDataURL('image/png')
     },
-    /** 大气预生成 TIF 路径，命名 {airKind}_{airType}.tif */
+    /** 大气 TIF 路径：按月份选 Mon1/Mon4/Mon7/Mon10 目录下的 {airKind}_{airType}.tif */
     getAirTifUrl() {
-      return `${AIR_CSV_BASE}/${this.airKind}_${this.airType}.tif`
+      return `${AIR_CSV_BASE}/${this.airMonFolder}/${this.airKind}_${this.airType}.tif`
     },
     removeAirLayer() {
       if (this.airLayer && window.$zMap) {
@@ -267,6 +289,9 @@ export default {
           </el-select>
         </template>
         <template v-else>
+          <el-select v-model="airMonth" style="margin-right: 8px;" :loading="airLoading">
+            <el-option v-for="item in months" :key="item.value" :label="item.label" :value="item.value" />
+          </el-select>
           <el-select v-model="airKind" :loading="airLoading">
             <el-option v-for="item in kinds" :key="item.value" :label="item.label" :value="item.value" />
           </el-select>
