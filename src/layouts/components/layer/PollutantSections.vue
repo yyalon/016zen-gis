@@ -46,6 +46,14 @@ const types = [
   { value: 'Ship', label: '港口和船舶源' },
 ]
 
+// 大气四季：对应 TIF 目录 Mon1(冬)/Mon4(春)/Mon7(夏)/Mon10(秋)
+const seasons = [
+  { value: 'Mon1', label: '冬季' },
+  { value: 'Mon4', label: '春季' },
+  { value: 'Mon7', label: '夏季' },
+  { value: 'Mon10', label: '秋季' },
+]
+
 export default {
   data() {
     return {
@@ -59,26 +67,16 @@ export default {
       airKind: 'NH3',
       types,
       airType: 'Industry',
-      airMonth: 1,
+      seasons,
+      airSeason: 'Mon4',
       airLayer: null,
       airLoading: false,
       airProgress: '',
     }
   },
   computed: {
-    /** 1-3→Mon1，4-6→Mon4，7-9→Mon7，10-12→Mon10 */
     airMonFolder() {
-      const m = this.airMonth
-      if (m >= 1 && m <= 3) {
-        return 'Mon1'
-      }
-      if (m >= 4 && m <= 6) {
-        return 'Mon4'
-      }
-      if (m >= 7 && m <= 9) {
-        return 'Mon7'
-      }
-      return 'Mon10'
+      return this.airSeason
     },
   },
   watch: {
@@ -98,7 +96,7 @@ export default {
         this.loadAirRaster()
       }
     },
-    airMonth() {
+    airSeason() {
       if (this.type === 'air' && window.$zMap) {
         this.loadAirRaster()
       }
@@ -131,12 +129,64 @@ export default {
         this.landLayer = null
       }
     },
-    /** 将 GeoTIFF 栅格数据绘制到 canvas，返回 PNG data URL（灰阶，与行政图不冲突） */
-    async renderGeoTiffToDataUrl(tifUrl) {
+    /** 双线性插值采样：用周围 4 格点加权得到平滑值，避免块状 */
+    sampleBilinear(data, width, height, x, y, noData, threshold) {
+      const x0 = Math.max(0, Math.min(width - 1, Math.floor(x)))
+      const y0 = Math.max(0, Math.min(height - 1, Math.floor(y)))
+      const x1 = Math.max(0, Math.min(width - 1, x0 + 1))
+      const y1 = Math.max(0, Math.min(height - 1, y0 + 1))
+      const dx = x - x0
+      const dy = y - y0
+      const valid = (v) => v !== noData && Number.isFinite(v) && v > threshold
+      const get = (ix, iy) => data[iy * width + ix]
+      const v00 = get(x0, y0)
+      const v10 = get(x1, y0)
+      const v01 = get(x0, y1)
+      const v11 = get(x1, y1)
+      let sum = 0
+      let wSum = 0
+      if (valid(v00)) {
+        const w = (1 - dx) * (1 - dy)
+        sum += v00 * w
+        wSum += w
+      }
+      if (valid(v10)) {
+        const w = dx * (1 - dy)
+        sum += v10 * w
+        wSum += w
+      }
+      if (valid(v01)) {
+        const w = (1 - dx) * dy
+        sum += v01 * w
+        wSum += w
+      }
+      if (valid(v11)) {
+        const w = dx * dy
+        sum += v11 * w
+        wSum += w
+      }
+      return wSum > 0 ? { v: sum / wSum, hasData: true } : { v: 0, hasData: false }
+    },
+    /** 将 GeoTIFF 栅格数据绘制到 canvas，返回 PNG data URL（灰阶）。
+     * opts.renderStyle === 'dots'：每格画小圆点，与陆域风格一致
+     * opts.uniformColor：有数据的格点统一用同一灰色点亮，无过渡色
+     * opts.quantizeLevels：灰阶分级数（如 5），有值时无平滑过渡，仅离散几档灰
+     * opts.interpolate + opts.scale：双线性插值放大，适合陆域栅格
+     * opts.returnBounds：为 true 时返回 { dataUrl, bounds }，bounds 来自 TIF 的 getBoundingBox，保证叠加范围正确
+     */
+    async renderGeoTiffToDataUrl(tifUrl, opts = {}) {
       const tiff = await fromUrl(tifUrl)
       const image = await tiff.getImage()
       const width = image.getWidth()
       const height = image.getHeight()
+      let geoBounds = null
+      if (opts.returnBounds && typeof image.getBoundingBox === 'function') {
+        const bbox = image.getBoundingBox()
+        if (Array.isArray(bbox) && bbox.length >= 4) {
+          const [west, south, east, north] = bbox
+          geoBounds = [[south, west], [north, east]]
+        }
+      }
       const rasters = await image.readRasters()
       const data = rasters[0]
       const noData = -3.4028235e38
@@ -155,24 +205,109 @@ export default {
         }
       }
       const range = max > min ? max - min : 1
+      const scale = Math.max(1, Math.min(4, Number(opts.scale) || 1))
+      const outW = width * scale
+      const outH = height * scale
       const canvas = document.createElement('canvas')
-      canvas.width = width
-      canvas.height = height
+      canvas.width = outW
+      canvas.height = outH
       const ctx = canvas.getContext('2d')
-      const imgData = ctx.createImageData(width, height)
-      for (let i = 0; i < data.length; i++) {
-        const v = data[i]
-        const isNoData = v === noData || !isFinite(v) || v <= dataThreshold
-        const t1 = isNoData ? 0 : Math.max(0, Math.min(1, (v - min) / range))
-        const gray = Math.round(t1 * 255)
-        const alpha = isNoData ? 0 : 255
-        imgData.data[i * 4] = gray
-        imgData.data[i * 4 + 1] = gray
-        imgData.data[i * 4 + 2] = gray
-        imgData.data[i * 4 + 3] = alpha
+      const useUniformColor = opts.uniformColor === true
+      const uniformGray = 20
+      const quantizeLevels = Math.max(0, Math.min(16, Number(opts.quantizeLevels) || 0))
+      if (opts.renderStyle === 'dots' || opts.renderStyle === 'blocks') {
+        ctx.clearRect(0, 0, outW, outH)
+        const useBlocks = opts.renderStyle === 'blocks'
+        for (let gy = 0; gy < height; gy++) {
+          for (let gx = 0; gx < width; gx++) {
+            const v = data[gy * width + gx]
+            const valid = v !== noData && Number.isFinite(v) && v > dataThreshold
+            if (!valid) {
+              continue
+            }
+            let gray
+            if (useUniformColor) {
+              gray = uniformGray
+            }
+            else {
+              const t = Math.max(0, Math.min(1, (v - min) / range))
+              if (quantizeLevels > 1) {
+                const level = Math.min(quantizeLevels - 1, Math.floor(t * quantizeLevels))
+                gray = Math.round((level / (quantizeLevels - 1)) * 255)
+              }
+              else {
+                gray = Math.round(t * 255)
+              }
+            }
+            ctx.fillStyle = `rgb(${gray},${gray},${gray})`
+            if (useBlocks) {
+              ctx.fillRect(gx * scale, gy * scale, scale, scale)
+            }
+            else {
+              const dotRadius = Math.max(0.5, scale * 0.55)
+              const cx = gx * scale + scale / 2
+              const cy = gy * scale + scale / 2
+              ctx.beginPath()
+              ctx.arc(cx, cy, dotRadius, 0, Math.PI * 2)
+              ctx.fill()
+            }
+          }
+        }
+        return canvas.toDataURL('image/png')
       }
-      ctx.putImageData(imgData, 0, 0)
-      return canvas.toDataURL('image/png')
+      const useInterpolate = opts.interpolate !== false && scale > 1
+      const imgData = ctx.createImageData(outW, outH)
+      if (useInterpolate) {
+        for (let j = 0; j < outH; j++) {
+          for (let i = 0; i < outW; i++) {
+            const x = (i + 0.5) / scale - 0.5
+            const y = (j + 0.5) / scale - 0.5
+            const { v, hasData } = this.sampleBilinear(data, width, height, x, y, noData, dataThreshold)
+            const t1 = hasData ? Math.max(0, Math.min(1, (v - min) / range)) : 0
+            const gray = Math.round(t1 * 255)
+            const alpha = hasData ? 255 : 0
+            const idx = (j * outW + i) * 4
+            imgData.data[idx] = gray
+            imgData.data[idx + 1] = gray
+            imgData.data[idx + 2] = gray
+            imgData.data[idx + 3] = alpha
+          }
+        }
+        ctx.putImageData(imgData, 0, 0)
+      }
+      else {
+        const smallCanvas = document.createElement('canvas')
+        smallCanvas.width = width
+        smallCanvas.height = height
+        const smallCtx = smallCanvas.getContext('2d')
+        const smallImg = smallCtx.createImageData(width, height)
+        for (let i = 0; i < data.length; i++) {
+          const v = data[i]
+          const isNoData = v === noData || !isFinite(v) || v <= dataThreshold
+          const t1 = isNoData ? 0 : Math.max(0, Math.min(1, (v - min) / range))
+          const gray = Math.round(t1 * 255)
+          const alpha = isNoData ? 0 : 255
+          smallImg.data[i * 4] = gray
+          smallImg.data[i * 4 + 1] = gray
+          smallImg.data[i * 4 + 2] = gray
+          smallImg.data[i * 4 + 3] = alpha
+        }
+        smallCtx.putImageData(smallImg, 0, 0)
+        if (scale > 1) {
+          const ctx2 = canvas.getContext('2d')
+          ctx2.imageSmoothingEnabled = true
+          ctx2.imageSmoothingQuality = 'high'
+          ctx2.drawImage(smallCanvas, 0, 0, width, height, 0, 0, outW, outH)
+        }
+        else {
+          ctx.putImageData(smallImg, 0, 0)
+        }
+      }
+      const dataUrl = canvas.toDataURL('image/png')
+      if (opts.returnBounds && geoBounds) {
+        return { dataUrl, bounds: geoBounds }
+      }
+      return dataUrl
     },
     /** 大气 TIF 路径：按月份选 Mon1/Mon4/Mon7/Mon10 目录下的 {airKind}_{airType}.tif */
     getAirTifUrl() {
@@ -197,16 +332,18 @@ export default {
       this.airProgress = '加载中…'
       this.removeAirLayer()
       try {
-        const dataUrl = await this.renderGeoTiffToDataUrl(tifUrl)
+        const result = await this.renderGeoTiffToDataUrl(tifUrl, { scale: 4, renderStyle: 'blocks', uniformColor: false, quantizeLevels: 5, returnBounds: true })
+        const dataUrl = (typeof result === 'string') ? result : result.dataUrl
+        const boundsArr = (typeof result === 'object' && result.bounds) ? result.bounds : AIR_RASTER_BOUNDS
         const bounds = window.$ZMap.L.latLngBounds(
-          window.$ZMap.L.latLng(AIR_RASTER_BOUNDS[0][0], AIR_RASTER_BOUNDS[0][1]),
-          window.$ZMap.L.latLng(AIR_RASTER_BOUNDS[1][0], AIR_RASTER_BOUNDS[1][1]),
+          window.$ZMap.L.latLng(boundsArr[0][0], boundsArr[0][1]),
+          window.$ZMap.L.latLng(boundsArr[1][0], boundsArr[1][1]),
         )
         this.airLayer = new window.$ZMap.layer.ImageLayer({
           url: dataUrl,
           bounds,
           name: 'airPollutantRaster',
-          opacity: 0.5,
+          opacity: 0.7,
           zIndex: 500,
         })
         window.$zMap.addLayer(this.airLayer)
@@ -241,7 +378,7 @@ export default {
       this.landLoading = true
       this.removeLandLayer()
       try {
-        const dataUrl = await this.renderGeoTiffToDataUrl(url)
+        const dataUrl = await this.renderGeoTiffToDataUrl(url, { scale: 3 })
         const bounds = window.$ZMap.L.latLngBounds(
           window.$ZMap.L.latLng(LAND_RASTER_BOUNDS[0][0], LAND_RASTER_BOUNDS[0][1]),
           window.$ZMap.L.latLng(LAND_RASTER_BOUNDS[1][0], LAND_RASTER_BOUNDS[1][1]),
@@ -289,8 +426,8 @@ export default {
           </el-select>
         </template>
         <template v-else>
-          <el-select v-model="airMonth" style="margin-right: 8px;" :loading="airLoading">
-            <el-option v-for="item in months" :key="item.value" :label="item.label" :value="item.value" />
+          <el-select v-model="airSeason" style="margin-right: 8px;" :loading="airLoading">
+            <el-option v-for="item in seasons" :key="item.value" :label="item.label" :value="item.value" />
           </el-select>
           <el-select v-model="airKind" :loading="airLoading">
             <el-option v-for="item in kinds" :key="item.value" :label="item.label" :value="item.value" />
