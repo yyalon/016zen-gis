@@ -39,6 +39,12 @@ import 'dayjs/locale/zh-cn'
 
 import geoApi from '@/api/modules/layers'
 import apiData from '@/api/modules/data'
+import eventBus from '@/utils/eventBus'
+import {
+  THREE_LEVEL_AREAS_RESET_DEFAULT_STYLE_EVENT,
+  cancelEutrophicationPolling,
+  latestThreeLevelEutrophicationRegionColors,
+} from '@/utils/eutrophicationFlow'
 
 export default {
   components: {
@@ -144,9 +150,15 @@ export default {
         {
           name: '三级分区',
           value: 'threeLevelAreas',
-          command: 'toggleLayer',
           visibility: false,
           icon: 'river',
+          showSubButtons: false,
+          subButtons: [
+            {
+              name: '富营养化评价',
+              command: 'eutrophicationUpload',
+            },
+          ],
         },
         {
           name: '河流',
@@ -311,6 +323,23 @@ export default {
           break
         case 'switchRiverLayer':
           this.switchRiverLayer(data.value)
+          break
+        case 'toggleThreeLevelAreasToolbar':
+          this.onThreeLevelAreasToolbarToggle()
+          break
+      }
+    },
+    onThreeLevelAreasToolbarToggle() {
+      const wasOn = this.visibilities.threeLevelAreas
+      if (wasOn) {
+        cancelEutrophicationPolling()
+        latestThreeLevelEutrophicationRegionColors.current = null
+        eventBus.emit(THREE_LEVEL_AREAS_RESET_DEFAULT_STYLE_EVENT)
+      }
+      this.toggleLayer('threeLevelAreas')
+      const btn = this.buttons.find((b: any) => b.value === 'threeLevelAreas')
+      if (btn) {
+        btn.showSubButtons = !wasOn
       }
     },
     switchRiverLayer(riverLevel: any) {

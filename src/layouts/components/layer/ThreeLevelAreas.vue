@@ -1,11 +1,87 @@
 <script>
 import PopupControlUnit from '../popup/ControlUnit.vue'
+import eventBus from '@/utils/eventBus'
+import {
+  EUTROPHICATION_LEVEL1_COLOR,
+  EUTROPHICATION_THREE_LEVEL_STYLE_EVENT,
+  THREE_LEVEL_AREAS_RESET_DEFAULT_STYLE_EVENT,
+  latestThreeLevelEutrophicationRegionColors,
+} from '@/utils/eutrophicationFlow'
 
 let _layer = null
 
+/** 与 GeoJsonLayer 初始 symbol.styleOptions 一致 */
+const THREE_LEVEL_AREAS_INITIAL_HEX = '#ffff56'
+
+/** GeoJSON name 如「陆域影响区」→ 接口 region 键「陆域」 */
+function featureNameToApiRegion(name) {
+  if (!name || typeof name !== 'string') {
+    return null
+  }
+  if (name.includes('陆域')) {
+    return '陆域'
+  }
+  if (name.includes('近岸')) {
+    return '近岸'
+  }
+  if (name.includes('离岸')) {
+    return '离岸'
+  }
+  return null
+}
+
+function applyEutrophicationRegionColorsToLayer(layer, regionHexMap) {
+  if (!layer || typeof layer.getGraphics !== 'function') {
+    return
+  }
+  const graphics = layer.getGraphics()
+  if (!graphics || !graphics.length) {
+    return
+  }
+  const map = (regionHexMap && typeof regionHexMap === 'object') ? regionHexMap : null
+  for (let i = 0; i < graphics.length; i++) {
+    const g = graphics[i]
+    const featureName = g.attr?.name
+    const regionKey = featureNameToApiRegion(featureName)
+    let hex = EUTROPHICATION_LEVEL1_COLOR
+    if (regionKey && map && map[regionKey]) {
+      hex = map[regionKey]
+    }
+    g.setStyle({
+      fillColor: hex,
+      color: hex,
+      outlineColor: hex,
+    })
+  }
+}
+
+function applyInitialDefaultStyleToLayer(layer) {
+  if (!layer || typeof layer.getGraphics !== 'function') {
+    return
+  }
+  const graphics = layer.getGraphics()
+  if (!graphics || !graphics.length) {
+    return
+  }
+  const hex = THREE_LEVEL_AREAS_INITIAL_HEX
+  for (let i = 0; i < graphics.length; i++) {
+    graphics[i].setStyle({
+      fillColor: hex,
+      color: hex,
+      outlineColor: hex,
+    })
+  }
+}
+
 export default {
   async mounted() {
+    eventBus.on(EUTROPHICATION_THREE_LEVEL_STYLE_EVENT, this.onEutrophicationThreeLevelStyle)
+    eventBus.on(THREE_LEVEL_AREAS_RESET_DEFAULT_STYLE_EVENT, this.onThreeLevelAreasResetDefaultStyle)
     this.showLayer()
+  },
+  beforeUnmount() {
+    eventBus.off(EUTROPHICATION_THREE_LEVEL_STYLE_EVENT, this.onEutrophicationThreeLevelStyle)
+    eventBus.off(THREE_LEVEL_AREAS_RESET_DEFAULT_STYLE_EVENT, this.onThreeLevelAreasResetDefaultStyle)
   },
   unmounted() {
     if (_layer) {
@@ -13,8 +89,25 @@ export default {
     }
   },
   methods: {
+    onThreeLevelAreasResetDefaultStyle() {
+      if (_layer) {
+        applyInitialDefaultStyleToLayer(_layer)
+      }
+    },
+    onEutrophicationThreeLevelStyle(payload) {
+      const regionColors = payload?.regionColors
+      if (regionColors && typeof regionColors === 'object' && _layer) {
+        applyEutrophicationRegionColorsToLayer(_layer, regionColors)
+        return
+      }
+      /** 兼容旧事件：单一 color */
+      const hex = payload?.color
+      if (hex && typeof hex === 'string' && _layer) {
+        const map = { 陆域: hex, 近岸: hex, 离岸: hex }
+        applyEutrophicationRegionColorsToLayer(_layer, map)
+      }
+    },
     showLayer() {
-      const name = 'controlUnit'
       if (_layer) {
         _layer.show = true
       }
@@ -33,10 +126,10 @@ export default {
           symbol: {
             styleOptions: {
               width: 3,
-              color: '#ffff56',
-              fillColor: '#ffff56',
+              color: THREE_LEVEL_AREAS_INITIAL_HEX,
+              fillColor: THREE_LEVEL_AREAS_INITIAL_HEX,
               fillOpacity: 0.2,
-              outlineColor: '#ffff56',
+              outlineColor: THREE_LEVEL_AREAS_INITIAL_HEX,
               opacity: 1,
               outlineWidth: 2,
             },
@@ -45,7 +138,6 @@ export default {
         window.$zMap.addLayer(tileLayer)
         tileLayer.on(window.$ZMap.EventType.load, (e) => {
           setTimeout(() => {
-            const names = []
             e.graphics.forEach((graphic) => {
               graphic.bindTooltip(null, {
                 className: 'custom_tooltip',
@@ -58,6 +150,9 @@ export default {
                 window.$Utitls.unloadComponentContent(e.target)
               })
             })
+            if (latestThreeLevelEutrophicationRegionColors.current) {
+              applyEutrophicationRegionColorsToLayer(tileLayer, latestThreeLevelEutrophicationRegionColors.current)
+            }
             tileLayer.show = true
             loading.close()
           }, 500)
