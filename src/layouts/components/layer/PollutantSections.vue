@@ -1,5 +1,6 @@
 <script>
 import { fromUrl } from 'geotiff'
+import { applyBasinMaskToCanvas } from '@/utils/basinMask'
 
 // 陆域栅格范围（与 /file/pollutant/land/*.tif.xml 中 nativeExtBox 一致）
 const LAND_RASTER_BOUNDS = [
@@ -7,7 +8,15 @@ const LAND_RASTER_BOUNDS = [
   [31.178078, 122.948019], // northEast [lat, lng]
 ]
 
-// 大气 TIF 范围（与陆域一致：江浙沪闽，与 generate_air_raster.py 输出范围一致）
+/** 与 LAND_RASTER_BOUNDS 一致，用于流域掩膜与 canvas 像素对齐 */
+const LAND_RASTER_GEO_BOUNDS = {
+  west: 118.023019,
+  south: 27.044745,
+  east: 122.948019,
+  north: 31.178078,
+}
+
+// 大气 TIF 范围：仅当 GeoTIFF 无法解析 bbox 时回退（正常情况用 TIF 自身 bounds）
 const AIR_RASTER_BOUNDS = [
   [27.044745, 118.023019], // southWest [lat, lng]
   [31.178078, 122.948019], // northEast [lat, lng]
@@ -15,6 +24,23 @@ const AIR_RASTER_BOUNDS = [
 
 // 大气 TIF 目录（仅用 TIF 加载）
 const AIR_CSV_BASE = '/file/pollutant/air'
+
+/** 大气物种品牌色 RGB（0–255） */
+const AIR_KIND_TINT_RGB = {
+  NH3: { r: 0x1A, g: 0x98, b: 0x50 },
+  NO: { r: 0x6A, g: 0x51, b: 0xA3 },
+  NO2: { r: 0xD7, g: 0x30, b: 0x27 },
+}
+
+/** 归一化强度 t1∈[0,1] → 不透明显色：RGB 在 45%～100% 品牌色之间（避免 R*t1 纯黑，也避免仅靠 alpha 在 ImageLayer 上不可见） */
+function airTintRgbComponents(tint, t1) {
+  const k = 0.45 + 0.55 * Math.max(0, Math.min(1, t1))
+  return {
+    r: Math.round(tint.r * k),
+    g: Math.round(tint.g * k),
+    b: Math.round(tint.b * k),
+  }
+}
 
 const months = [
   { value: 1, label: '一月' },
@@ -72,6 +98,11 @@ export default {
       airLayer: null,
       airLoading: false,
       airProgress: '',
+      /** 控制单元 / 流域（controlUnit1.json） */
+      basinSelectOptions: [],
+      selectedBasinCode: '',
+      controlUnitFC: null,
+      basinOutlineLayer: null,
     }
   },
   computed: {
@@ -101,8 +132,18 @@ export default {
         this.loadAirRaster()
       }
     },
+    selectedBasinCode() {
+      this.updateBasinOutlineLayer()
+      if (this.type === 'land' && window.$zMap) {
+        this.loadLandRaster()
+      }
+      if (this.type === 'air' && window.$zMap) {
+        this.loadAirRaster()
+      }
+    },
   },
   mounted() {
+    this.loadControlUnits()
     if (this.type === 'land' && window.$zMap) {
       this.loadLandRaster()
     }
@@ -113,8 +154,212 @@ export default {
   beforeUnmount() {
     this.removeLandLayer()
     this.removeAirLayer()
+    this.removeBasinOutlineLayer()
   },
   methods: {
+    /** 下拉显示名：仅用「名称」，不拼接「流域」（避免东南片等片区后缀）；若名称中含「·」则去掉后缀 */
+    formatBasinLabel(feature, idx) {
+      const p = feature.properties || {}
+      const name = p['名称']
+      if (name != null && String(name).trim() !== '') {
+        return String(name).replace(/\s*·\s*.+$/, '').trim()
+      }
+      return `控制单元 ${idx + 1}`
+    },
+    async loadControlUnits() {
+      try {
+        const res = await fetch('/file/json/controlUnit1.json')
+        const fc = await res.json()
+        if (fc?.type !== 'FeatureCollection' || !Array.isArray(fc.features)) {
+          return
+        }
+        this.controlUnitFC = fc
+        // 使用唯一 value：JSON 中多条要素可能共用同一「编码」，若用编码作 value 会导致 el-select 多选高亮错乱
+        const opts = fc.features.map((f, idx) => ({
+          value: `cu:${idx}`,
+          label: this.formatBasinLabel(f, idx),
+        }))
+        opts.sort((a, b) => a.label.localeCompare(b.label, 'zh-CN'))
+        this.basinSelectOptions = [{ value: '', label: '全部流域' }, ...opts]
+        // JSON 异步返回后若已选流域，补一次掩膜/高亮（避免首次 loadLandRaster 时 FC 尚未就绪）
+        this.$nextTick(() => {
+          if (!this.selectedBasinCode || !window.$zMap) {
+            return
+          }
+          this.updateBasinOutlineLayer()
+          if (this.type === 'land') {
+            this.loadLandRaster()
+          }
+          if (this.type === 'air') {
+            this.loadAirRaster()
+          }
+        })
+      }
+      catch (e) {
+        console.warn('PollutantSections: load controlUnit1.json failed', e)
+      }
+    },
+    getSelectedBasinGeometry() {
+      if (!this.selectedBasinCode || !this.controlUnitFC?.features) {
+        return null
+      }
+      const m = /^cu:(\d+)$/.exec(String(this.selectedBasinCode))
+      if (!m) {
+        return null
+      }
+      const idx = Number(m[1])
+      return this.controlUnitFC.features[idx]?.geometry ?? null
+    },
+    /** GeoJSON Polygon/MultiPolygon → WGS84 外包矩形 */
+    geometryLonLatBBox(geometry) {
+      if (!geometry) {
+        return null
+      }
+      let minLon = Infinity
+      let minLat = Infinity
+      let maxLon = -Infinity
+      let maxLat = -Infinity
+      const consumeRing = (ring) => {
+        for (let i = 0; i < ring.length; i++) {
+          const lon = ring[i][0]
+          const lat = ring[i][1]
+          if (lon < minLon) {
+            minLon = lon
+          }
+          if (lon > maxLon) {
+            maxLon = lon
+          }
+          if (lat < minLat) {
+            minLat = lat
+          }
+          if (lat > maxLat) {
+            maxLat = lat
+          }
+        }
+      }
+      const consumePolygon = (poly) => {
+        for (let r = 0; r < poly.length; r++) {
+          consumeRing(poly[r])
+        }
+      }
+      if (geometry.type === 'Polygon') {
+        consumePolygon(geometry.coordinates)
+      }
+      else if (geometry.type === 'MultiPolygon') {
+        for (let p = 0; p < geometry.coordinates.length; p++) {
+          consumePolygon(geometry.coordinates[p])
+        }
+      }
+      else {
+        return null
+      }
+      if (!Number.isFinite(minLon) || minLon === Infinity) {
+        return null
+      }
+      return { west: minLon, south: minLat, east: maxLon, north: maxLat }
+    },
+    /** 地图定位到流域几何中心并缩放至可见（不依赖 GeoJsonLayer.getBounds） */
+    flyToBasinGeometry(geometry) {
+      const box = this.geometryLonLatBBox(geometry)
+      if (!box || !window.$zMap || !window.$ZMap?.L) {
+        return
+      }
+      const L = window.$ZMap.L
+      const map = window.$zMap
+      const sw = L.latLng(box.south, box.west)
+      const ne = L.latLng(box.north, box.east)
+      const bounds = L.latLngBounds(sw, ne)
+      const center = bounds.getCenter()
+      const latSpan = Math.max(0.0001, box.north - box.south)
+      const lngSpan = Math.max(0.0001, box.east - box.west)
+      const span = Math.max(latSpan, lngSpan)
+      let zoomGuess = 9
+      if (span > 8) {
+        zoomGuess = 5
+      }
+      else if (span > 4) {
+        zoomGuess = 6
+      }
+      else if (span > 2) {
+        zoomGuess = 7
+      }
+      else if (span > 1) {
+        zoomGuess = 8
+      }
+      else if (span > 0.5) {
+        zoomGuess = 9
+      }
+      else if (span > 0.25) {
+        zoomGuess = 10
+      }
+      else {
+        zoomGuess = 11
+      }
+      try {
+        if (typeof map.fitBounds === 'function') {
+          // duration 与 WaterSections 等一致（ZMap 自定义动画时长）
+          // 大气：顶部有筛选项条，加大顶部留白使高亮区域在视口内下移，避免贴顶
+          const fitOpts = { duration: 5, maxZoom: 15 }
+          if (this.type === 'air' && typeof L.point === 'function') {
+            fitOpts.paddingTopLeft = L.point(48, 132)
+            fitOpts.paddingBottomRight = L.point(48, 64)
+          }
+          else {
+            fitOpts.padding = [56, 56]
+          }
+          map.fitBounds(bounds, fitOpts)
+        }
+        else if (typeof map.setView === 'function') {
+          map.setView(center, Math.min(zoomGuess, 14))
+        }
+      }
+      catch (e) {
+        console.warn('PollutantSections: fitBounds failed', e)
+        if (typeof map.setView === 'function') {
+          map.setView(center, Math.min(zoomGuess, 14))
+        }
+      }
+    },
+    removeBasinOutlineLayer() {
+      if (this.basinOutlineLayer && window.$zMap) {
+        window.$zMap.removeLayer(this.basinOutlineLayer)
+        this.basinOutlineLayer = null
+      }
+    },
+    updateBasinOutlineLayer() {
+      this.removeBasinOutlineLayer()
+      if (!this.selectedBasinCode || !window.$zMap) {
+        return
+      }
+      const geom = this.getSelectedBasinGeometry()
+      if (!geom || (geom.type !== 'Polygon' && geom.type !== 'MultiPolygon')) {
+        return
+      }
+      const fc = {
+        type: 'FeatureCollection',
+        features: [{ type: 'Feature', properties: {}, geometry: geom }],
+      }
+      const layer = new window.$ZMap.layer.GeoJsonLayer({
+        zIndex: 550,
+        name: 'pollutantBasinHighlight',
+        symbol: {
+          styleOptions: {
+            width: 3,
+            color: '#00ffc8',
+            fillColor: '#00e5ff',
+            fillOpacity: 0.18,
+            outlineColor: '#00ffc8',
+            outlineWidth: 3,
+            opacity: 1,
+          },
+        },
+      })
+      window.$zMap.addLayer(layer)
+      layer.load({ data: fc })
+      layer.show = true
+      this.basinOutlineLayer = layer
+      // 缩放到流域在「栅格加载完成」后再做，避免与 loadLandRaster / loadAirRaster 并发导致 ImageLayer 被盖掉或未带上掩膜
+    },
     /** 根据 landType(tn/tp) 和 landMonth(1-12) 得到 tif 文件名 */
     getTifUrl() {
       const prefix = this.landType === 'tp' ? 'TP' : 'TN'
@@ -173,6 +418,8 @@ export default {
      * opts.quantizeLevels：灰阶分级数（如 5），有值时无平滑过渡，仅离散几档灰
      * opts.interpolate + opts.scale：双线性插值放大，适合陆域栅格
      * opts.returnBounds：为 true 时返回 { dataUrl, bounds }，bounds 来自 TIF 的 getBoundingBox，保证叠加范围正确
+     * opts.basinGeometry + opts.rasterGeoBounds：按流域多边形裁剪栅格（与 opts.returnBounds 解析出的范围或显式 bounds 一致）
+     * opts.tintRgb：{ r, g, b } 0–255，大气图层按物种着色；不传则陆域灰阶
      */
     async renderGeoTiffToDataUrl(tifUrl, opts = {}) {
       const tiff = await fromUrl(tifUrl)
@@ -215,6 +462,7 @@ export default {
       const useUniformColor = opts.uniformColor === true
       const uniformGray = 20
       const quantizeLevels = Math.max(0, Math.min(16, Number(opts.quantizeLevels) || 0))
+      const tint = (opts.tintRgb && typeof opts.tintRgb.r === 'number') ? opts.tintRgb : null
       if (opts.renderStyle === 'dots' || opts.renderStyle === 'blocks') {
         ctx.clearRect(0, 0, outW, outH)
         const useBlocks = opts.renderStyle === 'blocks'
@@ -239,7 +487,19 @@ export default {
                 gray = Math.round(t * 255)
               }
             }
-            ctx.fillStyle = `rgb(${gray},${gray},${gray})`
+            if (tint) {
+              if (useUniformColor) {
+                ctx.fillStyle = `rgb(${tint.r},${tint.g},${tint.b})`
+              }
+              else {
+                const tCol = Math.max(0, Math.min(1, (v - min) / range))
+                const { r, g, b } = airTintRgbComponents(tint, tCol)
+                ctx.fillStyle = `rgb(${r},${g},${b})`
+              }
+            }
+            else {
+              ctx.fillStyle = `rgb(${gray},${gray},${gray})`
+            }
             if (useBlocks) {
               ctx.fillRect(gx * scale, gy * scale, scale, scale)
             }
@@ -265,12 +525,28 @@ export default {
             const { v, hasData } = this.sampleBilinear(data, width, height, x, y, noData, dataThreshold)
             const t1 = hasData ? Math.max(0, Math.min(1, (v - min) / range)) : 0
             const gray = Math.round(t1 * 255)
-            const alpha = hasData ? 255 : 0
             const idx = (j * outW + i) * 4
-            imgData.data[idx] = gray
-            imgData.data[idx + 1] = gray
-            imgData.data[idx + 2] = gray
-            imgData.data[idx + 3] = alpha
+            if (tint) {
+              if (hasData) {
+                const { r, g, b } = airTintRgbComponents(tint, t1)
+                imgData.data[idx] = r
+                imgData.data[idx + 1] = g
+                imgData.data[idx + 2] = b
+                imgData.data[idx + 3] = 255
+              }
+              else {
+                imgData.data[idx] = 0
+                imgData.data[idx + 1] = 0
+                imgData.data[idx + 2] = 0
+                imgData.data[idx + 3] = 0
+              }
+            }
+            else {
+              imgData.data[idx] = gray
+              imgData.data[idx + 1] = gray
+              imgData.data[idx + 2] = gray
+              imgData.data[idx + 3] = hasData ? 255 : 0
+            }
           }
         }
         ctx.putImageData(imgData, 0, 0)
@@ -286,11 +562,28 @@ export default {
           const isNoData = v === noData || !isFinite(v) || v <= dataThreshold
           const t1 = isNoData ? 0 : Math.max(0, Math.min(1, (v - min) / range))
           const gray = Math.round(t1 * 255)
-          const alpha = isNoData ? 0 : 255
-          smallImg.data[i * 4] = gray
-          smallImg.data[i * 4 + 1] = gray
-          smallImg.data[i * 4 + 2] = gray
-          smallImg.data[i * 4 + 3] = alpha
+          const base = i * 4
+          if (tint) {
+            if (isNoData) {
+              smallImg.data[base] = 0
+              smallImg.data[base + 1] = 0
+              smallImg.data[base + 2] = 0
+              smallImg.data[base + 3] = 0
+            }
+            else {
+              const { r, g, b } = airTintRgbComponents(tint, t1)
+              smallImg.data[base] = r
+              smallImg.data[base + 1] = g
+              smallImg.data[base + 2] = b
+              smallImg.data[base + 3] = 255
+            }
+          }
+          else {
+            smallImg.data[base] = gray
+            smallImg.data[base + 1] = gray
+            smallImg.data[base + 2] = gray
+            smallImg.data[base + 3] = isNoData ? 0 : 255
+          }
         }
         smallCtx.putImageData(smallImg, 0, 0)
         if (scale > 1) {
@@ -303,6 +596,25 @@ export default {
           ctx.putImageData(smallImg, 0, 0)
         }
       }
+
+      let maskBounds = opts.rasterGeoBounds
+      if (!maskBounds && geoBounds) {
+        maskBounds = {
+          west: geoBounds[0][1],
+          south: geoBounds[0][0],
+          east: geoBounds[1][1],
+          north: geoBounds[1][0],
+        }
+      }
+      const g = opts.basinGeometry
+      if (
+        maskBounds
+        && g
+        && (g.type === 'Polygon' || g.type === 'MultiPolygon')
+      ) {
+        applyBasinMaskToCanvas(canvas, maskBounds, g)
+      }
+
       const dataUrl = canvas.toDataURL('image/png')
       if (opts.returnBounds && geoBounds) {
         return { dataUrl, bounds: geoBounds }
@@ -327,12 +639,27 @@ export default {
       if (!window.$zMap || this.type !== 'air') {
         return
       }
+      this._airRasterReqId = (this._airRasterReqId || 0) + 1
+      const reqId = this._airRasterReqId
       const tifUrl = this.getAirTifUrl()
       this.airLoading = true
       this.airProgress = '加载中…'
       this.removeAirLayer()
       try {
-        const result = await this.renderGeoTiffToDataUrl(tifUrl, { scale: 4, renderStyle: 'blocks', uniformColor: false, quantizeLevels: 5, returnBounds: true })
+        const maskGeom = this.selectedBasinCode ? this.getSelectedBasinGeometry() : null
+        const airOpts = { scale: 3, returnBounds: true }
+        if (maskGeom && (maskGeom.type === 'Polygon' || maskGeom.type === 'MultiPolygon')) {
+          airOpts.basinGeometry = maskGeom
+        }
+        const kindTint = AIR_KIND_TINT_RGB[this.airKind]
+        if (kindTint) {
+          airOpts.tintRgb = kindTint
+        }
+        // 与陆域一致：双线性插值；bounds 取自 TIF；流域掩膜 bounds 在 render 内由 geoBounds 推导
+        const result = await this.renderGeoTiffToDataUrl(tifUrl, airOpts)
+        if (reqId !== this._airRasterReqId) {
+          return
+        }
         const dataUrl = (typeof result === 'string') ? result : result.dataUrl
         const boundsArr = (typeof result === 'object' && result.bounds) ? result.bounds : AIR_RASTER_BOUNDS
         const bounds = window.$ZMap.L.latLngBounds(
@@ -347,6 +674,16 @@ export default {
           zIndex: 500,
         })
         window.$zMap.addLayer(this.airLayer)
+        if (this.selectedBasinCode && reqId === this._airRasterReqId) {
+          const g = this.getSelectedBasinGeometry()
+          if (g) {
+            this.$nextTick(() => {
+              if (reqId === this._airRasterReqId) {
+                this.flyToBasinGeometry(g)
+              }
+            })
+          }
+        }
       }
       catch (err) {
         console.warn('PollutantSections: load air raster failed', tifUrl, err)
@@ -369,16 +706,28 @@ export default {
       else {
         this.removeAirLayer()
       }
+      this.updateBasinOutlineLayer()
     },
     async loadLandRaster() {
       if (!window.$zMap || this.type !== 'land') {
         return
       }
+      this._landRasterReqId = (this._landRasterReqId || 0) + 1
+      const reqId = this._landRasterReqId
       const url = this.getTifUrl()
       this.landLoading = true
       this.removeLandLayer()
       try {
-        const dataUrl = await this.renderGeoTiffToDataUrl(url, { scale: 3 })
+        const maskGeom = this.selectedBasinCode ? this.getSelectedBasinGeometry() : null
+        const landOpts = { scale: 3 }
+        if (maskGeom && (maskGeom.type === 'Polygon' || maskGeom.type === 'MultiPolygon')) {
+          landOpts.basinGeometry = maskGeom
+          landOpts.rasterGeoBounds = LAND_RASTER_GEO_BOUNDS
+        }
+        const dataUrl = await this.renderGeoTiffToDataUrl(url, landOpts)
+        if (reqId !== this._landRasterReqId) {
+          return
+        }
         const bounds = window.$ZMap.L.latLngBounds(
           window.$ZMap.L.latLng(LAND_RASTER_BOUNDS[0][0], LAND_RASTER_BOUNDS[0][1]),
           window.$ZMap.L.latLng(LAND_RASTER_BOUNDS[1][0], LAND_RASTER_BOUNDS[1][1]),
@@ -391,6 +740,16 @@ export default {
           zIndex: 500,
         })
         window.$zMap.addLayer(this.landLayer)
+        if (this.selectedBasinCode && reqId === this._landRasterReqId) {
+          const g = this.getSelectedBasinGeometry()
+          if (g) {
+            this.$nextTick(() => {
+              if (reqId === this._landRasterReqId) {
+                this.flyToBasinGeometry(g)
+              }
+            })
+          }
+        }
       }
       catch (err) {
         console.warn('PollutantSections: load raster failed', url, err)
@@ -407,9 +766,25 @@ export default {
   <div class="work-zone">
     <div class="filters">
       <div>
-        <el-select v-model="type" @change="onTypeChange">
+        <el-select v-model="type" style="margin-right: 8px;" @change="onTypeChange">
           <el-option label="陆域" value="land" />
           <el-option label="大气" value="air" />
+        </el-select>
+        <el-select
+          v-model="selectedBasinCode"
+          filterable
+          clearable
+          placeholder="全部流域"
+          class="basin-select"
+          style="min-width: 220px;"
+          @clear="selectedBasinCode = ''"
+        >
+          <el-option
+            v-for="item in basinSelectOptions"
+            :key="item.value === '' ? '_all' : item.value"
+            :label="item.label"
+            :value="item.value"
+          />
         </el-select>
       </div>
       <div style="display: flex; margin-top: 20px;">
@@ -452,6 +827,12 @@ export default {
 
   .filters {
     pointer-events: all;
+  }
+
+  .filter-label {
+    font-size: 13px;
+    color: var(--el-text-color-regular);
+    white-space: nowrap;
   }
 
   .air-progress {
