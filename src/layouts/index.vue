@@ -157,6 +157,8 @@ export default {
             {
               name: '富营养化评价',
               command: 'eutrophicationUpload',
+              value: '',
+              active: false,
             },
           ],
         },
@@ -228,7 +230,7 @@ export default {
         layerWaterQualityModel: false,
       },
       riverLevels: [],
-      riverLevel: null,
+      riverLevel: undefined as string | undefined,
       riverLevelShow: false,
     }
   },

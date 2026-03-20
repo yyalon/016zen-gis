@@ -46,6 +46,17 @@ function levelToColor(level: number): string | undefined {
   return LEVEL_COLORS[level]
 }
 
+const STANDARD_EUTROPHICATION_REGIONS = ['陆域', '近岸', '离岸'] as const
+
+/** 陆域/近岸/离岸在结果里缺省时，用调色板第一档补全，避免图层仍用上一轮的色 */
+function padStandardEutrophicationRegions(map: Record<string, string>): void {
+  for (const r of STANDARD_EUTROPHICATION_REGIONS) {
+    if (!map[r]) {
+      map[r] = EUTROPHICATION_LEVEL1_COLOR
+    }
+  }
+}
+
 function parseItemLevel(lv: unknown): number | undefined {
   if (typeof lv === 'number' && Number.isFinite(lv)) {
     return lv
@@ -71,33 +82,14 @@ function buildRegionColorMapFromResults(results: unknown): Record<string, string
     }
     const r = raw as Record<string, unknown>
     const region = typeof r.region === 'string' ? r.region.trim() : ''
-    const level = parseItemLevel(r.level)
-    if (!region || level === undefined) {
+    if (!region) {
       continue
     }
-    const hex = levelToColor(level)
-    if (hex) {
-      map[region] = hex
-    }
-    else {
-      ElMessage.warning(`区域「${region}」的等级 ${level} 无对应配色`)
-    }
+    const level = parseItemLevel(r.level)
+    const hex = level === undefined ? undefined : levelToColor(level)
+    map[region] = hex ?? EUTROPHICATION_LEVEL1_COLOR
   }
   return Object.keys(map).length > 0 ? map : null
-}
-
-/** 旧版：result 顶层单个 level */
-function buildSingleColorMap(result: Record<string, unknown>): Record<string, string> | null {
-  const level = parseItemLevel(result.level)
-  if (level === undefined) {
-    return null
-  }
-  const hex = levelToColor(level)
-  if (!hex) {
-    return null
-  }
-  /** 无分区信息时，三区用同一色 */
-  return { 陆域: hex, 近岸: hex, 离岸: hex }
 }
 
 function applyEutrophicationApiResult(result: EutrophicationEvalResult | undefined): boolean {
@@ -105,20 +97,17 @@ function applyEutrophicationApiResult(result: EutrophicationEvalResult | undefin
     ElMessage.warning('评价结果为空')
     return false
   }
-  const rec = result as Record<string, unknown>
-  let regionMap = buildRegionColorMapFromResults(rec.results)
+  const regionMap = buildRegionColorMapFromResults(result.results)
 
   if (!regionMap) {
-    regionMap = buildSingleColorMap(rec)
-  }
-
-  if (!regionMap) {
-    ElMessage.warning('评价结果中缺少有效的分区 level 数据')
+    ElMessage.warning('评价结果中缺少有效的 results 分区数据')
     return false
   }
 
+  padStandardEutrophicationRegions(regionMap)
+
   notifyThreeLevelRegionColors(regionMap)
-  ElMessage.success('富营养化评价完成，已更新三级分区着色')
+  ElMessage.success('富营养化评价完成')
   return true
 }
 

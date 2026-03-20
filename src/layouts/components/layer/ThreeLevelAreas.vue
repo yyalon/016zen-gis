@@ -1,5 +1,4 @@
 <script>
-import PopupControlUnit from '../popup/ControlUnit.vue'
 import eventBus from '@/utils/eventBus'
 import {
   EUTROPHICATION_LEVEL1_COLOR,
@@ -12,6 +11,9 @@ let _layer = null
 
 /** 与 GeoJsonLayer 初始 symbol.styleOptions 一致 */
 const THREE_LEVEL_AREAS_INITIAL_HEX = '#ffff56'
+
+const THREE_LEVEL_DEFAULT_FILL_OPACITY = 0.2
+const THREE_LEVEL_EUTROPHICATION_FILL_OPACITY = 0.5
 
 /** GeoJSON name 如「陆域影响区」→ 接口 region 键「陆域」 */
 function featureNameToApiRegion(name) {
@@ -51,6 +53,7 @@ function applyEutrophicationRegionColorsToLayer(layer, regionHexMap) {
       fillColor: hex,
       color: hex,
       outlineColor: hex,
+      fillOpacity: THREE_LEVEL_EUTROPHICATION_FILL_OPACITY,
     })
   }
 }
@@ -69,6 +72,7 @@ function applyInitialDefaultStyleToLayer(layer) {
       fillColor: hex,
       color: hex,
       outlineColor: hex,
+      fillOpacity: THREE_LEVEL_DEFAULT_FILL_OPACITY,
     })
   }
 }
@@ -128,7 +132,7 @@ export default {
               width: 3,
               color: THREE_LEVEL_AREAS_INITIAL_HEX,
               fillColor: THREE_LEVEL_AREAS_INITIAL_HEX,
-              fillOpacity: 0.2,
+              fillOpacity: THREE_LEVEL_DEFAULT_FILL_OPACITY,
               outlineColor: THREE_LEVEL_AREAS_INITIAL_HEX,
               opacity: 1,
               outlineWidth: 2,
@@ -143,11 +147,7 @@ export default {
                 className: 'custom_tooltip',
               })
               graphic.on(window.$ZMap.EventType.tooltipopen, async (e) => {
-                e.target.setTooltipContent(window.$Utitls.loadComponentContent(e.target, PopupControlUnit, { popupData: e.target.attr }))
-              })
-
-              graphic.on(window.$ZMap.EventType.tooltipclose, (e) => {
-                window.$Utitls.unloadComponentContent(e.target)
+                e.target.setTooltipContent(e.target.attr.name)
               })
             })
             if (latestThreeLevelEutrophicationRegionColors.current) {

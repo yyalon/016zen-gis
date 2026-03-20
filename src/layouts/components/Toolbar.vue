@@ -1,5 +1,6 @@
 <script>
 import { ElMessage } from 'element-plus'
+import { getEutrophicationUploadUrl } from '@/api/modules/eutrophication'
 import useUserStore from '@/store/modules/user'
 import { pollEutrophicationTask } from '@/utils/eutrophicationFlow'
 
@@ -20,11 +21,7 @@ export default {
   },
   computed: {
     eutrophicationUploadAction() {
-      if (import.meta.env.DEV && import.meta.env.VITE_OPEN_PROXY === 'true') {
-        return '/proxy/api/Eutrophication/upload'
-      }
-      const base = String(import.meta.env.VITE_APP_API_BASEURL || '').replace(/\/$/, '')
-      return `${base}/api/Eutrophication/upload`
+      return getEutrophicationUploadUrl()
     },
     eutrophicationUploadHeaders() {
       const store = useUserStore()
@@ -86,14 +83,22 @@ export default {
       }
       finally {
         this.eutrophicationBusy = false
-        this.$refs.eutrophicationUploadRef?.clearFiles?.()
+        this.resetEutrophicationUpload()
       }
     },
     onEutrophicationUploadError(error) {
       const msg = error?.message || String(error) || '上传失败'
       ElMessage.error(msg)
       this.eutrophicationBusy = false
-      this.$refs.eutrophicationUploadRef?.clearFiles?.()
+      this.resetEutrophicationUpload()
+    },
+    /** limit=1 时若 clearFiles 未命中实例，会一直认为「已满」且不再发请求；ref 在 v-for 里可能是数组 */
+    resetEutrophicationUpload() {
+      this.$nextTick(() => {
+        const ref = this.$refs.eutrophicationUploadRef
+        const inst = Array.isArray(ref) ? ref[0] : ref
+        inst?.clearFiles?.()
+      })
     },
     beforeEutrophicationUpload(file) {
       const okExt = ['xlsx', 'xls', 'csv', 'zip']
@@ -169,7 +174,6 @@ export default {
                 :action="eutrophicationUploadAction"
                 :headers="eutrophicationUploadHeaders"
                 :show-file-list="false"
-                :limit="1"
                 name="file"
                 accept=".xlsx,.xls,.csv,.zip"
                 :disabled="eutrophicationBusy || !button.visibility"
