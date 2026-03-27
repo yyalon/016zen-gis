@@ -18,6 +18,7 @@ export default {
       selectCode: null,
       waterQualityDimension: '水质类别',
       param: {},
+      markersLayerVisible: true,
     }
   },
   async mounted() {
@@ -25,6 +26,8 @@ export default {
       this.param = params
       await this.getData(params)
     })
+
+    eventBus.on('waterMarkersVisible', this.applyWaterMarkersVisible)
 
     eventBus.on('waterQualityDimension', async (param) => {
       if (param && param.waterQualityDimension) {
@@ -46,10 +49,17 @@ export default {
       _layer.show = false
     }
     eventBus.off('filterparam')
+    eventBus.off('waterMarkersVisible', this.applyWaterMarkersVisible)
     eventBus.off('waterQualityDimension')
     eventBus.off('selectRiverByCode')
   },
   methods: {
+    applyWaterMarkersVisible({ visible }) {
+      this.markersLayerVisible = visible
+      if (_layer) {
+        _layer.show = visible
+      }
+    },
     async getData(params) {
       const allRivers = await apiData.getRiverSections({ ...params, waterQualityDimension: this.waterQualityDimension })
 
@@ -121,7 +131,7 @@ export default {
         background: '#100d17e3',
       })
       if (_layer) {
-        _layer.show = true
+        _layer.show = this.markersLayerVisible
       }
       else {
         _layer = new window.$ZMap.layer.ClusterLayer({
@@ -140,7 +150,7 @@ export default {
           window.$zMap.fitBounds(_layer.getBounds(), { padding: [80, 80], duration: 5 })
         }
 
-        _layer.show = true
+        _layer.show = this.markersLayerVisible
         this.loading.close()
       }, 500)
     },

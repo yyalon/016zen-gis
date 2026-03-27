@@ -42,6 +42,8 @@ export default {
       oldActiveGraph: '',
       nShow: false,
       pShow: false,
+      /** 地图断面/排污口点位图层可见性，与 RiverWater、SewageOutfalls 同步 */
+      showWaterMarkers: true,
       ngif,
       pgif,
     }
@@ -63,8 +65,12 @@ export default {
         }
 
         this.oldActiveGraph = n
+        this.$nextTick(() => this.emitWaterMarkersVisible())
       },
     },
+  },
+  mounted() {
+    this.$nextTick(() => this.emitWaterMarkersVisible())
   },
   async created() {
     const res = await gisData.geGisConf()
@@ -306,6 +312,9 @@ export default {
         selectCode: this.selectCode,
       })
     },
+    emitWaterMarkersVisible() {
+      eventBus.emit('waterMarkersVisible', { visible: this.showWaterMarkers })
+    },
   },
 }
 </script>
@@ -386,6 +395,14 @@ export default {
         <el-select v-model="selectCode" filterable placeholder="搜索点位" clearable style="margin-left: 8px;" @change="zoomToMarkerByCode">
           <el-option v-for="item in codeSecetions" :key="item.code" :label="item.name" :value="item.code" />
         </el-select>
+        <el-checkbox
+          v-model="showWaterMarkers"
+          class="water-markers-checkbox"
+          style="margin-left: 12px;"
+          @change="emitWaterMarkersVisible"
+        >
+          显示点位
+        </el-checkbox>
       </div>
     </div>
     <RiverWater v-if="activeGraph !== 'outfall'" />
@@ -428,6 +445,21 @@ export default {
 
   .filters {
     pointer-events: all;
+  }
+}
+
+.water-markers-checkbox {
+  display: inline-flex;
+  align-items: center;
+  margin-right: 0;
+
+  :deep(.el-checkbox__label) {
+    color: rgb(255 255 255 / 90%);
+  }
+
+  :deep(.el-checkbox__inner) {
+    background-color: rgb(0 117 255 / 35%);
+    border-color: rgb(128 255 255 / 70%);
   }
 }
 

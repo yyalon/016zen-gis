@@ -15,12 +15,15 @@ export default {
       drawerData: {},
       markersMap: null,
       selectCode: null,
+      markersLayerVisible: true,
     }
   },
   async mounted() {
     eventBus.on('filterparam', async (params) => {
       await this.getData(params)
     })
+
+    eventBus.on('waterMarkersVisible', this.applyWaterMarkersVisible)
 
     eventBus.on('selectOutfallByCode', ({ selectCode }) => {
       this.zoomToMarkerByCode(selectCode)
@@ -33,9 +36,16 @@ export default {
       _layer.show = false
     }
     eventBus.off('filterparam')
+    eventBus.off('waterMarkersVisible', this.applyWaterMarkersVisible)
     eventBus.off('selectOutfallByCode')
   },
   methods: {
+    applyWaterMarkersVisible({ visible }) {
+      this.markersLayerVisible = visible
+      if (_layer) {
+        _layer.show = visible
+      }
+    },
     async getData(params) {
       const { code, data } = await apiData.getSewageOutfalls(params)
       if (code === 1000) {
@@ -93,7 +103,7 @@ export default {
         background: '#100d17e3',
       })
       if (_layer) {
-        _layer.show = true
+        _layer.show = this.markersLayerVisible
       }
       else {
         _layer = new window.$ZMap.layer.ClusterLayer({
@@ -108,7 +118,7 @@ export default {
       }
 
       setTimeout(() => {
-        _layer.show = true
+        _layer.show = this.markersLayerVisible
         loading.close()
       }, 500)
     },
