@@ -124,7 +124,8 @@ export default {
         })
 
         const tileLayer = new window.$ZMap.layer.GeoJsonLayer({
-          zIndex: 1,
+          /** 高于 PollutantSections 栅格（overlayPane 内为 0），避免区划面被污染源影像盖住 */
+          zIndex: 360,
           name: 'layerThreeLevelAreas',
           url: '/file/json/three_level_areas.geojson',
           symbol: {
