@@ -45,6 +45,7 @@ import {
   cancelEutrophicationPolling,
   latestThreeLevelEutrophicationRegionColors,
 } from '@/utils/eutrophicationFlow'
+import { ensureSeaLandOperationalLayersOnMap } from '@/utils/ensureSeaLandLayers'
 
 export default {
   components: {
@@ -237,7 +238,18 @@ export default {
   watch: {
     activeGraph: {
       deep: true,
-      handler(n) {
+      handler(n: string, o: string) {
+        if (o === 'pollutant' && n !== 'pollutant') {
+          this.applyPollutantBasemap('default')
+        }
+        if (n === 'pollutant') {
+          const run = () => ensureSeaLandOperationalLayersOnMap({
+            sea: this.visibilities.sea,
+            land: this.visibilities.land,
+          })
+          this.$nextTick(run)
+          window.setTimeout(run, 800)
+        }
         // if (n) {
         //   router.push({ query: { graph: n } })
         // }
@@ -290,6 +302,7 @@ export default {
     // })
 
     this.activeGraph = 'cockpit'
+    eventBus.on('pollutantBasemap', this.onPollutantBasemap as (...args: unknown[]) => void)
     // setTimeout(() => {
     //   const bounds1 = window.$zMap.getLayerById(2000).getBounds()
     //   const bounds2 = window.$zMap.getLayerById(2001).getBounds()
@@ -304,8 +317,128 @@ export default {
     //   await this.initSeaWaterQualityAreas()
     // }, 3000)
   },
-  unmounted() {},
+  unmounted() {
+    eventBus.off('pollutantBasemap', this.onPollutantBasemap as (...args: unknown[]) => void)
+  },
   methods: {
+    _leafletMapFromZ() {
+      const map = window.$zMap as any
+      if (!map) {
+        return null
+      }
+      return map._map || map._leaflet || map
+    },
+    /** 污染源自定义矢量底图（大气/陆域 TN·TP）图层名；切换前摘除残留，避免压住瓦片或其他底图 */
+    _pollutantCustomBasemapGeoNames(): string[] {
+      return [
+        '深蓝底',
+        '行政边界',
+        '陆域TN底',
+        '陆域TN界',
+        '陆域TP底',
+        '陆域TP界',
+        '行政区注记',
+      ]
+    },
+    _removePollutantCustomBasemapOrphans() {
+      const zmap = window.$zMap as any
+      const leafletMap = this._leafletMapFromZ()
+      if (!leafletMap || typeof leafletMap.eachLayer !== 'function') {
+        return
+      }
+      const names = new Set(this._pollutantCustomBasemapGeoNames())
+      const toRemove: any[] = []
+      leafletMap.eachLayer((ly: any) => {
+        const n = ly?.options?.name ?? ly?.name
+        if (n && names.has(n)) {
+          toRemove.push(ly)
+        }
+      })
+      toRemove.forEach((ly) => {
+        try {
+          if (zmap && typeof zmap.removeLayer === 'function') {
+            zmap.removeLayer(ly)
+          }
+          else {
+            leafletMap.removeLayer(ly)
+          }
+        }
+        catch (_) { /* noop */ }
+      })
+    },
+    /** 污染源矢量自定义底图须在 tilePane，与大气逻辑相同 */
+    _ensurePollutantVectorBasemapInTilePane() {
+      const leafletMap = this._leafletMapFromZ()
+      if (!leafletMap || typeof leafletMap.eachLayer !== 'function') {
+        return
+      }
+      const names = new Set(this._pollutantCustomBasemapGeoNames())
+      leafletMap.eachLayer((ly: any) => {
+        const n = ly?.options?.name ?? ly?.name
+        if (!n || !names.has(n) || typeof ly.setPane !== 'function') {
+          return
+        }
+        try {
+          ly.setPane(n === '行政区注记' ? 'overlayPane' : 'tilePane')
+        }
+        catch (_) { /* noop */ }
+      })
+    },
+    /** 污染源专用底图；其它模块保持 default.json 默认（天地图卫星） */
+    applyPollutantBasemap(
+      mode: 'land' | 'air' | 'default',
+      landType?: 'tn' | 'tp',
+    ) {
+      const map = window.$zMap
+      if (!map) {
+        return
+      }
+      this._removePollutantCustomBasemapOrphans()
+      let name = '天地图卫星'
+      if (mode === 'land') {
+        name = landType === 'tp' ? '污染源陆域TP' : '污染源陆域TN'
+      }
+      else if (mode === 'air') {
+        /** 与专题图一致：统一深蓝底 + 浅灰省界线、无道路与注记（ZMap default.json 中「污染源大气深蓝」） */
+        name = '污染源大气深蓝'
+      }
+      try {
+        map.basemap = name
+      }
+      catch (err) {
+        console.warn('Layout: 底图切换失败', name, err)
+      }
+      if (mode === 'air' || mode === 'land') {
+        this.$nextTick(() => {
+          this._ensurePollutantVectorBasemapInTilePane()
+          window.setTimeout(() => this._ensurePollutantVectorBasemapInTilePane(), 450)
+          const run = () => ensureSeaLandOperationalLayersOnMap({
+            sea: this.visibilities.sea,
+            land: this.visibilities.land,
+          })
+          run()
+          window.setTimeout(run, 500)
+          window.setTimeout(run, 1200)
+        })
+      }
+      else if (mode === 'default') {
+        const run = () => ensureSeaLandOperationalLayersOnMap({
+          sea: this.visibilities.sea,
+          land: this.visibilities.land,
+        })
+        this.$nextTick(() => {
+          run()
+          window.setTimeout(run, 400)
+        })
+      }
+    },
+    onPollutantBasemap(e: { mode?: string; landType?: string }) {
+      const m = e && e.mode
+      if (m === 'land' || m === 'air' || m === 'default') {
+        const lt = (e && e.landType === 'tp') ? 'tp' : 'tn'
+        this.applyPollutantBasemap(m, m === 'land' ? lt : undefined)
+      }
+    },
     mapLoaded() {
       window.$zMap.on(window.$ZMap.EventType.zoom, () => {})
     },

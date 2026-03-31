@@ -1,6 +1,11 @@
 <script>
+import { ElLoading } from 'element-plus'
 import { fromUrl } from 'geotiff'
 import { applyBasinMaskToCanvas } from '@/utils/basinMask'
+import eventBus from '@/utils/eventBus'
+
+/** 与 layouts/index 约定：陆域→浅色二维底图，大气→蓝色二维底图，default→恢复全局默认 */
+const POLLUTANT_BASEMAP_EVENT = 'pollutantBasemap'
 
 // 陆域栅格范围（与 /file/pollutant/land/*.tif.xml 中 nativeExtBox 一致）
 const LAND_RASTER_BOUNDS = [
@@ -19,6 +24,7 @@ const LAND_RASTER_GEO_BOUNDS = {
 /**
  * 陆域 TN 总量（t）分级设色，与钱塘江流域专题图例一致（离散档、无渐变）。
  * 每档上界 inclusive：v <= max 落入该档（末档 max 为 Infinity）。
+ * 图例 landLegendRows 直接使用本表同一套 rgb，上色 landDiscreteColorForValue(..., LAND_TN_PALETTE)，与图例一致。
  */
 const LAND_TN_CLASSES = [
   { max: 0.020, r: 30, g: 58, b: 138, label: '0 – 0.020' },
@@ -33,6 +39,7 @@ const LAND_TN_PALETTE = LAND_TN_CLASSES.map(({ max, r, g, b }) => ({ max, r, g, 
 
 /**
  * 陆域 TP 总量（t）分级设色，与钱塘江流域专题图例一致；色序与 TN 相同（蓝→红）。
+ * 图例与栅格同上，共用本表 + LAND_TP_PALETTE。
  */
 const LAND_TP_CLASSES = [
   { max: 0.004, r: 30, g: 58, b: 138, label: '0 – 0.004' },
@@ -63,10 +70,10 @@ const AIR_RASTER_BOUNDS = [
 // 大气 TIF 目录（仅用 TIF 加载）
 const AIR_CSV_BASE = '/file/pollutant/air'
 
-/** mars2d ImageLayer 默认为 tilePane，会整体压在 GeoJsonLayer（overlayPane）之下；与陆海域同 pane 才能被 zIndex 控制叠置 */
+/** mars2d ImageLayer 默认 tilePane；污染源栅格用 overlayPane，Leaflet 中 overlayPane 高于 tilePane，故可压在 tilePane 内的大气深蓝底图之上且仍低于同 pane 内高 zIndex 区划层 */
 const POLLUTANT_MAP_OVERLAY_PANE = 'overlayPane'
 /**
- * 须低于 overlayPane 内常见区划/矢量（多为 zIndex≥1，如 ThreeLevelAreas 360、ControlUnit 1），且勿对栅格 bringToFront。
+ * 须低于 overlayPane 内常见区划/矢量（如 ThreeLevelAreas 360、ControlUnit 1）；大气深蓝底图在 tilePane 时不与之比 zIndex。
  */
 const POLLUTANT_RASTER_Z_INDEX = 0
 
@@ -191,8 +198,10 @@ function isGeoTiffNoData(v, noData) {
 }
 
 /**
- * 大气排放栅格统一设色：连续彩虹色带（低值深蓝 → 高值红）。
- * 地图像元配色为 t = clamp(v / cMax, 0, 1) 经下列 stops 分段线性插值，与图例 CSS 渐变色条一致，不按 stats breaks 分档。
+ * 大气排放栅格（NO/NO₂）：连续彩虹色带（低值深蓝 → 高值红）。
+ * t = clamp(v / cMax, 0, 1) 经下列 stops 分段线性插值；NH₃ 单独使用 NH3_JET_STOPS，与 2022 专题图工业源 7 档色相一致。
+ * 图例：NO/NO₂ 竖条用 AIR_JET_STOPS；刻度位置 t=v/max 与栅格 t=v/emissionColorMax（max 同 getAirFixedLegendMeta）。
+ * NH₃ 栅格用 nh3ValueToNormT 与图例 breakNormT 一致；顶台溢出色与 airLegendVBarStyle 中 plateauRgb 一致。
  */
 const AIR_JET_STOPS = [
   { t: 0, r: 0, g: 0, b: 139 },
@@ -204,17 +213,35 @@ const AIR_JET_STOPS = [
   { t: 1, r: 200, g: 0, b: 0 },
 ]
 
-function airJetRgbComponents(t) {
+/**
+ * NH₃ 专用色标：在 t = 0, 1/6, …, 1 上对 Matplotlib 3.8 `jet`（_jet_data）逐通道插值取样的整型 RGB，
+ * 与专题图 / ArcGIS 常见 Jet 一致；段间仍线性插值。NO/NO₂ 仍用 AIR_JET_STOPS。
+ */
+const NH3_JET_STOPS = [
+  { t: 0, r: 0, g: 0, b: 128 },
+  { t: 1 / 6, r: 0, g: 42, b: 255 },
+  { t: 2 / 6, r: 0, g: 212, b: 255 },
+  { t: 0.5, r: 123, g: 255, b: 123 },
+  { t: 4 / 6, r: 255, g: 230, b: 0 },
+  { t: 5 / 6, r: 255, g: 72, b: 0 },
+  { t: 1, r: 128, g: 0, b: 0 },
+]
+
+function jetRgbFromStops(stops, t) {
   const u = Math.max(0, Math.min(1, t))
-  if (u <= AIR_JET_STOPS[0].t) {
-    const s = AIR_JET_STOPS[0]
+  if (!stops.length) {
+    return { r: 0, g: 0, b: 0 }
+  }
+  if (u <= stops[0].t) {
+    const s = stops[0]
     return { r: s.r, g: s.g, b: s.b }
   }
-  for (let i = 0; i < AIR_JET_STOPS.length - 1; i++) {
-    const a = AIR_JET_STOPS[i]
-    const b = AIR_JET_STOPS[i + 1]
+  for (let i = 0; i < stops.length - 1; i++) {
+    const a = stops[i]
+    const b = stops[i + 1]
     if (u <= b.t) {
-      const f = (u - a.t) / (b.t - a.t)
+      const denom = b.t - a.t
+      const f = denom > 0 ? (u - a.t) / denom : 0
       return {
         r: Math.round(a.r + (b.r - a.r) * f),
         g: Math.round(a.g + (b.g - a.g) * f),
@@ -222,24 +249,88 @@ function airJetRgbComponents(t) {
       }
     }
   }
-  const last = AIR_JET_STOPS[AIR_JET_STOPS.length - 1]
+  const last = stops[stops.length - 1]
   return { r: last.r, g: last.g, b: last.b }
 }
 
 /**
- * 排放像元值 → 连续 Jet RGB（t = (v - cMin) / (cMax - cMin)，与图例渐变色条一致，不按 stats breaks 分档）
+ * 图例竖条：与栅格相同的 stops，to top = 低 t 在下、高 t 在上。
+ * topPlateauPct>0 时 Jet 占 (100−p)%，顶端 p% 为平顶饱和色；须配合 CSS background-size/repeat 铺满色条。
  */
-function airEmissionRgbForValue(v, cMin, cMax) {
-  const span = cMax - cMin
-  if (!Number.isFinite(v) || !(span > 0)) {
-    return airJetRgbComponents(0)
+function airLegendLinearGradientToTop(stops, { topPlateauPct = 0, rampTopT = 1, plateauRgb = null } = {}) {
+  const p = Math.max(0, Math.min(25, topPlateauPct))
+  const mt = Math.max(1e-6, Math.min(1, rampTopT))
+  const inner = 100 - p
+  const topC = jetRgbFromStops(stops, mt)
+  const segs = []
+  for (const s of stops) {
+    if (s.t > mt + 1e-9) {
+      continue
+    }
+    const posNum = (s.t / mt) * inner
+    segs.push({ pos: posNum, css: `rgb(${s.r},${s.g},${s.b}) ${posNum.toFixed(3)}%` })
   }
-  const t = Math.max(0, Math.min(1, (v - cMin) / span))
-  return airJetRgbComponents(t)
+  const innerNum = inner
+  const topCss = `rgb(${topC.r},${topC.g},${topC.b}) ${innerNum.toFixed(3)}%`
+  if (segs.length && Math.abs(segs[segs.length - 1].pos - innerNum) < 1e-4) {
+    segs[segs.length - 1].css = topCss
+  }
+  else {
+    segs.push({ pos: innerNum, css: topCss })
+  }
+  const strParts = segs.map(x => x.css)
+  if (p > 0) {
+    const pl = plateauRgb || topC
+    strParts.push(`rgb(${pl.r},${pl.g},${pl.b}) 100%`)
+  }
+  return `linear-gradient(to top, ${strParts.join(', ')})`
 }
 
-/** 图例左侧竖条：分段堆叠近似连续彩虹带（与部分环境下 CSS linear-gradient 不生效时仍稳定） */
-const AIR_LEGEND_VBAR_SEGMENT_COUNT = 28
+function airJetRgbComponents(t) {
+  return jetRgbFromStops(AIR_JET_STOPS, t)
+}
+
+function nh3JetRgbComponents(t) {
+  return jetRgbFromStops(NH3_JET_STOPS, t)
+}
+
+/**
+ * 排放像元值 → Jet RGB。NH₃：nh3Piecewise 在 breaks 间对 breakNormT 插值；overflowRgb 且 v>cMax 时用顶台色。
+ */
+function airEmissionRgbForValue(v, cMin, cMax, useNh3ReferenceJet = false, nh3Piecewise = null) {
+  const span = cMax - cMin
+  const jetLow = useNh3ReferenceJet ? nh3JetRgbComponents(0) : airJetRgbComponents(0)
+  if (!Number.isFinite(v) || !(span > 0)) {
+    return jetLow
+  }
+  if (
+    useNh3ReferenceJet
+    && nh3Piecewise
+    && Array.isArray(nh3Piecewise.breaks)
+    && nh3Piecewise.breaks.length > 0
+    && Array.isArray(nh3Piecewise.breakNormT)
+    && nh3Piecewise.breakNormT.length === nh3Piecewise.breaks.length
+  ) {
+    const ov = nh3Piecewise.overflowRgb
+    if (
+      ov
+      && typeof ov.r === 'number'
+      && typeof ov.g === 'number'
+      && typeof ov.b === 'number'
+      && v > cMax
+    ) {
+      return { r: Math.round(ov.r), g: Math.round(ov.g), b: Math.round(ov.b) }
+    }
+    const tMap = nh3ValueToNormT(v, cMax, nh3Piecewise.breaks, nh3Piecewise.breakNormT)
+    return nh3JetRgbComponents(tMap)
+  }
+  const t = Math.max(0, Math.min(1, (v - cMin) / span))
+  return useNh3ReferenceJet ? nh3JetRgbComponents(t) : airJetRgbComponents(t)
+}
+
+/** 与 .air-legend-vbar 同高；色条不用 border 占高，避免渐变按 padding-box 变矮、刻度却仍按 220px 算导致与参考图错位 */
+const AIR_LEGEND_VBAR_HEIGHT_PX = 220
+const AIR_LEGEND_VBAR_INSET_PCT = 0
 
 /** 归一化强度 t1∈[0,1] → 品牌色（仅在不走排放 Jet 时保留；当前大气只用 Jet） */
 function airTintRgbComponents(tint, t1) {
@@ -281,6 +372,253 @@ const types = [
   { value: 'Ship', label: '港口和船舶源' },
 ]
 
+/**
+ * 大气排放：物种×六源固定图例（显式 breaks / breaksFormatted；不用 stats.json）。
+ *
+ * NH₃ 固定图例对齐《2022 年大气 NH₃ 行业排放空间分布》专题图右侧竖条（色标 + 断点数值）。
+ * 参考图刻度与数字画在色条内侧、居中对齐；本组件为色条 + 外侧刻度线 + 文案，数值与断点与参考一致。
+ *
+ * | 应用排放源     | 参考子图   | max     | 刻度 |
+ * |---------------|-----------|---------|------|
+ * | 工业源         | 工业源     | 0.6     | 0.0…0.6 步长 0.1 |
+ * | 能源及电厂源   | 能源及电厂 | 0.0004  | 五位小数至 0.00040 |
+ * | 居民源         | 居民源     | 0.6     | 同工业 |
+ * | 交通源         | 交通源     | 0.08    | 0.00…0.08 步长 0.01 |
+ * | 农业源         | 农业源     | 6       | 整数 0…6 |
+ * | 港口和船舶源   | 自然源     | 0.04    | 0.00…0.04 步长 0.01；顶台饱和略高（NH3_LEGEND_TOP_PLATEAU_PCT_SHIP） |
+ *
+ * 单位：µg/m²/s（与 emitgrid.ctl 一致）。
+ */
+/** 7 档：断点在色带上均匀分布（0, 1/6, …, 1） */
+const NH3_LEGEND_NORM_T_7 = [0, 1 / 6, 2 / 6, 3 / 6, 4 / 6, 5 / 6, 1]
+/** 9 档：0, 1/8, …, 1 */
+const NH3_LEGEND_NORM_T_9 = [0, 1 / 8, 2 / 8, 3 / 8, 4 / 8, 5 / 8, 6 / 8, 7 / 8, 1]
+/** 5 档：0, 0.25, …, 1 */
+const NH3_LEGEND_NORM_T_5 = [0, 0.25, 0.5, 0.75, 1]
+/** 顶台区高度（占色条 %），与参考图 max 刻度下方～条顶之间的饱和段一致 */
+const NH3_LEGEND_TOP_PLATEAU_PCT_STANDARD = 8
+/** NH₃ 港口和船舶源（自然源档）：专题图顶台占比更大，约 10%～15% 色条高 */
+const NH3_LEGEND_TOP_PLATEAU_PCT_SHIP = 12
+/** NO / NO₂ 图例顶台（《2022 年大气 NO₂ 行业排放空间分布》竖条顶饱和深红） */
+const NO_NO2_LEGEND_TOP_PLATEAU_PCT = NH3_LEGEND_TOP_PLATEAU_PCT_STANDARD
+/** 港口和船舶栅格 v>cMax 时略深饱和色（与图例顶台同色带衔接） */
+const NH3_SHIP_OVERFLOW_RGB = { r: 92, g: 0, b: 28 }
+
+/** 专题图「自然源」图例（max 0.04、五档）；本应用由港口和船舶源（Ship）沿用 */
+const NH3_AIR_LEGEND_NATURAL = {
+  max: 0.04,
+  breaks: [0, 0.01, 0.02, 0.03, 0.04],
+  breaksFormatted: ['0.00', '0.01', '0.02', '0.03', '0.04'],
+  breakNormT: NH3_LEGEND_NORM_T_5,
+}
+
+const NH3_AIR_LEGEND_INDUSTRY_DOMESTIC = {
+  max: 0.6,
+  breaks: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6],
+  breaksFormatted: ['0.0', '0.1', '0.2', '0.3', '0.4', '0.5', '0.6'],
+  breakNormT: NH3_LEGEND_NORM_T_7,
+  nh3LegendTopPlateauPct: NH3_LEGEND_TOP_PLATEAU_PCT_STANDARD,
+}
+
+/** 能源及电厂源与陆域交通源同档（2022 年 NO₂ 行业排放专题图：0–1.4，步长 0.2） */
+const NO_NO2_AIR_ENERGY_TRAFFIC = {
+  max: 1.4,
+  breaks: [0, 0.2, 0.4, 0.6, 0.8, 1.0, 1.2, 1.4],
+  breaksFormatted: ['0.0', '0.2', '0.4', '0.6', '0.8', '1.0', '1.2', '1.4'],
+}
+
+/**
+ * NO / NO₂ 固定图例：与《2022 年大气 NO₂ 行业排放空间分布》六子图右侧竖条一致（色带 AIR_JET_STOPS；顶台见 getAirFixedLegendMeta）。
+ * | 应用排放源   | 参考子图     | max   | 刻度 |
+ * |-------------|-------------|-------|------|
+ * | 工业源       | 工业源       | 2     | 0.00…2.00 步长 0.25 |
+ * | 能源及电厂源 | 能源及电厂   | 1.4   | 0.0…1.4 步长 0.2 |
+ * | 居民源       | 居民源       | 0.3   | 0.00…0.30 步长 0.05 |
+ * | 交通源       | 陆域交通源   | 1.4   | 同能源 |
+ * | 农业源       | 农业源       | 0.025 | 0.000…0.025 步长 0.005 |
+ * | 港口和船舶源 | 港口和船舶   | 1.75  | 0.00…1.75 步长 0.25 |
+ */
+const NO_NO2_AIR_LEGEND_BY_SOURCE = {
+  Industry: {
+    max: 2,
+    breaks: [0, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2],
+    breaksFormatted: ['0.00', '0.25', '0.50', '0.75', '1.00', '1.25', '1.50', '1.75', '2.00'],
+  },
+  Energy: NO_NO2_AIR_ENERGY_TRAFFIC,
+  Domestic: {
+    max: 0.3,
+    breaks: [0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3],
+    breaksFormatted: ['0.00', '0.05', '0.10', '0.15', '0.20', '0.25', '0.30'],
+  },
+  Traffic: NO_NO2_AIR_ENERGY_TRAFFIC,
+  Agriculture: {
+    max: 0.025,
+    breaks: [0, 0.005, 0.01, 0.015, 0.02, 0.025],
+    breaksFormatted: ['0.000', '0.005', '0.010', '0.015', '0.020', '0.025'],
+  },
+  Ship: {
+    max: 1.75,
+    breaks: [0, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75],
+    breaksFormatted: ['0.00', '0.25', '0.50', '0.75', '1.00', '1.25', '1.50', '1.75'],
+  },
+}
+
+const AIR_FIXED_AIR_LEGEND_BY_KIND_AND_SOURCE = {
+  NH3: {
+    Industry: NH3_AIR_LEGEND_INDUSTRY_DOMESTIC,
+    Energy: {
+      max: 0.0004,
+      breaks: [
+        0,
+        0.00005,
+        0.0001,
+        0.00015,
+        0.0002,
+        0.00025,
+        0.0003,
+        0.00035,
+        0.0004,
+      ],
+      breaksFormatted: [
+        '0.00000',
+        '0.00005',
+        '0.00010',
+        '0.00015',
+        '0.00020',
+        '0.00025',
+        '0.00030',
+        '0.00035',
+        '0.00040',
+      ],
+      breakNormT: NH3_LEGEND_NORM_T_9,
+      nh3LegendTopPlateauPct: NH3_LEGEND_TOP_PLATEAU_PCT_STANDARD,
+    },
+    Domestic: { ...NH3_AIR_LEGEND_INDUSTRY_DOMESTIC },
+    /** 交通源：参考图 0.00～0.08、步长 0.01（九档） */
+    Traffic: {
+      max: 0.08,
+      breaks: [0, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08],
+      breaksFormatted: [
+        '0.00',
+        '0.01',
+        '0.02',
+        '0.03',
+        '0.04',
+        '0.05',
+        '0.06',
+        '0.07',
+        '0.08',
+      ],
+      breakNormT: NH3_LEGEND_NORM_T_9,
+      nh3LegendTopPlateauPct: NH3_LEGEND_TOP_PLATEAU_PCT_STANDARD,
+    },
+    Agriculture: {
+      max: 6,
+      breaks: [0, 1, 2, 3, 4, 5, 6],
+      breaksFormatted: ['0', '1', '2', '3', '4', '5', '6'],
+      breakNormT: NH3_LEGEND_NORM_T_7,
+      nh3LegendTopPlateauPct: NH3_LEGEND_TOP_PLATEAU_PCT_STANDARD,
+    },
+    Ship: {
+      ...NH3_AIR_LEGEND_NATURAL,
+      nh3LegendTopPlateauPct: NH3_LEGEND_TOP_PLATEAU_PCT_SHIP,
+      nh3OverflowRgb: NH3_SHIP_OVERFLOW_RGB,
+    },
+  },
+  NO: NO_NO2_AIR_LEGEND_BY_SOURCE,
+  NO2: NO_NO2_AIR_LEGEND_BY_SOURCE,
+}
+
+function getAirFixedLegendEntry(kind, sourceType) {
+  return AIR_FIXED_AIR_LEGEND_BY_KIND_AND_SOURCE[kind]?.[sourceType] || null
+}
+
+function getAirFixedEmissionColorMax(kind, sourceType) {
+  const e = getAirFixedLegendEntry(kind, sourceType)
+  const v = e && e.max
+  return (Number.isFinite(v) && v > 0) ? v : NaN
+}
+
+/** NH₃：解析断点在固定色带上的归一化位置；未配置时与 breaks[i]/max 线性对应 */
+function resolveNh3BreakNormT(e) {
+  if (!e || !Array.isArray(e.breaks) || e.breaks.length === 0) {
+    return null
+  }
+  const br = e.breaks
+  const mx = e.max
+  if (Array.isArray(e.breakNormT) && e.breakNormT.length === br.length) {
+    return e.breakNormT.map(t => Math.max(0, Math.min(1, Number(t))))
+  }
+  if (!Number.isFinite(mx) || mx <= 0) {
+    return br.map(() => 0)
+  }
+  return br.map(b => Math.max(0, Math.min(1, b / mx)))
+}
+
+/** NH₃：数值 v → 固定色带上的 t∈[0,1]，在相邻断点间对 breakNormT 线性插值；v>vmax 映射到 t=1（图例顶台 / Jet 顶色） */
+function nh3ValueToNormT(v, vmax, breaks, breakNormT) {
+  if (!breaks.length || !breakNormT || breakNormT.length !== breaks.length) {
+    return Math.max(0, Math.min(1, vmax > 0 ? v / vmax : 0))
+  }
+  if (Number.isFinite(v) && Number.isFinite(vmax) && v > vmax) {
+    return 1
+  }
+  const vn = Math.max(0, Math.min(v, vmax))
+  const n = breaks.length
+  if (vn <= breaks[0]) {
+    return breakNormT[0]
+  }
+  if (vn >= breaks[n - 1]) {
+    return breakNormT[n - 1]
+  }
+  for (let i = 0; i < n - 1; i++) {
+    const b1 = breaks[i + 1]
+    if (vn <= b1) {
+      const b0 = breaks[i]
+      const span = b1 - b0
+      const f = span > 0 ? (vn - b0) / span : 0
+      return breakNormT[i] + f * (breakNormT[i + 1] - breakNormT[i])
+    }
+  }
+  return breakNormT[n - 1]
+}
+
+/** 固定图例元数据（breaks 与 breaksFormatted 等长；NH₃ 带 breakNormT 供刻度与上色） */
+function getAirFixedLegendMeta(kind, sourceType) {
+  const e = getAirFixedLegendEntry(kind, sourceType)
+  if (
+    !e
+    || !Array.isArray(e.breaks)
+    || !Array.isArray(e.breaksFormatted)
+    || e.breaks.length !== e.breaksFormatted.length
+    || e.breaks.length === 0
+  ) {
+    return null
+  }
+  const meta = {
+    min: 0,
+    max: e.max,
+    breaks: e.breaks,
+    breaksFormatted: e.breaksFormatted,
+  }
+  if (kind === 'NH3') {
+    meta.breakNormT = resolveNh3BreakNormT(e)
+    const pl = e.nh3LegendTopPlateauPct
+    meta.legendTopPlateauPct = (
+      Number.isFinite(pl) && pl >= 0
+    )
+      ? Math.max(0, Math.min(25, pl))
+      : 0
+    if (e.nh3OverflowRgb && typeof e.nh3OverflowRgb.r === 'number') {
+      meta.nh3OverflowRgb = e.nh3OverflowRgb
+    }
+  }
+  else if (kind === 'NO' || kind === 'NO2') {
+    meta.legendTopPlateauPct = NO_NO2_LEGEND_TOP_PLATEAU_PCT
+  }
+  return meta
+}
+
 // 大气四季：对应 TIF 目录 Mon1(冬)/Mon4(春)/Mon7(夏)/Mon10(秋)
 const seasons = [
   { value: 'Mon1', label: '冬季' },
@@ -297,7 +635,6 @@ export default {
       months,
       landMonth: 1,
       landLayer: null,
-      landLoading: false,
       kinds,
       airKind: 'NH3',
       types,
@@ -305,8 +642,8 @@ export default {
       seasons,
       airSeason: 'Mon4',
       airLayer: null,
+      /** 大气栅格请求中（仅用于图例空态，不用于筛选区 loading） */
       airLoading: false,
-      airProgress: '',
       /** 当前大气栅格动态范围，用于图例（与 canvas 着色一致） */
       airStats: null,
       /** 控制单元 / 流域（controlUnit1.json） */
@@ -346,19 +683,43 @@ export default {
       const src = this.types.find(t => t.value === this.airType)?.label || this.airType
       return `${kind} · ${src}`
     },
-    /** 左侧色条：自上而下高→低，与地图 Jet 连续映射一致 */
-    airLegendVBarBands() {
-      const n = AIR_LEGEND_VBAR_SEGMENT_COUNT
-      const list = []
-      for (let i = 0; i < n; i++) {
-        const tMid = 1 - (i + 0.5) / n
-        list.push(airJetRgbComponents(tMid))
+    /** 左侧渐变色条：Jet 主段 + legendTopPlateauPct 顶台饱和（NH₃ / NO / NO₂ 与专题图一致） */
+    airLegendVBarStyle() {
+      if (this.type !== 'air') {
+        return {}
       }
-      return list
+      const stops = this.airKind === 'NH3' ? NH3_JET_STOPS : AIR_JET_STOPS
+      const o = (
+        this.airStats
+        && Number.isFinite(this.airStats.legendTopPlateauPct)
+      )
+        ? this.airStats.legendTopPlateauPct
+        : 0
+      const ov = this.airStats?.nh3OverflowRgb
+      const plateauRgb = (
+        this.airKind === 'NH3'
+        && ov
+        && typeof ov.r === 'number'
+        && typeof ov.g === 'number'
+        && typeof ov.b === 'number'
+      )
+        ? { r: ov.r, g: ov.g, b: ov.b }
+        : null
+      /** 顶台颜色与 airEmissionRgbForValue 中 v>cMax 的 overflowRgb 一致（如 NH₃ 船舶源） */
+      const grad = airLegendLinearGradientToTop(stops, {
+        topPlateauPct: o,
+        rampTopT: 1,
+        plateauRgb,
+      })
+      return {
+        backgroundColor: 'transparent',
+        backgroundImage: grad,
+        backgroundRepeat: 'no-repeat',
+        backgroundSize: '100% 100%',
+      }
     },
     /**
-     * 色条右侧刻度：自上而下高→低。刻度与文案仅来自 stats.json breaks / breaks_formatted；
-     * 竖向位置按 value / airStats.max（与地图色标上界 valid_max 一致）。
+     * 色条右侧刻度：自上而下高→低。NH₃ 刻度沿分段归一；NO/NO₂ 用 v/max；有顶台时 max 在顶台下沿。
      */
     airLegendBreakTicks() {
       if (this.type !== 'air' || !this.airStats) {
@@ -378,21 +739,70 @@ export default {
       ) {
         return []
       }
+      const bnt = (
+        this.airKind === 'NH3'
+        && Array.isArray(st.breakNormT)
+        && st.breakNormT.length === br.length
+      )
+        ? st.breakNormT
+        : null
+      const k = AIR_LEGEND_VBAR_INSET_PCT
+      const o = Number.isFinite(this.airStats.legendTopPlateauPct)
+        ? this.airStats.legendTopPlateauPct
+        : 0
+      const inner = 100 - 2 * k - o
+      const tEps = 1e-6
       const rows = []
       for (let i = br.length - 1; i >= 0; i--) {
         const v = Number(br[i])
-        const topPct = (1 - Math.max(0, Math.min(v, vMax)) / vMax) * 100
+        const vn = Math.max(0, Math.min(v, vMax))
+        const tShow = Math.max(0, Math.min(1, bnt ? bnt[i] : (vn / vMax)))
+        const topFrac = 1 - tShow
+
+        let tickStyle
+        let tickClass = ''
+        if (tShow <= tEps) {
+          tickStyle = {
+            top: 'auto',
+            bottom: `${k}%`,
+            transform: 'translateY(50%)',
+          }
+          tickClass = 'air-legend-break-tick--edge-bottom'
+        }
+        else if (tShow >= 1 - tEps) {
+          /* 主段顶 = 顶台下沿；整行垂直居中对齐交界 */
+          tickStyle = {
+            top: `${k + o}%`,
+            bottom: 'auto',
+            transform: 'translateY(-50%)',
+          }
+          tickClass = 'air-legend-break-tick--edge-top'
+        }
+        else {
+          tickStyle = {
+            top: `${k + o + topFrac * inner}%`,
+            bottom: 'auto',
+            transform: 'translateY(-50%)',
+          }
+        }
         rows.push({
           label: String(bf[i]),
-          topPct,
+          tickStyle,
+          tickClass,
         })
       }
       return rows
     },
   },
   watch: {
+    type() {
+      this.emitPollutantBasemapForType()
+    },
     landType() {
       this.loadLandRaster()
+      if (this.type === 'land') {
+        this.emitPollutantBasemapForType()
+      }
     },
     landMonth() {
       this.loadLandRaster()
@@ -423,6 +833,7 @@ export default {
     },
   },
   mounted() {
+    this.$nextTick(() => this.emitPollutantBasemapForType())
     this.loadControlUnits()
     if (this.type === 'land' && window.$zMap) {
       this.loadLandRaster()
@@ -435,11 +846,65 @@ export default {
     }
   },
   beforeUnmount() {
+    eventBus.emit(POLLUTANT_BASEMAP_EVENT, { mode: 'default' })
+    this._forceClosePollutantDataLoading()
     this.removeLandLayer()
     this.removeAirLayer()
     this.removeBasinOutlineLayer()
   },
   methods: {
+    /** 污染源栅格：全屏加载；新请求会关掉上一请求的遮罩，避免叠两层 */
+    _beginPollutantDataLoading() {
+      const prev = this._pollutantDataLoading
+      if (prev) {
+        try {
+          prev.inst.close()
+        }
+        catch (_) { /* noop */ }
+      }
+      const token = (this._pollutantDataLoadingGen = (this._pollutantDataLoadingGen || 0) + 1)
+      const inst = ElLoading.service({
+        lock: true,
+        text: '加载中…',
+        background: 'rgba(7, 14, 20, 0.85)',
+      })
+      this._pollutantDataLoading = { token, inst }
+      return token
+    },
+    _endPollutantDataLoading(token) {
+      const cur = this._pollutantDataLoading
+      if (!cur || cur.token !== token) {
+        return
+      }
+      try {
+        cur.inst.close()
+      }
+      catch (_) { /* noop */ }
+      this._pollutantDataLoading = null
+    },
+    _forceClosePollutantDataLoading() {
+      const cur = this._pollutantDataLoading
+      if (!cur) {
+        return
+      }
+      try {
+        cur.inst.close()
+      }
+      catch (_) { /* noop */ }
+      this._pollutantDataLoading = null
+    },
+    /** 与 default.json 中 basemaps.name 一致：陆域 TN/TP 浅色二维、大气=污染源大气深蓝 */
+    emitPollutantBasemapForType() {
+      if (this.type === 'air') {
+        eventBus.emit(POLLUTANT_BASEMAP_EVENT, { mode: 'air' })
+      }
+      else {
+        eventBus.emit(POLLUTANT_BASEMAP_EVENT, {
+          mode: 'land',
+          landType: this.landType === 'tp' ? 'tp' : 'tn',
+        })
+      }
+    },
     /** 下拉显示名：仅用「名称」，不拼接「流域」（避免东南片等片区后缀）；若名称中含「·」则去掉后缀 */
     formatBasinLabel(feature, idx) {
       const p = feature.properties || {}
@@ -795,7 +1260,9 @@ export default {
      * opts.returnBounds：为 true 时返回 { dataUrl, bounds }，bounds 来自 TIF 的 getBoundingBox，保证叠加范围正确
      * opts.basinGeometry + opts.rasterGeoBounds：按流域多边形裁剪栅格（与 opts.returnBounds 解析出的范围或显式 bounds 一致）
      * opts.tintRgb：{ r, g, b } 备用品牌色（当前大气 emissionRaster 统一用 Jet 彩虹色带）
-     * opts.emissionColorMax：大气排放色标上界（必选；优先与 stats.json valid_max 一致，图例同比例尺）
+     * opts.emissionColorMax：大气排放色标上界（必选；NH3/NO/NO2 由物种×六源固定上界传入，图例同比例尺）
+     * opts.useNh3ReferenceJet：NH₃ 时使用固定 NH3_JET 色带
+     * opts.nh3Piecewise：{ breaks, breakNormT, overflowRgb? } 将数值映射到色带；overflowRgb 时 v>cMax 用顶台色；缺省则 t=v/max
      * 大气像元：NoData、≤0 不参与设色，画布 alpha=0（透明）
      */
     async renderGeoTiffToDataUrl(tifUrl, opts = {}) {
@@ -819,11 +1286,22 @@ export default {
       const noData = readGeoTiffNoData(image)
       const dataThreshold = 1e-6
       const emissionRaster = opts.emissionRaster === true
+      const useNh3RefJet = emissionRaster && opts.useNh3ReferenceJet === true
+      const nh3Piecewise = (
+        useNh3RefJet
+        && opts.nh3Piecewise
+        && Array.isArray(opts.nh3Piecewise.breaks)
+        && opts.nh3Piecewise.breaks.length > 0
+        && Array.isArray(opts.nh3Piecewise.breakNormT)
+        && opts.nh3Piecewise.breakNormT.length === opts.nh3Piecewise.breaks.length
+      )
+        ? opts.nh3Piecewise
+        : null
       const emissionColorMaxOpt = opts.emissionColorMax
       if (emissionRaster) {
         const req = Number(emissionColorMaxOpt)
         if (!Number.isFinite(req) || req <= 0) {
-          throw new Error('PollutantSections: emissionRaster 须传入有效的 opts.emissionColorMax（来自 stats.json）')
+          throw new Error('PollutantSections: emissionRaster 须传入有效的 opts.emissionColorMax')
         }
       }
       let min = Infinity
@@ -852,7 +1330,7 @@ export default {
       }
       const range = max - min
 
-      /** 大气排放：色标 [0, emissionColorMax]，由 loadAirRaster 传入（一般为 stats valid_max；无则用 legend 上界） */
+      /** 大气排放：色标 [0, emissionColorMax]，由 loadAirRaster 传入物种×六源固定上界 */
       let cMin = min
       let cMax = max
       if (emissionRaster) {
@@ -919,8 +1397,8 @@ export default {
               }
               if (emissionRaster) {
                 const { r, g, b } = useUniformColor
-                  ? airJetRgbComponents(0.5)
-                  : airEmissionRgbForValue(v, cMin, cMax)
+                  ? (useNh3RefJet ? nh3JetRgbComponents(0.5) : airJetRgbComponents(0.5))
+                  : airEmissionRgbForValue(v, cMin, cMax, useNh3RefJet, nh3Piecewise)
                 ctx.fillStyle = `rgb(${r},${g},${b})`
               }
               else if (tint) {
@@ -999,7 +1477,7 @@ export default {
             const idx = (j * outW + i) * 4
             if (emissionRaster) {
               if (emissionShow) {
-                const { r, g, b } = airEmissionRgbForValue(v, cMin, cMax)
+                const { r, g, b } = airEmissionRgbForValue(v, cMin, cMax, useNh3RefJet, nh3Piecewise)
                 imgData.data[idx] = r
                 imgData.data[idx + 1] = g
                 imgData.data[idx + 2] = b
@@ -1063,7 +1541,7 @@ export default {
               smallImg.data[base + 3] = 0
             }
             else {
-              const { r, g, b } = airEmissionRgbForValue(v, cMin, cMax)
+              const { r, g, b } = airEmissionRgbForValue(v, cMin, cMax, useNh3RefJet, nh3Piecewise)
               smallImg.data[base] = r
               smallImg.data[base + 1] = g
               smallImg.data[base + 2] = b
@@ -1132,24 +1610,6 @@ export default {
     getAirTifUrl() {
       return `${AIR_CSV_BASE}/${this.airMonFolder}/${this.airKind}_${this.airType}.tif`
     },
-    /** 读取当季 stats.json 中与当前物种·源对应的图层项（含 legend） */
-    async fetchAirStatsLayerEntry() {
-      const url = `${AIR_CSV_BASE}/${this.airMonFolder}/stats.json`
-      try {
-        const res = await fetch(url, { credentials: 'same-origin' })
-        if (!res.ok) {
-          return null
-        }
-        const manifest = await res.json()
-        const fname = `${this.airKind}_${this.airType}.tif`
-        const layer = (manifest.layers || []).find(L => L && L.file === fname)
-        return layer || null
-      }
-      catch (e) {
-        console.warn('PollutantSections: stats.json', url, e)
-        return null
-      }
-    },
     removeAirLayer() {
       const map = window.$zMap
       const ref = this.airLayer
@@ -1175,85 +1635,68 @@ export default {
       this._airRasterReqId = (this._airRasterReqId || 0) + 1
       const reqId = this._airRasterReqId
       const tifUrl = this.getAirTifUrl()
+      const loadToken = this._beginPollutantDataLoading()
       this.airLoading = true
-      this.airProgress = '加载中…'
       this.airStats = null
       this.removeAirLayer()
       this.removeLandLayer()
       try {
-        const prefLayer = await this.fetchAirStatsLayerEntry()
+        const emissionCap = getAirFixedEmissionColorMax(this.airKind, this.airType)
+        const fixedLeg = getAirFixedLegendMeta(this.airKind, this.airType)
+        if (!Number.isFinite(emissionCap) || emissionCap <= 0 || !fixedLeg) {
+          console.warn('PollutantSections: 无固定大气色标/图例配置', this.airKind, this.airType)
+          return
+        }
         const maskGeom = this.selectedBasinCode ? this.getSelectedBasinGeometry() : null
-        const airOpts = { scale: 4, returnBounds: true, emissionRaster: true, interpolate: true }
+        const airOpts = {
+          scale: 4,
+          returnBounds: true,
+          emissionRaster: true,
+          interpolate: true,
+          emissionColorMax: emissionCap,
+          useNh3ReferenceJet: this.airKind === 'NH3',
+          nh3Piecewise: (
+            this.airKind === 'NH3'
+            && Array.isArray(fixedLeg.breakNormT)
+            && fixedLeg.breakNormT.length === fixedLeg.breaks.length
+          )
+            ? {
+                breaks: fixedLeg.breaks,
+                breakNormT: fixedLeg.breakNormT,
+                overflowRgb: fixedLeg.nh3OverflowRgb || null,
+              }
+            : null,
+        }
         if (maskGeom && (maskGeom.type === 'Polygon' || maskGeom.type === 'MultiPolygon')) {
           airOpts.basinGeometry = maskGeom
         }
-        const leg = prefLayer && prefLayer.legend
-        /** 着色上界：优先 TIF 统计 valid_max，与图例顶端比例尺一致；兜底再用 legend 显示上界 */
-        let emissionCap = NaN
-        if (prefLayer) {
-          const vm = Number(prefLayer.valid_max)
-          if (Number.isFinite(vm) && vm > 0) {
-            emissionCap = vm
-          }
-        }
-        if (!Number.isFinite(emissionCap) && leg) {
-          const fromDisp = Number(leg.display_max_125)
-          const br = leg.breaks
-          const lastBreak = (Array.isArray(br) && br.length)
-            ? Number(br[br.length - 1])
-            : NaN
-          const cm = (Number.isFinite(fromDisp) && fromDisp > 0)
-            ? fromDisp
-            : ((Number.isFinite(lastBreak) && lastBreak > 0) ? lastBreak : NaN)
-          if (Number.isFinite(cm) && cm > 0) {
-            emissionCap = cm
-          }
-        }
-        if (Number.isFinite(emissionCap) && emissionCap > 0) {
-          airOpts.emissionColorMax = emissionCap
-        }
-        // 双线性插值；色标 [0, emissionColorMax] 与 stats valid_max / 图例比例尺一致（若有）
         const result = await this.renderGeoTiffToDataUrl(tifUrl, airOpts)
         if (reqId !== this._airRasterReqId || this.type !== 'air') {
           return
         }
         const dataUrl = (typeof result === 'string') ? result : result.dataUrl
-        const rasterStats = (typeof result === 'object' && result.stats) ? result.stats : null
-        if (
-          prefLayer
-          && leg
-          && Array.isArray(leg.breaks)
-          && leg.breaks.length > 0
-          && Array.isArray(leg.breaks_formatted)
-          && leg.breaks_formatted.length === leg.breaks.length
-        ) {
-          const cmOpt = Number(airOpts.emissionColorMax)
-          const fromLeg = Number(leg.display_max_125)
-          const brLast = Number(leg.breaks[leg.breaks.length - 1])
-          let cap = (Number.isFinite(cmOpt) && cmOpt > 0)
-            ? cmOpt
-            : ((Number.isFinite(fromLeg) && fromLeg > 0)
-                ? fromLeg
-                : ((Number.isFinite(brLast) && brLast > 0) ? brLast : NaN))
-          if (!Number.isFinite(cap) || cap <= 0) {
-            cap = (rasterStats && Number(rasterStats.max)) || 1
-          }
-          this.airStats = {
-            min: typeof leg.display_min === 'number' ? leg.display_min : 0,
-            max: cap,
-            breaks: leg.breaks,
-            breaksFormatted: leg.breaks_formatted,
-          }
-        }
-        else if (rasterStats) {
-          this.airStats = rasterStats
-        }
-        else {
-          this.airStats = null
-        }
-        if (!this.airStats) {
-          console.warn('PollutantSections: 大气栅格无有效像元或统计失败', tifUrl)
+        if (!dataUrl) {
+          console.warn('PollutantSections: 大气栅格渲染无数据', tifUrl)
           return
+        }
+        const airLegendExtras = {}
+        if (Number.isFinite(fixedLeg.legendTopPlateauPct)) {
+          airLegendExtras.legendTopPlateauPct = fixedLeg.legendTopPlateauPct
+        }
+        if (this.airKind === 'NH3') {
+          if (Array.isArray(fixedLeg.breakNormT)) {
+            airLegendExtras.breakNormT = fixedLeg.breakNormT
+          }
+          if (fixedLeg.nh3OverflowRgb) {
+            airLegendExtras.nh3OverflowRgb = fixedLeg.nh3OverflowRgb
+          }
+        }
+        this.airStats = {
+          min: fixedLeg.min,
+          max: fixedLeg.max,
+          breaks: fixedLeg.breaks,
+          breaksFormatted: fixedLeg.breaksFormatted,
+          ...airLegendExtras,
         }
         const boundsArr = (typeof result === 'object' && result.bounds) ? result.bounds : AIR_RASTER_BOUNDS
         const bounds = window.$ZMap.L.latLngBounds(
@@ -1293,8 +1736,8 @@ export default {
         this.airStats = null
       }
       finally {
+        this._endPollutantDataLoading(loadToken)
         this.airLoading = false
-        this.airProgress = ''
       }
     },
     onTypeChange() {
@@ -1324,7 +1767,7 @@ export default {
       this._landRasterReqId = (this._landRasterReqId || 0) + 1
       const reqId = this._landRasterReqId
       const url = this.getTifUrl()
-      this.landLoading = true
+      const loadToken = this._beginPollutantDataLoading()
       this.removeLandLayer()
       this.removeAirLayer()
       try {
@@ -1373,7 +1816,7 @@ export default {
         console.warn('PollutantSections: load raster failed', url, err)
       }
       finally {
-        this.landLoading = false
+        this._endPollutantDataLoading(loadToken)
       }
     },
   },
@@ -1414,21 +1857,20 @@ export default {
             <el-radio-button label="总氮" value="tn" />
             <el-radio-button label="总磷" value="tp" />
           </el-radio-group>
-          <el-select v-model="landMonth" style="margin-left: 8px;" :loading="landLoading">
+          <el-select v-model="landMonth" style="margin-left: 8px;">
             <el-option v-for="item in months" :key="item.value" :label="item.label" :value="item.value" />
           </el-select>
         </template>
         <template v-else>
-          <el-select v-model="airSeason" style="margin-right: 8px;" :loading="airLoading">
+          <el-select v-model="airSeason" style="margin-right: 8px;">
             <el-option v-for="item in seasons" :key="item.value" :label="item.label" :value="item.value" />
           </el-select>
-          <el-select v-model="airKind" :loading="airLoading">
+          <el-select v-model="airKind">
             <el-option v-for="item in kinds" :key="item.value" :label="item.label" :value="item.value" />
           </el-select>
-          <el-select v-model="airType" style="margin-left: 8px;" :loading="airLoading">
+          <el-select v-model="airType" style="margin-left: 8px;">
             <el-option v-for="item in types" :key="item.value" :label="item.label" :value="item.value" />
           </el-select>
-          <span v-if="airProgress" class="air-progress">{{ airProgress }}</span>
         </template>
       </div>
     </div>
@@ -1463,23 +1905,18 @@ export default {
       <div class="air-legend-vertical-box">
         <div class="air-legend-bar-and-ticks">
           <div class="air-legend-vbar-track">
-            <div class="air-legend-vbar air-legend-vbar--stacked">
-              <div
-                v-for="(b, bidx) in airLegendVBarBands"
-                :key="bidx"
-                class="air-legend-vbar-seg"
-                :style="{
-                  backgroundColor: `rgb(${b.r}, ${b.g}, ${b.b})`,
-                }"
-              />
-            </div>
+            <div
+              class="air-legend-vbar air-legend-vbar--gradient"
+              :style="airLegendVBarStyle"
+            />
           </div>
           <div class="air-legend-break-axis">
             <div
               v-for="(row, idx) in airLegendBreakTicks"
               :key="idx"
               class="air-legend-break-tick"
-              :style="{ top: `${row.topPct}%` }"
+              :class="row.tickClass"
+              :style="row.tickStyle"
             >
               <span class="air-legend-break-tick-line" />
               <span class="air-legend-break-tick-label">{{ row.label }}</span>
@@ -1568,16 +2005,11 @@ export default {
     border: 1px solid rgba(0, 0, 0, 0.12);
   }
 
-  .air-progress {
-    margin-left: 8px;
-    color: var(--el-text-color-secondary);
-    font-size: 12px;
-  }
-
   .air-legend-vertical-box {
     margin-top: 6px;
   }
 
+  /* 高度须与脚本中 AIR_LEGEND_VBAR_HEIGHT_PX 一致（NH3 刻度 inset 计算） */
   .air-legend-bar-and-ticks {
     display: flex;
     flex-direction: row;
@@ -1588,28 +2020,26 @@ export default {
 
   .air-legend-vbar-track {
     flex-shrink: 0;
-    padding: 2px 0;
     display: flex;
     align-items: stretch;
   }
 
   .air-legend-vbar {
     width: 20px;
-    height: 220px;
-    border-radius: 3px;
+    height: 220px; /* AIR_LEGEND_VBAR_HEIGHT_PX */
     border: 1px solid rgba(0, 0, 0, 0.14);
     box-sizing: border-box;
 
-    &--stacked {
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
+    &--gradient {
+      border-radius: 0;
+      flex-shrink: 0;
+      /* 不用 border 占高度，渐变与右侧刻度同属 220px，避免 padding-box 比色条「矮 2px」 */
+      border: none;
+      box-sizing: border-box;
+      background-origin: border-box;
+      background-position: center;
+      box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.14);
     }
-  }
-
-  .air-legend-vbar-seg {
-    flex: 1;
-    min-height: 0;
   }
 
   .air-legend-empty-hint {
@@ -1623,7 +2053,7 @@ export default {
     position: relative;
     flex: 1;
     min-width: 0;
-    height: 220px;
+    height: 220px; /* AIR_LEGEND_VBAR_HEIGHT_PX */
     /* 紧贴色条：与 vbar 之间不再留空 */
     margin-left: 0;
   }
@@ -1635,9 +2065,16 @@ export default {
     display: flex;
     align-items: center;
     gap: 6px;
-    transform: translateY(-50%);
     font-size: 11px;
     line-height: 1.2;
+  }
+
+  .air-legend-break-tick--edge-top {
+    align-items: center;
+  }
+
+  .air-legend-break-tick--edge-bottom {
+    align-items: center;
   }
 
   .air-legend-break-tick-line {

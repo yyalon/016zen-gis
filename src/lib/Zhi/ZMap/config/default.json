@@ -1,4 +1,4 @@
-﻿{
+{
   "map3d": {
     "zoom": 6,
     "center": {
@@ -58,6 +58,153 @@
         "url": "http://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineStreetPurplishBlue/MapServer",
         "chinaCRS": "GCJ02",
         "show": false
+      },
+      {
+        "name": "污染源大气深蓝",
+        "type": "group",
+        "show": false,
+        "layers": [
+          {
+            "name": "深蓝底",
+            "type": "geojson",
+            "url": "/file/json/pollutant_air_ocean_fill.json",
+            "pane": "tilePane",
+            "zIndex": 1,
+            "interactive": false,
+            "symbol": {
+              "styleOptions": {
+                "fill": true,
+                "fillColor": "#020080",
+                "fillOpacity": 1,
+                "outline": false
+              }
+            }
+          },
+          {
+            "name": "行政边界",
+            "type": "geojson",
+            "url": "/file/json/china_provinces_datav.json",
+            "pane": "tilePane",
+            "zIndex": 2,
+            "interactive": false,
+            "symbol": {
+              "styleOptions": {
+                "fill": true,
+                "fillColor": "#020080",
+                "fillOpacity": 1,
+                "outline": true,
+                "outlineColor": "#c5d0e0",
+                "outlineWidth": 1,
+                "outlineOpacity": 1
+              }
+            }
+          },
+          {
+            "name": "行政区注记",
+            "type": "tdt",
+            "layer": "vec_z",
+            "pane": "overlayPane",
+            "zIndex": 15
+          }
+        ]
+      },
+      {
+        "name": "污染源陆域TN",
+        "type": "group",
+        "show": false,
+        "layers": [
+          {
+            "name": "陆域TN底",
+            "type": "geojson",
+            "url": "/file/json/pollutant_air_ocean_fill.json",
+            "pane": "tilePane",
+            "zIndex": 1,
+            "interactive": false,
+            "symbol": {
+              "styleOptions": {
+                "fill": true,
+                "fillColor": "#BEE6FF",
+                "fillOpacity": 1,
+                "outline": false
+              }
+            }
+          },
+          {
+            "name": "陆域TN界",
+            "type": "geojson",
+            "url": "/file/json/china_provinces_datav.json",
+            "pane": "tilePane",
+            "zIndex": 2,
+            "interactive": false,
+            "symbol": {
+              "styleOptions": {
+                "fill": true,
+                "fillColor": "#BEE6FF",
+                "fillOpacity": 1,
+                "outline": true,
+                "outlineColor": "#4a6b82",
+                "outlineWidth": 1,
+                "outlineOpacity": 1
+              }
+            }
+          },
+          {
+            "name": "行政区注记",
+            "type": "tdt",
+            "layer": "vec_z",
+            "pane": "overlayPane",
+            "zIndex": 15
+          }
+        ]
+      },
+      {
+        "name": "污染源陆域TP",
+        "type": "group",
+        "show": false,
+        "layers": [
+          {
+            "name": "陆域TP底",
+            "type": "geojson",
+            "url": "/file/json/pollutant_air_ocean_fill.json",
+            "pane": "tilePane",
+            "zIndex": 1,
+            "interactive": false,
+            "symbol": {
+              "styleOptions": {
+                "fill": true,
+                "fillColor": "#D4FEBD",
+                "fillOpacity": 1,
+                "outline": false
+              }
+            }
+          },
+          {
+            "name": "陆域TP界",
+            "type": "geojson",
+            "url": "/file/json/china_provinces_datav.json",
+            "pane": "tilePane",
+            "zIndex": 2,
+            "interactive": false,
+            "symbol": {
+              "styleOptions": {
+                "fill": true,
+                "fillColor": "#D4FEBD",
+                "fillOpacity": 1,
+                "outline": true,
+                "outlineColor": "#4a7358",
+                "outlineWidth": 1,
+                "outlineOpacity": 1
+              }
+            }
+          },
+          {
+            "name": "行政区注记",
+            "type": "tdt",
+            "layer": "vec_z",
+            "pane": "overlayPane",
+            "zIndex": 15
+          }
+        ]
       },
       {
         "name": "灰色地图",
