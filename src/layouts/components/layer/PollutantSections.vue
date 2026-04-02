@@ -77,12 +77,13 @@ const POLLUTANT_MAP_OVERLAY_PANE = 'overlayPane'
  */
 const POLLUTANT_RASTER_Z_INDEX = 0
 
-/** pipelines/inventory-1km 等导出的米制 Albers 与脚本 preprocess 默认一致 */
-const CHINA_ALBERS_PROJ
-  = '+proj=aea +lat_1=25 +lat_2=47 +lat_0=36 +lon_0=105 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs'
-
-function bboxLooksLikeWgs84Degrees(minX, minY, maxX, maxY) {
-  return (
+/**
+ * geotiff getBoundingBox → Leaflet 用的 [[south,west],[north,east]]（WGS84 经纬度）
+ */
+async function geoTiffBBoxToLatLngBounds(bbox) {
+  const [minX, minY, maxX, maxY] = bbox
+  // 简单校验是否像经纬度，是则直接返回
+  if (
     [minX, minY, maxX, maxY].every(Number.isFinite)
     && minX >= -180
     && maxX <= 180
@@ -90,41 +91,14 @@ function bboxLooksLikeWgs84Degrees(minX, minY, maxX, maxY) {
     && maxY <= 90
     && maxX > minX
     && maxY > minY
-  )
-}
-
-/**
- * geotiff getBoundingBox → Leaflet 用的 [[south,west],[north,east]]（WGS84 经纬度）
- */
-async function geoTiffBBoxToLatLngBounds(bbox) {
-  const [minX, minY, maxX, maxY] = bbox
-  if (bboxLooksLikeWgs84Degrees(minX, minY, maxX, maxY)) {
+  ) {
     return [[minY, minX], [maxY, maxX]]
   }
-  try {
-    const proj4 = (await import('proj4')).default
-    const corners = [
-      [minX, minY],
-      [maxX, minY],
-      [maxX, maxY],
-      [minX, maxY],
-    ]
-    const ll = corners.map(([x, y]) => proj4(CHINA_ALBERS_PROJ, 'WGS84', [x, y]))
-    const lons = ll.map(c => c[0])
-    const lats = ll.map(c => c[1])
-    const west = Math.min(...lons)
-    const east = Math.max(...lons)
-    const south = Math.min(...lats)
-    const north = Math.max(...lats)
-    return [[south, west], [north, east]]
-  }
-  catch (e) {
-    console.warn('PollutantSections: 投影转 WGS84 失败（需安装 proj4: pnpm install）', e)
-    return [
-      [AIR_RASTER_BOUNDS[0][0], AIR_RASTER_BOUNDS[0][1]],
-      [AIR_RASTER_BOUNDS[1][0], AIR_RASTER_BOUNDS[1][1]],
-    ]
-  }
+  // 兜底返回默认范围
+  return [
+    [AIR_RASTER_BOUNDS[0][0], AIR_RASTER_BOUNDS[0][1]],
+    [AIR_RASTER_BOUNDS[1][0], AIR_RASTER_BOUNDS[1][1]],
+  ]
 }
 
 /** GDAL 常见 float32 空值；与 geotiff.js 读出的值对齐 */
@@ -1074,14 +1048,20 @@ export default {
         this.basinOutlineLayer = null
       }
     },
-    /** 仅将流域高亮置顶；栅格不显式 bringToFront，以免压盖行政区面（依赖 zIndex） */
+    /** 调整层级：流域在下，栅格在上。依赖 zIndex，不再调用 bringToFront 避免底层报错 */
     syncPollutantLayerZOrder() {
       if (!window.$zMap) {
         return
       }
       try {
-        if (this.basinOutlineLayer && typeof this.basinOutlineLayer.bringToFront === 'function') {
-          this.basinOutlineLayer.bringToFront()
+        if (this.basinOutlineLayer && typeof this.basinOutlineLayer.setZIndex === 'function') {
+          this.basinOutlineLayer.setZIndex(-1)
+        }
+        if (this.landLayer && typeof this.landLayer.setZIndex === 'function') {
+          this.landLayer.setZIndex(0)
+        }
+        if (this.airLayer && typeof this.airLayer.setZIndex === 'function') {
+          this.airLayer.setZIndex(0)
         }
       }
       catch (e) {
@@ -1123,7 +1103,7 @@ export default {
         features: [{ type: 'Feature', properties: {}, geometry: geom }],
       }
       const layer = new window.$ZMap.layer.GeoJsonLayer({
-        zIndex: 8010,
+        zIndex: -1,
         pane: POLLUTANT_MAP_OVERLAY_PANE,
         name: 'pollutantBasinHighlight',
         symbol: {
@@ -1207,43 +1187,89 @@ export default {
       }
     },
     /** 双线性插值采样：用周围 4 格点加权得到平滑值，避免块状 */
-    sampleBilinear(data, width, height, x, y, noData, threshold, emissionRaster) {
+    sampleBilinear(data, width, height, x, y, noData, emissionRaster) {
       const x0 = Math.max(0, Math.min(width - 1, Math.floor(x)))
       const y0 = Math.max(0, Math.min(height - 1, Math.floor(y)))
       const x1 = Math.max(0, Math.min(width - 1, x0 + 1))
       const y1 = Math.max(0, Math.min(height - 1, y0 + 1))
       const dx = x - x0
       const dy = y - y0
-      const valid = (v) => {
-        if (isGeoTiffNoData(v, noData)) {
-          return false
-        }
-        // 大气：仅正值参与插值；0 / 负值与无数据一样视为空
-        return emissionRaster ? (Number.isFinite(v) && v > 0) : v > threshold
-      }
-      const get = (ix, iy) => data[iy * width + ix]
-      const v00 = get(x0, y0)
-      const v10 = get(x1, y0)
-      const v01 = get(x0, y1)
-      const v11 = get(x1, y1)
+
+      const v00 = data[y0 * width + x0]
+      const v10 = data[y0 * width + x1]
+      const v01 = data[y1 * width + x0]
+      const v11 = data[y1 * width + x1]
+
       let sum = 0
       let wSum = 0
-      if (valid(v00)) {
+
+      let valid00 = Number.isFinite(v00)
+      let valid10 = Number.isFinite(v10)
+      let valid01 = Number.isFinite(v01)
+      let valid11 = Number.isFinite(v11)
+
+      if (noData != null && Number.isFinite(noData)) {
+        if (Math.abs(noData) >= 3e38) {
+          if (valid00 && Math.abs(v00 - noData) < 1e31) {
+            valid00 = false
+          }
+          if (valid10 && Math.abs(v10 - noData) < 1e31) {
+            valid10 = false
+          }
+          if (valid01 && Math.abs(v01 - noData) < 1e31) {
+            valid01 = false
+          }
+          if (valid11 && Math.abs(v11 - noData) < 1e31) {
+            valid11 = false
+          }
+        }
+        else {
+          if (valid00 && Math.abs(v00 - noData) <= 1e-9 * (Math.abs(v00) + Math.abs(noData) + 1)) {
+            valid00 = false
+          }
+          if (valid10 && Math.abs(v10 - noData) <= 1e-9 * (Math.abs(v10) + Math.abs(noData) + 1)) {
+            valid10 = false
+          }
+          if (valid01 && Math.abs(v01 - noData) <= 1e-9 * (Math.abs(v01) + Math.abs(noData) + 1)) {
+            valid01 = false
+          }
+          if (valid11 && Math.abs(v11 - noData) <= 1e-9 * (Math.abs(v11) + Math.abs(noData) + 1)) {
+            valid11 = false
+          }
+        }
+      }
+
+      if (emissionRaster) {
+        if (valid00 && v00 <= 0) {
+          valid00 = false
+        }
+        if (valid10 && v10 <= 0) {
+          valid10 = false
+        }
+        if (valid01 && v01 <= 0) {
+          valid01 = false
+        }
+        if (valid11 && v11 <= 0) {
+          valid11 = false
+        }
+      }
+
+      if (valid00) {
         const w = (1 - dx) * (1 - dy)
         sum += v00 * w
         wSum += w
       }
-      if (valid(v10)) {
+      if (valid10) {
         const w = dx * (1 - dy)
         sum += v10 * w
         wSum += w
       }
-      if (valid(v01)) {
+      if (valid01) {
         const w = (1 - dx) * dy
         sum += v01 * w
         wSum += w
       }
-      if (valid(v11)) {
+      if (valid11) {
         const w = dx * dy
         sum += v11 * w
         wSum += w
@@ -1284,7 +1310,7 @@ export default {
       const rasters = await image.readRasters()
       const data = rasters[0]
       const noData = readGeoTiffNoData(image)
-      const dataThreshold = 1e-6
+      const dataThreshold = 0 // 移除 1e-6 的人为阈值，依赖 isGeoTiffNoData 和 v>0
       const emissionRaster = opts.emissionRaster === true
       const useNh3RefJet = emissionRaster && opts.useNh3ReferenceJet === true
       const nh3Piecewise = (
@@ -1368,17 +1394,35 @@ export default {
       if (opts.renderStyle === 'dots' || opts.renderStyle === 'blocks') {
         ctx.clearRect(0, 0, outW, outH)
         const useBlocks = opts.renderStyle === 'blocks'
-        for (let gy = 0; gy < height; gy++) {
-          for (let gx = 0; gx < width; gx++) {
-            const v = data[gy * width + gx]
+
+        if (useBlocks) {
+          // 使用 ImageData 优化块状渲染性能
+          const smallCanvas = document.createElement('canvas')
+          smallCanvas.width = width
+          smallCanvas.height = height
+          const smallCtx = smallCanvas.getContext('2d')
+          const imgData = smallCtx.createImageData(width, height)
+
+          for (let i = 0; i < data.length; i++) {
+            const v = data[i]
             const valid = !isGeoTiffNoData(v, noData)
               && (emissionRaster ? (Number.isFinite(v) && v > 0) : v > dataThreshold)
+
+            const base = i * 4
             if (!valid) {
+              imgData.data[base] = 0
+              imgData.data[base + 1] = 0
+              imgData.data[base + 2] = 0
+              imgData.data[base + 3] = 0
               continue
             }
+
             if (landDiscretePalette && !tint) {
               const { r, g, b } = landDiscreteColorForValue(v, landDiscretePalette)
-              ctx.fillStyle = `rgb(${r},${g},${b})`
+              imgData.data[base] = r
+              imgData.data[base + 1] = g
+              imgData.data[base + 2] = b
+              imgData.data[base + 3] = 255
             }
             else {
               let gray
@@ -1395,30 +1439,100 @@ export default {
                   gray = Math.round(t * 255)
                 }
               }
+
               if (emissionRaster) {
                 const { r, g, b } = useUniformColor
                   ? (useNh3RefJet ? nh3JetRgbComponents(0.5) : airJetRgbComponents(0.5))
                   : airEmissionRgbForValue(v, cMin, cMax, useNh3RefJet, nh3Piecewise)
-                ctx.fillStyle = `rgb(${r},${g},${b})`
+                imgData.data[base] = r
+                imgData.data[base + 1] = g
+                imgData.data[base + 2] = b
+                imgData.data[base + 3] = 255
               }
               else if (tint) {
                 if (useUniformColor) {
-                  ctx.fillStyle = `rgb(${tint.r},${tint.g},${tint.b})`
+                  imgData.data[base] = tint.r
+                  imgData.data[base + 1] = tint.g
+                  imgData.data[base + 2] = tint.b
+                  imgData.data[base + 3] = 255
                 }
                 else {
                   const tCol = Math.max(0, Math.min(1, (v - min) / range))
                   const { r, g, b } = airTintRgbComponents(tint, tCol)
-                  ctx.fillStyle = `rgb(${r},${g},${b})`
+                  imgData.data[base] = r
+                  imgData.data[base + 1] = g
+                  imgData.data[base + 2] = b
+                  imgData.data[base + 3] = 255
                 }
               }
               else {
-                ctx.fillStyle = `rgb(${gray},${gray},${gray})`
+                imgData.data[base] = gray
+                imgData.data[base + 1] = gray
+                imgData.data[base + 2] = gray
+                imgData.data[base + 3] = 255
               }
             }
-            if (useBlocks) {
-              ctx.fillRect(gx * scale, gy * scale, scale, scale)
-            }
-            else {
+          }
+          smallCtx.putImageData(imgData, 0, 0)
+
+          if (scale > 1) {
+            ctx.imageSmoothingEnabled = false
+            ctx.drawImage(smallCanvas, 0, 0, width, height, 0, 0, outW, outH)
+            ctx.imageSmoothingEnabled = true // 恢复默认状态
+          }
+          else {
+            ctx.putImageData(imgData, 0, 0)
+          }
+        }
+        else {
+          // dots 渲染模式保持不变
+          for (let gy = 0; gy < height; gy++) {
+            for (let gx = 0; gx < width; gx++) {
+              const v = data[gy * width + gx]
+              const valid = !isGeoTiffNoData(v, noData)
+                && (emissionRaster ? (Number.isFinite(v) && v > 0) : v > dataThreshold)
+              if (!valid) {
+                continue
+              }
+              if (landDiscretePalette && !tint) {
+                const { r, g, b } = landDiscreteColorForValue(v, landDiscretePalette)
+                ctx.fillStyle = `rgb(${r},${g},${b})`
+              }
+              else {
+                let gray
+                if (useUniformColor) {
+                  gray = uniformGray
+                }
+                else {
+                  const t = Math.max(0, Math.min(1, (v - min) / range))
+                  if (quantizeLevels > 1) {
+                    const level = Math.min(quantizeLevels - 1, Math.floor(t * quantizeLevels))
+                    gray = Math.round((level / (quantizeLevels - 1)) * 255)
+                  }
+                  else {
+                    gray = Math.round(t * 255)
+                  }
+                }
+                if (emissionRaster) {
+                  const { r, g, b } = useUniformColor
+                    ? (useNh3RefJet ? nh3JetRgbComponents(0.5) : airJetRgbComponents(0.5))
+                    : airEmissionRgbForValue(v, cMin, cMax, useNh3RefJet, nh3Piecewise)
+                  ctx.fillStyle = `rgb(${r},${g},${b})`
+                }
+                else if (tint) {
+                  if (useUniformColor) {
+                    ctx.fillStyle = `rgb(${tint.r},${tint.g},${tint.b})`
+                  }
+                  else {
+                    const tCol = Math.max(0, Math.min(1, (v - min) / range))
+                    const { r, g, b } = airTintRgbComponents(tint, tCol)
+                    ctx.fillStyle = `rgb(${r},${g},${b})`
+                  }
+                }
+                else {
+                  ctx.fillStyle = `rgb(${gray},${gray},${gray})`
+                }
+              }
               const dotRadius = Math.max(0.5, scale * 0.55)
               const cx = gx * scale + scale / 2
               const cy = gy * scale + scale / 2
@@ -1428,6 +1542,7 @@ export default {
             }
           }
         }
+
         let maskBounds = opts.rasterGeoBounds
         if (!maskBounds && boundsForLayer) {
           maskBounds = {
@@ -1461,7 +1576,6 @@ export default {
               x,
               y,
               noData,
-              dataThreshold,
               emissionRaster,
             )
             const emissionShow = emissionRaster && hasData && Number.isFinite(v) && v > 0
@@ -1649,7 +1763,7 @@ export default {
         }
         const maskGeom = this.selectedBasinCode ? this.getSelectedBasinGeometry() : null
         const airOpts = {
-          scale: 4,
+          scale: 1,
           returnBounds: true,
           emissionRaster: true,
           interpolate: true,
@@ -1671,6 +1785,7 @@ export default {
           airOpts.basinGeometry = maskGeom
         }
         const result = await this.renderGeoTiffToDataUrl(tifUrl, airOpts)
+        console.log('PollutantSections: renderGeoTiffToDataUrl success', { reqId, currentReqId: this._airRasterReqId, type: this.type })
         if (reqId !== this._airRasterReqId || this.type !== 'air') {
           return
         }
@@ -1732,10 +1847,11 @@ export default {
         }
       }
       catch (err) {
-        console.warn('PollutantSections: load air raster failed', tifUrl, err)
+        console.error('PollutantSections: load air raster failed', tifUrl, err)
         this.airStats = null
       }
       finally {
+        console.log('PollutantSections: load air raster finally. airStats is:', this.airStats)
         this._endPollutantDataLoading(loadToken)
         this.airLoading = false
       }
