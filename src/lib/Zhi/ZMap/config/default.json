@@ -98,13 +98,6 @@
                 "outlineOpacity": 1
               }
             }
-          },
-          {
-            "name": "行政区注记",
-            "type": "tdt",
-            "layer": "vec_z",
-            "pane": "overlayPane",
-            "zIndex": 15
           }
         ]
       },
@@ -147,13 +140,6 @@
                 "outlineOpacity": 1
               }
             }
-          },
-          {
-            "name": "行政区注记",
-            "type": "tdt",
-            "layer": "vec_z",
-            "pane": "overlayPane",
-            "zIndex": 15
           }
         ]
       },
@@ -196,13 +182,6 @@
                 "outlineOpacity": 1
               }
             }
-          },
-          {
-            "name": "行政区注记",
-            "type": "tdt",
-            "layer": "vec_z",
-            "pane": "overlayPane",
-            "zIndex": 15
           }
         ]
       },

@@ -46,6 +46,11 @@ import {
   latestThreeLevelEutrophicationRegionColors,
 } from '@/utils/eutrophicationFlow'
 import { ensureSeaLandOperationalLayersOnMap } from '@/utils/ensureSeaLandLayers'
+import zmapDefaultConfig from '@/lib/Zhi/ZMap/config/default.json'
+
+/** 污染源专题下天地图 vec_z 单独挂 overlayPane，高于栅格(zIndex 0)、低于海域/陆域业务层(约 1100/2000) */
+const POLLUTANT_ADMIN_LABEL_LAYER_NAME = '污染源行政区注记'
+const POLLUTANT_ADMIN_LABEL_Z_INDEX = 100
 
 export default {
   components: {
@@ -328,8 +333,8 @@ export default {
       }
       return map._map || map._leaflet || map
     },
-    /** 污染源自定义矢量底图（大气/陆域 TN·TP）图层名；切换前摘除残留，避免压住瓦片或其他底图 */
-    _pollutantCustomBasemapGeoNames(): string[] {
+    /** 仅 GeoJSON 自定义底图；setPane 纠偏用，不含单独挂接的注记层 */
+    _pollutantBasemapTilePaneGeoNames(): string[] {
       return [
         '深蓝底',
         '行政边界',
@@ -337,8 +342,11 @@ export default {
         '陆域TN界',
         '陆域TP底',
         '陆域TP界',
-        '行政区注记',
       ]
+    },
+    /** 污染源自定义底图相关图层名；切换前摘除残留（含 programmatic vec_z 注记） */
+    _pollutantCustomBasemapGeoNames(): string[] {
+      return [...this._pollutantBasemapTilePaneGeoNames(), POLLUTANT_ADMIN_LABEL_LAYER_NAME]
     },
     _removePollutantCustomBasemapOrphans() {
       const zmap = window.$zMap as any
@@ -372,17 +380,54 @@ export default {
       if (!leafletMap || typeof leafletMap.eachLayer !== 'function') {
         return
       }
-      const names = new Set(this._pollutantCustomBasemapGeoNames())
+      const names = new Set(this._pollutantBasemapTilePaneGeoNames())
       leafletMap.eachLayer((ly: any) => {
         const n = ly?.options?.name ?? ly?.name
         if (!n || !names.has(n) || typeof ly.setPane !== 'function') {
           return
         }
         try {
-          ly.setPane(n === '行政区注记' ? 'overlayPane' : 'tilePane')
+          ly.setPane('tilePane')
         }
         catch (_) { /* noop */ }
       })
+    },
+    _ensurePollutantAdminLabelLayer() {
+      const map = window.$zMap as any
+      const Z = window.$ZMap as any
+      if (!map || typeof map.addLayer !== 'function' || !Z?.layer?.TdtLayer) {
+        return
+      }
+      const leafletMap = this._leafletMapFromZ()
+      const dup: any[] = []
+      if (leafletMap && typeof leafletMap.eachLayer === 'function') {
+        leafletMap.eachLayer((ly: any) => {
+          const n = ly?.options?.name ?? ly?.name
+          if (n === POLLUTANT_ADMIN_LABEL_LAYER_NAME) {
+            dup.push(ly)
+          }
+        })
+      }
+      dup.forEach((ly) => {
+        try {
+          map.removeLayer(ly)
+        }
+        catch (_) { /* noop */ }
+      })
+      try {
+        const ly = new Z.layer.TdtLayer({
+          name: POLLUTANT_ADMIN_LABEL_LAYER_NAME,
+          layer: 'vec_z',
+          key: zmapDefaultConfig.tdtKeys,
+          pane: 'overlayPane',
+          zIndex: POLLUTANT_ADMIN_LABEL_Z_INDEX,
+          show: true,
+        })
+        map.addLayer(ly)
+      }
+      catch (err) {
+        console.warn('Layout: 污染源行政区注记层添加失败', err)
+      }
     },
     /** 污染源专用底图；其它模块保持 default.json 默认（天地图卫星） */
     applyPollutantBasemap(
@@ -399,7 +444,7 @@ export default {
         name = landType === 'tp' ? '污染源陆域TP' : '污染源陆域TN'
       }
       else if (mode === 'air') {
-        /** 与专题图一致：统一深蓝底 + 浅灰省界线、无道路与注记（ZMap default.json 中「污染源大气深蓝」） */
+        /** 与专题图一致：深蓝底 + 浅灰省界线；行政区注记由 programmatic vec_z（overlayPane）叠加 */
         name = '污染源大气深蓝'
       }
       try {
@@ -411,7 +456,11 @@ export default {
       if (mode === 'air' || mode === 'land') {
         this.$nextTick(() => {
           this._ensurePollutantVectorBasemapInTilePane()
-          window.setTimeout(() => this._ensurePollutantVectorBasemapInTilePane(), 450)
+          this._ensurePollutantAdminLabelLayer()
+          window.setTimeout(() => {
+            this._ensurePollutantVectorBasemapInTilePane()
+            this._ensurePollutantAdminLabelLayer()
+          }, 450)
           const run = () => ensureSeaLandOperationalLayersOnMap({
             sea: this.visibilities.sea,
             land: this.visibilities.land,
