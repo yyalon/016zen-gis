@@ -258,7 +258,7 @@ export default {
     :title="`${currentModalCity} 区县统计`"
     :append-to-body="true"
     width="800"
-    class="right-side-dialog"
+    class="pollutant-center-dialog"
     @close="handleClose"
   >
     <div v-loading="modalLoading" class="modal-charts-container">
@@ -277,10 +277,8 @@ export default {
 </template>
 
 <style lang="scss">
-.right-side-dialog {
-  margin-right: 20px !important;
-  margin-left: auto !important;
-  margin-top: 100px !important;
+.pollutant-center-dialog {
+  margin-top: 15vh !important;
   background: rgba(10, 25, 50, 0.9) !important;
   border: 1px solid #188df0;
 

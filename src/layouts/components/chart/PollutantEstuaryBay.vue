@@ -314,7 +314,7 @@ export default {
       :title="modalLevel === 'secondary' ? `${modalParentBay} 二级河湾排污统计` : `${modalCurrentBay} 三级河湾排污统计`"
       :append-to-body="true"
       width="800"
-      class="left-side-dialog"
+      class="pollutant-center-dialog"
       @close="handleClose"
     >
       <div class="dialog-header-actions" style="margin-bottom: 15px;">
@@ -341,9 +341,8 @@ export default {
 </template>
 
 <style lang="scss">
-.left-side-dialog {
-  margin-left: 20px !important;
-  margin-top: 100px !important;
+.pollutant-center-dialog {
+  margin-top: 15vh !important;
   background: rgba(10, 25, 50, 0.9) !important;
   border: 1px solid #188df0;
 
