@@ -43,7 +43,7 @@ import eventBus from '@/utils/eventBus'
 import {
   THREE_LEVEL_AREAS_RESET_DEFAULT_STYLE_EVENT,
   cancelEutrophicationPolling,
-  latestThreeLevelEutrophicationRegionColors,
+  latestThreeLevelEutrophicationResults,
 } from '@/utils/eutrophicationFlow'
 import { ensureSeaLandOperationalLayersOnMap } from '@/utils/ensureSeaLandLayers'
 import zmapDefaultConfig from '@/lib/Zhi/ZMap/config/default.json'
@@ -517,7 +517,7 @@ export default {
       const wasOn = this.visibilities.threeLevelAreas
       if (wasOn) {
         cancelEutrophicationPolling()
-        latestThreeLevelEutrophicationRegionColors.current = null
+        latestThreeLevelEutrophicationResults.results = null
         eventBus.emit(THREE_LEVEL_AREAS_RESET_DEFAULT_STYLE_EVENT)
       }
       this.toggleLayer('threeLevelAreas')

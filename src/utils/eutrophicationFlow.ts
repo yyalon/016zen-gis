@@ -14,7 +14,7 @@ export const EUTROPHICATION_THREE_LEVEL_STYLE_EVENT = 'eutrophication-three-leve
 export const THREE_LEVEL_AREAS_RESET_DEFAULT_STYLE_EVENT = 'three-level-areas-reset-default-style'
 
 /** 分区着色：region（接口返回值，如 陆域/近岸/离岸） -> 颜色 */
-export const latestThreeLevelEutrophicationRegionColors = { current: null as Record<string, string> | null }
+export const latestThreeLevelEutrophicationResults = { results: null as unknown | null }
 
 const LEVEL_COLORS: Record<number, string> = {
   1: '#FFFFFF',
@@ -37,76 +37,24 @@ export function cancelEutrophicationPolling(): void {
   evaluationGeneration++
 }
 
-function notifyThreeLevelRegionColors(regionHexMap: Record<string, string>) {
-  latestThreeLevelEutrophicationRegionColors.current = regionHexMap
-  eventBus.emit(EUTROPHICATION_THREE_LEVEL_STYLE_EVENT, { regionColors: regionHexMap })
+function notifyThreeLevelEutrophicationResults(results?: unknown) {
+  latestThreeLevelEutrophicationResults.results = results || null
+  eventBus.emit(EUTROPHICATION_THREE_LEVEL_STYLE_EVENT, { results })
 }
-
-function levelToColor(level: number): string | undefined {
-  return LEVEL_COLORS[level]
-}
-
-const STANDARD_EUTROPHICATION_REGIONS = ['陆域', '近岸', '离岸'] as const
 
 /** 陆域/近岸/离岸在结果里缺省时，用调色板第一档补全，避免图层仍用上一轮的色 */
-function padStandardEutrophicationRegions(map: Record<string, string>): void {
-  for (const r of STANDARD_EUTROPHICATION_REGIONS) {
-    if (!map[r]) {
-      map[r] = EUTROPHICATION_LEVEL1_COLOR
-    }
-  }
-}
-
-function parseItemLevel(lv: unknown): number | undefined {
-  if (typeof lv === 'number' && Number.isFinite(lv)) {
-    return lv
-  }
-  if (typeof lv === 'string' && lv !== '') {
-    const n = Number.parseInt(lv, 10)
-    return Number.isFinite(n) ? n : undefined
-  }
-  return undefined
-}
 
 /**
  * 从接口 result.results 构建 区域 -> 颜色（区域名与接口 region 字段一致）
  */
-function buildRegionColorMapFromResults(results: unknown): Record<string, string> | null {
-  if (!Array.isArray(results) || results.length === 0) {
-    return null
-  }
-  const map: Record<string, string> = {}
-  for (const raw of results) {
-    if (!raw || typeof raw !== 'object') {
-      continue
-    }
-    const r = raw as Record<string, unknown>
-    const region = typeof r.region === 'string' ? r.region.trim() : ''
-    if (!region) {
-      continue
-    }
-    const level = parseItemLevel(r.level)
-    const hex = level === undefined ? undefined : levelToColor(level)
-    map[region] = hex ?? EUTROPHICATION_LEVEL1_COLOR
-  }
-  return Object.keys(map).length > 0 ? map : null
-}
 
 function applyEutrophicationApiResult(result: EutrophicationEvalResult | undefined): boolean {
-  if (!result || typeof result !== 'object') {
-    ElMessage.warning('评价结果为空')
-    return false
-  }
-  const regionMap = buildRegionColorMapFromResults(result.results)
-
-  if (!regionMap) {
-    ElMessage.warning('评价结果中缺少有效的 results 分区数据')
+  if (!result || typeof result !== 'object' || !result.results) {
+    ElMessage.warning('评价结果为空或缺少结果数据')
     return false
   }
 
-  padStandardEutrophicationRegions(regionMap)
-
-  notifyThreeLevelRegionColors(regionMap)
+  notifyThreeLevelEutrophicationResults(result.results)
   ElMessage.success('富营养化评价完成')
   return true
 }
