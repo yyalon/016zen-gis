@@ -21,6 +21,7 @@ import LayergerEnterprises from './components/layer/Enterprises.vue'
 import LayerReservoirs from './components/layer/Reservoirs.vue'
 import LayerCellAbundance from './components/layer/CellAbundance.vue'
 import LayerWaterQualityModel from './components/layer/WaterQualityModel.vue'
+import LayerPollutionSourceInventory from './components/layer/PollutionSourceInventory.vue'
 import LayerRiverChannels from './components/layer/RiverChannels.vue'
 
 import GraphSwitcher from './components/GraphSwitcher.vue'
@@ -65,6 +66,7 @@ export default {
     LayerReservoirs,
     LayerCellAbundance,
     LayerWaterQualityModel,
+    LayerPollutionSourceInventory,
     LayerRiverChannels,
     LayerRivers,
     GraphMeteorology,
@@ -72,6 +74,7 @@ export default {
     LayerWaterSections,
   },
   data() {
+    console.log('test123')
     return {
       abbreviationSrc: './breadcrumb/abbreviation.png',
       loading: null,
@@ -200,6 +203,20 @@ export default {
           visibility: true,
           icon: 'polygon',
         },
+        {
+          name: '污染源清单（总氮）',
+          value: 'tnAllMonths',
+          command: 'toggleLayer',
+          visibility: false,
+          icon: 'ep:memo',
+        },
+        {
+          name: '污染源清单（总磷）',
+          value: 'tpAllMonths',
+          command: 'toggleLayer',
+          visibility: false,
+          icon: 'ep:memo',
+        },
       ],
       visibilities: {
         sea: true,
@@ -214,6 +231,8 @@ export default {
         threeLevelAreas: false,
         layerCellAbundance: false,
         layerWaterQualityModel: false,
+        tnAllMonths: false,
+        tpAllMonths: false,
       },
       riverLevels: [],
       riverLevel: null,
@@ -480,9 +499,11 @@ export default {
         <LayerReservoirs v-if="visibilities.layerReservoirs" />
         <LayerCellAbundance :visible="visibilities.layerCellAbundance" />
         <LayerWaterQualityModel v-if="visibilities.layerWaterQualityModel" />
+        <LayerPollutionSourceInventory v-if="visibilities.tnAllMonths" image-path="tnAllMonths" :bounds="[13138262.40256834, 3128667.7067795335, 13686187.328218153, 3655897.626244731]" />
+        <LayerPollutionSourceInventory v-if="visibilities.tpAllMonths" image-path="tpAllMonths" :bounds="[13138262.40256834, 3128667.7067795335, 13686187.328218153, 3655897.626244731]" />
         <LayerRiverChannels v-if="visibilities.layerRiverChannels" />
         <LayerRivers v-if="visibilities.layerRiver" :river-level="riverLevel" :river-level-show="riverLevelShow" />
-        <Toolbar :buttons="buttons" @excute-command="excuteCommand" />
+        <Toolbar :buttons="buttons" class="custom-toolbar" @excute-command="excuteCommand" />
         <!-- <LayerAllBorderMask /> -->
         <div class="layout-container">
           <div class="header">
@@ -636,5 +657,9 @@ export default {
       }
     }
   }
+}
+
+.custom-toolbar {
+  bottom: 53px;
 }
 </style>
