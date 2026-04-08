@@ -34,6 +34,17 @@ export default ({ mode, command }) => {
           changeOrigin: command === 'serve' && env.VITE_OPEN_PROXY === 'true',
           rewrite: (path) => path.replace(/\/proxy/, ''),
         },
+        /**
+         * 与 /zapi 同主机、根路径上的 /zennet/api（富营养化等）。
+         * 前缀不可用 /proxy-*，否则会先被上方 /proxy 规则匹配并错误改写路径。
+         */
+        '/zen-root': {
+          target: /^https?:\/\//i.test(env.VITE_APP_API_BASEURL)
+            ? new URL(env.VITE_APP_API_BASEURL).origin
+            : env.VITE_APP_API_BASEURL,
+          changeOrigin: command === 'serve' && env.VITE_OPEN_PROXY === 'true',
+          rewrite: (path) => path.replace(/^\/zen-root/, ''),
+        },
         // '/arcmap': {
         //   target: 'https://services.arcgisonline.com',
         //   changeOrigin: command === 'serve' && env.VITE_OPEN_PROXY === 'true',

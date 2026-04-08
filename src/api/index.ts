@@ -42,15 +42,25 @@ api.interceptors.request.use((request) => {
 
 api.interceptors.response.use(
   (response: AxiosResponse) => {
-    if (response.data.code === 1000) {
-      return Promise.resolve(response.data)
+    const data = response.data
+    if (data?.code === 1000) {
+      return Promise.resolve(data)
     }
-    else {
+    /** 如 /api/Eutrophication/*：{ success, message, result } */
+    if (data?.success === true) {
+      return Promise.resolve(data)
+    }
+    if (data?.success === false) {
       ElMessage({
-        message: response.data.message,
+        message: data.message ?? '请求失败',
         type: 'error',
       })
+      return Promise.reject(data)
     }
+    ElMessage({
+      message: data?.message ?? '请求失败',
+      type: 'error',
+    })
     // else {
     //   toLogin()
     // }

@@ -30,7 +30,7 @@ export default {
       default: () => ({}),
     },
   },
-  emits: ['onFinished'],
+  emits: ['onFinished', 'click'],
   data() {
     return {
       chart: null,
@@ -63,6 +63,9 @@ export default {
       // 渲染后
       this.chart.on('finished', (_) => {
         this.$emit('onFinished')
+      })
+      this.chart.on('click', (params) => {
+        this.$emit('click', params)
       })
     },
   },

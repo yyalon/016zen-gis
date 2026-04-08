@@ -3,6 +3,10 @@
   "version": "1.0.1",
   "private": true,
   "author": "lihr",
+  "engines": {
+    "node": ">=20.10.0",
+    "pnpm": ">=8.0.0"
+  },
   "scripts": {
     "dev": "pnpm vite --host 0.0.0.0",
     "build:test": "vue-tsc --noEmit && vite build --mode test",
@@ -11,11 +15,11 @@
     "serve": "http-server ./dist -o",
     "svgo": "svgo -f src/assets/icons",
     "new": "plop",
-    "lint": "npm-run-all -s lint:tsc lint:eslint lint:stylelint",
+    "lint": "pnpm run lint:tsc && pnpm run lint:eslint && pnpm run lint:stylelint",
     "lint:tsc": "vue-tsc --noEmit",
     "lint:eslint": "eslint --cache --fix --no-ignore --no-error-on-unmatched-pattern --ext .ts,.tsx,.vue src/",
     "lint:stylelint": "stylelint src/**/*.{css,scss,vue} --cache --fix --allow-empty-input",
-    "postinstall": "simple-git-hooks && esno scripts/prepare.js",
+    "postinstall": "simple-git-hooks",
     "preinstall": "npx only-allow pnpm",
     "commit": "git cz",
     "release": "bumpp"
@@ -41,6 +45,7 @@
     "path-browserify": "^1.0.1",
     "path-to-regexp": "^6.2.1",
     "pinia": "^2.0.35",
+    "proj4": "^2.11.0",
     "qs": "^6.11.1",
     "vconsole": "^3.15.0",
     "vue": "^3.2.47",
@@ -91,10 +96,10 @@
     "vite-plugin-svg-icons": "^2.0.1",
     "vite-plugin-vue-inspector": "^3.4.0",
     "vite-plugin-vue-meta-layouts": "^0.2.2",
-    "vue-tsc": "^1.4.2"
+    "vue-tsc": "^2.0.0"
   },
   "simple-git-hooks": {
-    "pre-commit": "pnpm lint-staged",
+    "pre-commit": "bash scripts/git-pre-commit.sh",
     "preserveUnused": true
   },
   "config": {

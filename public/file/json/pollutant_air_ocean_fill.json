@@ -1,0 +1,21 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": { "name": "pollutant-air-ocean" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [55, -5],
+            [155, -5],
+            [155, 58],
+            [55, 58],
+            [55, -5]
+          ]
+        ]
+      }
+    }
+  ]
+}
