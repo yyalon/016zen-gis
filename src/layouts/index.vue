@@ -23,6 +23,7 @@ import LayerCellAbundance from './components/layer/CellAbundance.vue'
 import LayerWaterQualityModel from './components/layer/WaterQualityModel.vue'
 import LayerPollutionSourceInventory from './components/layer/PollutionSourceInventory.vue'
 import LayerRiverChannels from './components/layer/RiverChannels.vue'
+import LayerWaterPowerModel from './components/layer/WaterPowerModel.vue'
 
 import GraphSwitcher from './components/GraphSwitcher.vue'
 import GraphCockpit from './components/graph/Cockpit.vue'
@@ -66,6 +67,7 @@ export default {
     LayerReservoirs,
     LayerCellAbundance,
     LayerWaterQualityModel,
+    LayerWaterPowerModel,
     LayerPollutionSourceInventory,
     LayerRiverChannels,
     LayerRivers,
@@ -217,6 +219,13 @@ export default {
           visibility: false,
           icon: 'ep:memo',
         },
+        {
+          name: '水动力模型',
+          value: 'waterPowerModel',
+          command: 'toggleLayer',
+          visibility: false,
+          icon: 'ep:monitor',
+        },
       ],
       visibilities: {
         sea: true,
@@ -231,6 +240,7 @@ export default {
         threeLevelAreas: false,
         layerCellAbundance: false,
         layerWaterQualityModel: false,
+        waterPowerModel: false,
         tnAllMonths: false,
         tpAllMonths: false,
       },
@@ -374,6 +384,15 @@ export default {
         }
       })
     },
+    toggleLayerClose(name: keyof typeof this.visibilities) {
+      const key: keyof typeof this.visibilities = name
+      this.visibilities[key] = false
+      this.buttons.forEach((button) => {
+        if (button.value === name) {
+          button.visibility = false
+        }
+      })
+    },
     async initSeaWaterQualityAreas() {
       const provinces: any = {
         shanghai: window.$zMap.getLayerById(2000),
@@ -499,6 +518,7 @@ export default {
         <LayerReservoirs v-if="visibilities.layerReservoirs" />
         <LayerCellAbundance :visible="visibilities.layerCellAbundance" />
         <LayerWaterQualityModel v-if="visibilities.layerWaterQualityModel" />
+        <LayerWaterPowerModel v-if="visibilities.waterPowerModel" @close="toggleLayerClose('waterPowerModel')" />
         <LayerPollutionSourceInventory v-if="visibilities.tnAllMonths" image-path="tnAllMonths" :bounds="[13138262.40256834, 3128667.7067795335, 13686187.328218153, 3655897.626244731]" />
         <LayerPollutionSourceInventory v-if="visibilities.tpAllMonths" image-path="tpAllMonths" :bounds="[13138262.40256834, 3128667.7067795335, 13686187.328218153, 3655897.626244731]" />
         <LayerRiverChannels v-if="visibilities.layerRiverChannels" />
@@ -660,6 +680,6 @@ export default {
 }
 
 .custom-toolbar {
-  bottom: 53px;
+  bottom: 20px;
 }
 </style>
