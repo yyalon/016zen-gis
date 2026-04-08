@@ -44,9 +44,23 @@ export default {
         grid: {
           left: '3%',
           right: '4%',
-          bottom: '3%',
+          bottom: '15%',
           containLabel: true,
         },
+        dataZoom: [
+          {
+            type: 'slider',
+            show: true,
+            xAxisIndex: [0],
+            start: 0,
+            end: 50,
+            bottom: 5,
+            height: 15,
+            textStyle: {
+              color: '#fff',
+            },
+          },
+        ],
         xAxis: {
           type: 'category',
           data: [],
@@ -80,14 +94,16 @@ export default {
           formatter: '{b}: {c} ({d}%)',
         },
         legend: {
+          type: 'scroll',
           orient: 'vertical',
           left: 'left',
           top: 'middle',
+          textStyle: { color: '#fff' },
         },
         series: [
           {
             type: 'pie',
-            radius: ['40%', '70%'],
+            radius: ['35%', '50%'],
             center: ['60%', '55%'],
             avoidLabelOverlap: false,
             itemStyle: {
@@ -257,20 +273,20 @@ export default {
     draggable
     :title="`${currentModalCity} 区县统计`"
     :append-to-body="true"
-    width="800"
+    width="1200"
     class="pollutant-center-dialog"
     @close="handleClose"
   >
     <div v-loading="modalLoading" class="modal-charts-container">
       <Echart
         :options="modalBarOptions"
-        height="300px"
-        width="380px"
+        height="500px"
+        width="560px"
       />
       <Echart
         :options="modalPieOptions"
-        height="300px"
-        width="380px"
+        height="500px"
+        width="560px"
       />
     </div>
   </el-dialog>
