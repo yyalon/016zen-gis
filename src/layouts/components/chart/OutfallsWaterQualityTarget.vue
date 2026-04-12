@@ -170,7 +170,7 @@ export default {
         top: -1px;
         left: -11px;
         width: 12px;
-        background-image: url("/zen-gis/src/assets/images/line.png");
+        background-image: url("@/assets/images/line.png");
         height: 7px;
         background-color: #061b41;
       }
